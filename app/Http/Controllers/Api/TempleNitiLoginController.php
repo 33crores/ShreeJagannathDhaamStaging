@@ -105,6 +105,7 @@ class TempleNitiLoginController extends Controller
                 'success' => true,
                 'message' => 'OTP sent successfully via WhatsApp.',
                 'user_status' => $status,
+                'phone' => $phone,
                 'token' => $shortToken,
                 'api_response' => $result
             ], 200);
