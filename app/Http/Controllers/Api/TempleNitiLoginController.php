@@ -9,132 +9,151 @@ use GuzzleHttp\Exception\RequestException;
 use App\Models\NitiadminLogin;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class TempleNitiLoginController extends Controller
 {
-    private $apiUrl;
-    private $clientId;
-    private $clientSecret;
-
-    public function __construct()
-    {
-        $this->apiUrl = 'https://auth.otpless.app';
-        $this->clientId = 'Q9Z0F0NXFT3KG3IHUMA4U4LADMILH1CB';
-        $this->clientSecret = '5rjidx7nav2mkrz9jo7f56bmj8zuc1r2';
-    }
-
+  
     public function sendOtp(Request $request)
     {
-        // Validate input
-        $validator = Validator::make($request->all(), [
-            'phone' => 'required|digits:10',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json(['message' => 'Invalid phone number.'], 422);
-        }
-
-        $phoneNumber = $request->input('phone');
-        $countryCode = '+91';
-        $fullPhoneNumber = $countryCode . $phoneNumber;
-
-        // Check if phone number exists in DB
-        $temple = NitiadminLogin::where('mobile_no', $phoneNumber)->first();
-        if (!$temple) {
-            return response()->json(['message' => 'Mobile number is not registered.'], 404);
-        }
-
-        $client = new Client();
-        $url = rtrim($this->apiUrl, '/') . '/auth/otp/v1/send';
-
-        try {
-            $response = $client->post($url, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'clientId' => $this->clientId,
-                    'clientSecret' => $this->clientSecret,
-                ],
-                'json' => [
-                    'phoneNumber' => $fullPhoneNumber,
-                ],
+        $request->validate([
+                'phone' => 'required|string',
             ]);
 
-            $body = json_decode($response->getBody(), true);
+        $phone = $request->phone;
+        $otp = rand(100000, 999999);
+        $shortToken = Str::random(6); // WhatsApp button token (max 15 characters)
 
-            if (isset($body['orderId'])) {
-                session(['otp_order_id' => $body['orderId']]);
-                session(['otp_phone' => $fullPhoneNumber]);
+        // Check for existing user
+        $user = NitiadminLogin::where('mobile_no', $phone)->first();
 
+        if ($user) {
+            // Update OTP
+            $user->otp = $otp;
+            $user->save();
+            $status = 'existing';
+        } else {
+            // Create new user with OTP
+            $user = NitiadminLogin::create([
+                'mobile_no' => $phone,
+                'otp' => $otp,
+            ]);
+            $status = 'new';
+        }
+
+        // ✅ Correct MSG91 WhatsApp API Payload
+        $payload = [
+            "integrated_number" => env('MSG91_WA_NUMBER'),
+            "content_type" => "template",
+            "payload" => [
+                "messaging_product" => "whatsapp",
+                "to" => $phone,
+                "type" => "template",
+                "template" => [
+                    "name" => env('MSG91_WA_TEMPLATE'),
+                    "language" => [
+                        "code" => "en",
+                        "policy" => "deterministic"
+                    ],
+                    "namespace" => env('MSG91_WA_NAMESPACE'),
+                    "components" => [
+                        [
+                            "type" => "body",
+                            "parameters" => [
+                                [
+                                    "type" => "text",
+                                    "text" => (string) $otp
+                                ]
+                            ]
+                        ],
+                        [
+                            "type" => "button",
+                            "sub_type" => "url",
+                            "index" => 0,
+                            "parameters" => [
+                                [
+                                    "type" => "text",
+                                    "text" => $shortToken
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        // ✅ Send OTP via MSG91
+        try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'authkey' => env('MSG91_AUTHKEY'),
+            ])->post('https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/', $payload);
+
+            $result = $response->json();
+
+            if ($response->status() === 401 || ($result['status'] ?? '') === 'fail') {
                 return response()->json([
-                    'message' => 'OTP sent successfully.',
-                    'order_id' => $body['orderId'],
-                    'phone' => $fullPhoneNumber
-                ], 200);
+                    'success' => false,
+                    'message' => 'Unauthorized or template error: check MSG91 credentials or payload.',
+                    'error' => $result
+                ], 401);
             }
 
-            return response()->json(['message' => 'Failed to send OTP.'], 400);
-        } catch (RequestException $e) {
-            Log::error("OTP Send Error: " . $e->getMessage());
-            return response()->json(['message' => 'Error while sending OTP.'], 500);
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully via WhatsApp.',
+                'user_status' => $status,
+                'token' => $shortToken,
+                'api_response' => $result
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send OTP due to server error.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
     public function verifyOtp(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'orderId' => 'required|string',
-            'otp' => 'required|digits:6',
+        $request->validate([
             'phoneNumber' => 'required|string',
+            'otp' => 'required|string'
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['message' => 'Invalid input for OTP verification.'], 422);
+        // Find user by phone number
+        $user = NitiadminLogin::where('mobile_no', $request->phoneNumber)->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Mobile number not found. Please request OTP first.'
+            ], 404);
         }
 
-        $orderId = $request->input('orderId');
-        $otp = $request->input('otp');
-        $phoneNumber = $request->input('phoneNumber');
-
-        $client = new Client();
-        $url = rtrim($this->apiUrl, '/') . '/auth/otp/v1/verify';
-
-        try {
-            $response = $client->post($url, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'clientId' => $this->clientId,
-                    'clientSecret' => $this->clientSecret,
-                ],
-                'json' => [
-                    'orderId' => $orderId,
-                    'otp' => $otp,
-                    'phoneNumber' => $phoneNumber,
-                ],
-            ]);
-
-            $body = json_decode($response->getBody(), true);
-
-            if (isset($body['isOTPVerified']) && $body['isOTPVerified']) {
-                $cleanPhone = str_replace('+91', '', $phoneNumber);
-                $temple = NitiadminLogin::where('mobile_no', $cleanPhone)->first();
-
-                if ($temple) {
-                    $token = $temple->createToken('Temple User Token')->plainTextToken;
-                    return response()->json([
-                        'message' => 'OTP verified successfully.',
-                        'user' => $temple,
-                        'token' => $token,
-                        'token_type' => 'Bearer'
-                    ], 200);
-                } else {
-                    return response()->json(['message' => 'Mobile number not found.'], 404);
-                }
-            } else {
-                return response()->json(['message' => $body['message'] ?? 'OTP verification failed.'], 400);
-            }
-        } catch (RequestException $e) {
-            Log::error("OTP Verify Error: " . $e->getMessage());
-            return response()->json(['message' => 'Error during OTP verification.'], 500);
+        // Check OTP match
+        if ($user->otp !== $request->otp) {
+            return response()->json([
+                'message' => 'Invalid OTP.'
+            ], 401);
         }
+
+        // OTP is valid — clear it
+        $user->otp = null;
+        $user->save();
+
+        // ✅ Generate Sanctum token
+        $token = $user->createToken('Temple User Token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'User authenticated successfully.',
+            'token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user
+        ], 200);
     }
 }
+

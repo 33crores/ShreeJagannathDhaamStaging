@@ -59,4 +59,5 @@ class RathaYatraController extends Controller
             ], 500);
         }
     }
+    
 }
