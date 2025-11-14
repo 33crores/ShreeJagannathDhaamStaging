@@ -27,7 +27,7 @@ class TempleNitiLoginController extends Controller
         // Default to India if no country code
         $countryCode = env('MSG91_DEFAULT_COUNTRY_CODE', '91');
 
-        if (!str_starts_with($digits, $countryCode)) {
+        if (!Str::startsWith($digits, $countryCode)) {
             $digits = $countryCode . $digits;
         }
 
@@ -69,6 +69,7 @@ class TempleNitiLoginController extends Controller
         $langCode = env('MSG91_WA_LANG_CODE', 'en_US');
 
         // Build components for MSG91 bulk format
+        // matches docs: body_1 + button_1
         $components = [
             'body_1' => [
                 'type'  => 'text',
@@ -85,7 +86,7 @@ class TempleNitiLoginController extends Controller
             ];
         }
 
-        // ✅ MSG91 BULK WhatsApp template payload (matches your cURL sample)
+        // ✅ MSG91 BULK WhatsApp template payload (same structure as your cURL)
         $payload = [
             'integrated_number' => env('MSG91_WA_NUMBER'),    // 919124420330
             'content_type'      => 'template',
@@ -102,7 +103,7 @@ class TempleNitiLoginController extends Controller
                     'to_and_components' => [
                         [
                             'to'         => [$waPhone],        // list_of_phone_numbers
-                            'components' => $components,       // body_1, button_1 etc.
+                            'components' => $components,       // body_1, button_1
                         ],
                     ],
                 ],
@@ -123,8 +124,14 @@ class TempleNitiLoginController extends Controller
             $result = $response->json();
 
             // Optional: log for debugging
-            // \Log::info('MSG91 WA sendOtp', ['payload' => $payload, 'response' => $result]);
+            // \Log::info('MSG91 WA sendOtp', [
+            //     'endpoint' => $endpoint,
+            //     'payload'  => $payload,
+            //     'status'   => $response->status(),
+            //     'result'   => $result,
+            // ]);
 
+            // If MSG91 returned non-2xx, bubble it up
             if (!$response->successful()) {
                 return response()->json([
                     'success'     => false,
@@ -134,7 +141,7 @@ class TempleNitiLoginController extends Controller
                 ], $response->status());
             }
 
-            // Specific check for blocked prefixes text
+            // Specific check for "blocked prefixes"
             $reason = $result['reason'] ?? ($result['error'] ?? null);
             if ($reason && str_contains(strtolower($reason), 'blocked prefixes')) {
                 return response()->json([
