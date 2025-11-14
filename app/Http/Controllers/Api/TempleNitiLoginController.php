@@ -4,117 +4,161 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use App\Models\NitiadminLogin;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use App\Models\NitiadminLogin;
 
 class TempleNitiLoginController extends Controller
 {
+    /**
+     * Normalize a phone number to E.164-ish format for WhatsApp:
+     * - Keep digits only
+     * - Remove leading 0
+     * - Ensure it starts with the default country code (91 for India)
+     */
+    protected function formatWhatsAppNumber(string $number): string
+    {
+        // Keep digits only
+        $digits = preg_replace('/\D/', '', $number ?? '');
+
+        // Remove leading zeros
+        $digits = ltrim($digits, '0');
+
+        // Default to India if no country code
+        $countryCode = env('MSG91_DEFAULT_COUNTRY_CODE', '91');
+
+        if (!str_starts_with($digits, $countryCode)) {
+            $digits = $countryCode . $digits;
+        }
+
+        return $digits;
+    }
 
     public function sendOtp(Request $request)
     {
-
         $request->validate([
-                'phone' => 'required|string',
-            ]);
+            'phone' => 'required|string',
+        ]);
 
-        $phone = $request->phone;
-        $otp = rand(100000, 999999);
-        $shortToken = Str::random(6); // WhatsApp button token (max 15 characters)
+        $rawPhone = $request->phone;
 
-        // Check for existing user
-        $user = NitiadminLogin::where('mobile_no', $phone)->first();
+        // WhatsApp “to” number (must include country code)
+        $waPhone = $this->formatWhatsAppNumber($rawPhone);
 
+        // Store / lookup in DB as pure digits
+        $dbPhone = preg_replace('/\D/', '', $rawPhone);
+
+        $otp        = rand(100000, 999999);
+        $shortToken = Str::random(6); // Must be < 15 chars for button url var
+
+        // Find or create user
+        $user = NitiadminLogin::where('mobile_no', $dbPhone)->first();
         if ($user) {
-            // Update OTP
             $user->otp = $otp;
             $user->save();
             $status = 'existing';
         } else {
-            // Create new user with OTP
             $user = NitiadminLogin::create([
-                'mobile_no' => $phone,
-                'otp' => $otp,
+                'mobile_no' => $dbPhone,
+                'otp'       => $otp,
             ]);
             $status = 'new';
         }
 
-        // ✅ Correct MSG91 WhatsApp API Payload
-        $payload = [
-            "integrated_number" => env('MSG91_WA_NUMBER'),
-            "content_type" => "template",
-            "payload" => [
-                "messaging_product" => "whatsapp",
-                "to" => $phone,
-                "type" => "template",
-                "template" => [
-                    "name" => env('MSG91_WA_TEMPLATE'),
-                    "language" => [
-                        "code" => "en",
-                        "policy" => "deterministic"
-                    ],
-                    "namespace" => env('MSG91_WA_NAMESPACE'),
-                    "components" => [
-                        [
-                            "type" => "body",
-                            "parameters" => [
-                                [
-                                    "type" => "text",
-                                    "text" => (string) $otp
-                                ]
-                            ]
-                        ],
-                        [
-                            "type" => "button",
-                            "sub_type" => "url",
-                            "index" => 0,
-                            "parameters" => [
-                                [
-                                    "type" => "text",
-                                    "text" => $shortToken
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+        // language code from env (en_US etc.)
+        $langCode = env('MSG91_WA_LANG_CODE', 'en_US');
+
+        // Build components for MSG91 bulk format
+        $components = [
+            'body_1' => [
+                'type'  => 'text',
+                'value' => (string) $otp,
+            ],
         ];
 
-        // ✅ Send OTP via MSG91
+        // Add button component only if configured
+        if (filter_var(env('MSG91_WA_URL_HAS_PARAM', true), FILTER_VALIDATE_BOOL)) {
+            $components['button_1'] = [
+                'subtype' => 'url',
+                'type'    => 'text',
+                'value'   => $shortToken, // this becomes <{{url text variable}}>
+            ];
+        }
+
+        // ✅ MSG91 BULK WhatsApp template payload (matches your cURL sample)
+        $payload = [
+            'integrated_number' => env('MSG91_WA_NUMBER'),    // 919124420330
+            'content_type'      => 'template',
+            'payload'           => [
+                'messaging_product' => 'whatsapp',
+                'type'              => 'template',
+                'template'          => [
+                    'name'      => env('MSG91_WA_TEMPLATE'),   // 33_crores_flowerdelivery
+                    'language'  => [
+                        'code'   => $langCode,                 // en_US
+                        'policy' => 'deterministic',
+                    ],
+                    'namespace' => env('MSG91_WA_NAMESPACE'),
+                    'to_and_components' => [
+                        [
+                            'to'         => [$waPhone],        // list_of_phone_numbers
+                            'components' => $components,       // body_1, button_1 etc.
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
         try {
+            $endpoint = env(
+                'MSG91_WA_BULK_ENDPOINT',
+                'https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/bulk/'
+            );
+
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-                'authkey' => env('MSG91_AUTHKEY'),
-            ])->post('https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/', $payload);
+                'authkey'      => env('MSG91_AUTHKEY'),
+            ])->post($endpoint, $payload);
 
             $result = $response->json();
 
-            if ($response->status() === 401 || ($result['status'] ?? '') === 'fail') {
+            // Optional: log for debugging
+            // \Log::info('MSG91 WA sendOtp', ['payload' => $payload, 'response' => $result]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'success'     => false,
+                    'message'     => 'MSG91 API error',
+                    'status_code' => $response->status(),
+                    'error'       => $result,
+                ], $response->status());
+            }
+
+            // Specific check for blocked prefixes text
+            $reason = $result['reason'] ?? ($result['error'] ?? null);
+            if ($reason && str_contains(strtolower($reason), 'blocked prefixes')) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Unauthorized or template error: check MSG91 credentials or payload.',
-                    'error' => $result
-                ], 401);
+                    'message' => 'MSG91 has blocked this country / number prefix. Please enable this prefix in MSG91 WhatsApp Country Block settings.',
+                    'error'   => $reason,
+                ], 400);
             }
 
             return response()->json([
-                'success' => true,
-                'message' => 'OTP sent successfully via WhatsApp.',
-                'user_status' => $status,
-                'phone' => $phone,
-                'token' => $shortToken,
-                'api_response' => $result
+                'success'      => true,
+                'message'      => 'OTP sent successfully via WhatsApp.',
+                'user_status'  => $status,
+                'phone'        => $dbPhone,
+                'whatsapp_to'  => $waPhone,
+                'token'        => $shortToken,
+                'api_response' => $result,
             ], 200);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to send OTP due to server error.',
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage(),
             ], 500);
         }
     }
@@ -123,22 +167,22 @@ class TempleNitiLoginController extends Controller
     {
         $request->validate([
             'phoneNumber' => 'required|string',
-            'otp' => 'required|string'
+            'otp'         => 'required|string',
         ]);
 
-        // Find user by phone number
-        $user = NitiadminLogin::where('mobile_no', $request->phoneNumber)->first();
+        $dbPhone = preg_replace('/\D/', '', $request->phoneNumber);
+
+        $user = NitiadminLogin::where('mobile_no', $dbPhone)->first();
 
         if (!$user) {
             return response()->json([
-                'message' => 'Mobile number not found. Please request OTP first.'
+                'message' => 'Mobile number not found. Please request OTP first.',
             ], 404);
         }
 
-        // Check OTP match
-        if ($user->otp !== $request->otp) {
+        if ($user->otp != $request->otp) {
             return response()->json([
-                'message' => 'Invalid OTP.'
+                'message' => 'Invalid OTP.',
             ], 401);
         }
 
@@ -146,15 +190,23 @@ class TempleNitiLoginController extends Controller
         $user->otp = null;
         $user->save();
 
-        // ✅ Generate Sanctum token
+        // Sanctum token
         $token = $user->createToken('Temple User Token')->plainTextToken;
 
         return response()->json([
-            'message' => 'User authenticated successfully.',
-            'token' => $token,
+            'message'    => 'User authenticated successfully.',
+            'token'      => $token,
             'token_type' => 'Bearer',
-            'user' => $user
+            'user'       => $user,
         ], 200);
     }
-}
 
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logged out successfully.',
+        ]);
+    }
+}
