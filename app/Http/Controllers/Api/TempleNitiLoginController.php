@@ -10,12 +10,7 @@ use App\Models\NitiadminLogin;
 
 class TempleNitiLoginController extends Controller
 {
-    /**
-     * Normalize a phone number to E.164-ish format for WhatsApp:
-     * - Keep digits only
-     * - Remove leading 0
-     * - Ensure it starts with the default country code (91 for India)
-     */
+  
     protected function formatWhatsAppNumber(string $number): string
     {
         // Keep digits only

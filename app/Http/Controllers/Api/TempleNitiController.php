@@ -1946,4 +1946,32 @@ public function getStartedDarshanData()
     }
 }
 
+ public function todayFestivalNitiList(Request $request)
+    {
+        try {
+            // Today (app timezone)
+            $today = Carbon::today()->toDateString();
+
+            $festivalNitis = NitiMaster::where('niti_type', 'festival')
+                ->where('status', 'active')
+                ->whereDate('date_time', $today)
+                ->orderBy('date_time', 'asc')
+                ->get();
+
+            return response()->json([
+                'status' => true,
+                'date'   => $today,
+                'count'  => $festivalNitis->count(),
+                'data'   => $festivalNitis,
+            ], 200);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Something went wrong while fetching today\'s festival nitis.',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }

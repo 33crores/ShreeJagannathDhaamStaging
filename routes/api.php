@@ -264,6 +264,8 @@ Route::controller(TempleNitiLoginController::class)->group(function() {
 });
 
 Route::controller(TempleNitiController::class)->group(function () {
+  
+  Route::get('/today-festival-niti', 'todayFestivalNitiList');
 
   // Public or generic route (no auth)
   Route::get('/manage-niti', 'manageNiti');
@@ -304,29 +306,6 @@ Route::controller(TempleNitiController::class)->group(function () {
   Route::post('/niti-information/{id}', 'deleteNitiInformation');
   Route::get('/darshan/started-data',  'getStartedDarshanData');
 });
-
-// Route::controller(RathaYatraApiController::class)->group(function () {
-
-//       Route::get('/manage-niti', 'getFirstPendingDayNitis');
-//       Route::get('/completed-niti', 'completedNiti');
-//       Route::get('/get-mahasnana-niti', 'getMahasnanaNiti');
-//       Route::post('/save-other-niti', 'storeOtherNiti');
-//       Route::get('/get-mahasnana-niti', 'getMahasnanaNiti');
-//       Route::get('/get-other-niti', 'getOtherNiti');
-//       Route::middleware('auth:niti_admin')->group(function () {
-//       Route::post('/start-niti', 'startNiti');
-//       Route::post('/stop-niti', 'stopNiti');
-//       Route::post('/niti/edit-start-time',  'editStartTime');
-//       Route::post('/niti/edit-end-time',  'editEndTime');
-//       Route::post('/niti/reset','resetNiti');
-//       Route::post('/niti/not-started', 'markNitiAsNotStarted');
-
-//   });
-
-//     Route::get('/darshan/started-data',  'getStartedDarshanData');
-
-// });
-
 
 Route::controller(TempleDarshanController::class)->group(function () {
 
