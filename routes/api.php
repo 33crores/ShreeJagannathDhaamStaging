@@ -257,15 +257,10 @@ Route::controller(QuickServiceController::class)->group(function() {
   Route::get('/darshan-list','getDarshanListApi');
 });
 
-Route::prefix('admin')->group(function () {
-
-    // POST: /api/admin/niti-send-otp
-    Route::post('/send-otp', [TempleNitiLoginController::class, 'sendOtp'])
-        ->name('admin.niti.sendOtp');
-
-    // POST: /api/admin/niti-verify-otp
-    Route::post('/verify-otp', [TempleNitiLoginController::class, 'verifyOtp'])
-        ->name('admin.niti.verifyOtp');
+Route::controller(TempleNitiLoginController::class)->group(function() {
+  Route::post('admin/send-otp',  'sendOtp');
+  Route::post('admin/verify-otp', 'verifyOtp');
+  Route::post('admin/logout', 'logout')->middleware('auth:sanctum');
 });
 
 Route::controller(TempleNitiController::class)->group(function () {
