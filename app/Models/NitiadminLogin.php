@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -25,5 +26,15 @@ class NitiadminLogin extends Authenticatable
         'client_secret',
         'otp_length',
         'channel',
+    ];
+
+    protected $hidden = [
+        'otp',
+        'hash',
+        'client_secret',
+    ];
+
+    protected $casts = [
+        'expires_at' => 'datetime',
     ];
 }
