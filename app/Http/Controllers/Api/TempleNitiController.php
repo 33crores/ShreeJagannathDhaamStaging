@@ -532,6 +532,176 @@ public function resumeNiti(Request $request)
     }
 }
 
+// public function stopNiti(Request $request)
+// {
+//     try {
+//         $request->validate([
+//             'niti_id' => 'required|string|exists:temple__niti_details,niti_id',
+//         ]);
+
+//         $user = Auth::guard('niti_admin')->user();
+
+//         if (!$user) {
+//             return response()->json([
+//                 'status' => false,
+//                 'message' => 'Unauthorized access.'
+//             ], 401);
+//         }
+
+//         $tz = 'Asia/Kolkata';
+//         $now = Carbon::now($tz);
+
+//         // ✅ Get latest TempleNews to complete
+//         $latestNews = TempleNews::where('type', 'information')
+//             ->where('niti_notice_status', 'Started')
+//             ->orderBy('created_at', 'desc')
+//             ->first();
+
+//         // ✅ Fetch NitiMaster and check day_id
+//         $nitiMaster = NitiMaster::where('niti_id', $request->niti_id)->first();
+
+//         if (!$nitiMaster || !$nitiMaster->day_id) {
+//             return response()->json([
+//                 'status' => false,
+//                 'message' => 'Niti not found or day_id missing.'
+//             ], 404);
+//         }
+
+//         $dayId = $nitiMaster->day_id;
+
+//         // ✅ Get the active Started Niti row
+//         $activeNiti = NitiManagement::where('niti_id', $request->niti_id)
+//             ->where('niti_status', 'Started')
+//             ->where('day_id', $dayId)
+//             ->latest()
+//             ->first();
+
+//         if (!$activeNiti || !$activeNiti->start_time) {
+//             return response()->json([
+//                 'status' => false,
+//                 'message' => 'No active Niti found to stop.'
+//             ], 400);
+//         }
+
+//         // ✅ Validate based on latest entry
+//         $latestEntry = NitiManagement::where('niti_id', $request->niti_id)
+//             ->where('day_id', $dayId)
+//             ->latest('created_at')
+//             ->first();
+
+//         $nitiType = $nitiMaster->niti_type;
+
+//         if (
+//             $latestEntry &&
+//             $latestEntry->niti_status === 'Completed' &&
+//             (
+//                 ($nitiType === 'other') ||
+//                 ($nitiType !== 'other')
+//             )
+//         ) {
+//             return response()->json([
+//                 'status' => false,
+//                 'message' => 'This Niti is already marked as completed for today.'
+//             ], 400);
+//         }
+
+//         // ✅ Calculate duration
+//         $startDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $activeNiti->date . ' ' . $activeNiti->start_time, $tz);
+//         $durationInSeconds = $startDateTime->diffInSeconds($now);
+
+//         $hours = floor($durationInSeconds / 3600);
+//         $minutes = floor(($durationInSeconds % 3600) / 60);
+//         $seconds = $durationInSeconds % 60;
+
+//         $runningTime = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+//         $durationText = $hours > 0 ? "{$hours} hr {$minutes} min" : ($minutes > 0 ? "{$minutes} min" : "{$seconds} sec");
+
+//         // Get the latest order_id for the current day_id and niti_id
+//         $orderIds = NitiManagement::where('day_id', $dayId)
+//         ->whereNotNull('order_id')
+//         ->pluck('order_id')
+//         ->map(fn($id) => floatval($id))
+//         ->toArray();
+
+//         $maxOrderFloat = !empty($orderIds) ? max($orderIds) : 0;
+
+//         // Calculate new order id integer part by ceiling maxOrderFloat
+//         $newOrderIdInt = (int) ceil($maxOrderFloat) + 1;
+
+//         // Format as zero-padded 2-digit string
+//         $newOrderId = str_pad($newOrderIdInt, 2, '0', STR_PAD_LEFT);
+
+//         // Update the activeNiti row with new order_id
+//         $activeNiti->update([
+//             'end_user_id'    => $user->sebak_id,
+//             'end_time'      => $now->format('H:i:s'),
+//             'running_time'  => $runningTime,
+//             'duration'      => $durationText,
+//             'niti_status'   => 'Completed',
+//             'order_id'      => $newOrderId,
+//             'date'        => $now->toDateString(),
+//         ]);
+
+
+//         // ✅ Update NitiMaster
+//         $nitiMaster->update([
+//             'niti_status' => 'Completed'
+//         ]);
+
+//         // ✅ Update TempleNews
+//         if ($latestNews) {
+//             $latestNews->update(['niti_notice_status' => 'Completed']);
+//         }
+
+//            // ✅ Step 3: Start Mahaprasad if linked
+//         $prasadLog = null;
+//         if ($nitiMaster->connected_mahaprasad_id) {
+
+//             $existingPrasad = PrasadManagement::where('day_id', $dayId)
+//                 ->where('prasad_status', 'Started')
+//                 ->latest()
+//                 ->first();
+
+//             if ($existingPrasad) {
+//                 $existingPrasad->update(['prasad_status' => 'Completed']);
+//                 TemplePrasad::where('id', $existingPrasad->prasad_id)->update(['prasad_status' => 'Completed']);
+//             }
+
+//             // Create new PrasadManagement entry
+//             $prasadLog = PrasadManagement::create([
+//                 'prasad_id'     => $nitiMaster->connected_mahaprasad_id,
+//                 'sebak_id'      => $user->sebak_id,
+//                 'day_id'        => $dayId,
+//                 'date'          => $now->toDateString(),
+//                 'start_time'    => $now->format('H:i:s'),
+//                 'prasad_status' => 'Started',
+//                 'temple_id'     => $nitiMaster->temple_id ?? null,
+//             ]);
+
+//             TemplePrasad::where('id', $nitiMaster->connected_mahaprasad_id)
+//                 ->update(['prasad_status' => 'Started']);
+//         }
+
+//         return response()->json([
+//             'status' => true,
+//             'message' => 'Niti (and linked Darshan if any) stopped successfully.',
+//             'data' => [
+//                 'niti'    => $activeNiti,
+//                 'darshan'=> $darshanCompleted,
+//                 'prasad_management'  => $prasadLog
+//             ]
+//         ], 200);
+
+//         } catch (\Exception $e) {
+//             return response()->json([
+//                 'status' => false,
+//                 'message' => 'Failed to stop Niti.',
+//                 'error' => $e->getMessage()
+//             ], 500);
+//         }
+// }
+
+
 public function stopNiti(Request $request)
 {
     try {
@@ -543,13 +713,17 @@ public function stopNiti(Request $request)
 
         if (!$user) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Unauthorized access.'
             ], 401);
         }
 
-        $tz = 'Asia/Kolkata';
+        $tz  = 'Asia/Kolkata';
         $now = Carbon::now($tz);
+
+        // For response safety
+        $darshanCompleted = null;
+        $prasadLog        = null;
 
         // ✅ Get latest TempleNews to complete
         $latestNews = TempleNews::where('type', 'information')
@@ -557,17 +731,27 @@ public function stopNiti(Request $request)
             ->orderBy('created_at', 'desc')
             ->first();
 
-        // ✅ Fetch NitiMaster and check day_id
+        // ✅ Fetch NitiMaster and check day_id (can be normal / other / festival)
         $nitiMaster = NitiMaster::where('niti_id', $request->niti_id)->first();
 
         if (!$nitiMaster || !$nitiMaster->day_id) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Niti not found or day_id missing.'
             ], 404);
         }
 
-        $dayId = $nitiMaster->day_id;
+        $dayId    = $nitiMaster->day_id;
+        $nitiType = $nitiMaster->niti_type;
+
+        // Label just for messages
+        if ($nitiType === 'festival') {
+            $typeLabel = 'Festival Niti';
+        } elseif ($nitiType === 'other') {
+            $typeLabel = 'Other Niti';
+        } else {
+            $typeLabel = 'Niti';
+        }
 
         // ✅ Get the active Started Niti row
         $activeNiti = NitiManagement::where('niti_id', $request->niti_id)
@@ -578,72 +762,71 @@ public function stopNiti(Request $request)
 
         if (!$activeNiti || !$activeNiti->start_time) {
             return response()->json([
-                'status' => false,
-                'message' => 'No active Niti found to stop.'
+                'status'  => false,
+                'message' => "No active {$typeLabel} found to stop."
             ], 400);
         }
 
-        // ✅ Validate based on latest entry
+        // ✅ Validate based on latest entry (avoid double completion)
         $latestEntry = NitiManagement::where('niti_id', $request->niti_id)
             ->where('day_id', $dayId)
             ->latest('created_at')
             ->first();
-
-        $nitiType = $nitiMaster->niti_type;
 
         if (
             $latestEntry &&
             $latestEntry->niti_status === 'Completed' &&
             (
                 ($nitiType === 'other') ||
-                ($nitiType !== 'other')
+                ($nitiType !== 'other')   // this makes it true for all types (including festival)
             )
         ) {
             return response()->json([
-                'status' => false,
-                'message' => 'This Niti is already marked as completed for today.'
+                'status'  => false,
+                'message' => "This {$typeLabel} is already marked as completed for today."
             ], 400);
         }
 
         // ✅ Calculate duration
-        $startDateTime = Carbon::createFromFormat('Y-m-d H:i:s', $activeNiti->date . ' ' . $activeNiti->start_time, $tz);
+        $startDateTime     = Carbon::createFromFormat('Y-m-d H:i:s', $activeNiti->date . ' ' . $activeNiti->start_time, $tz);
         $durationInSeconds = $startDateTime->diffInSeconds($now);
 
-        $hours = floor($durationInSeconds / 3600);
+        $hours   = floor($durationInSeconds / 3600);
         $minutes = floor(($durationInSeconds % 3600) / 60);
         $seconds = $durationInSeconds % 60;
 
-        $runningTime = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-        $durationText = $hours > 0 ? "{$hours} hr {$minutes} min" : ($minutes > 0 ? "{$minutes} min" : "{$seconds} sec");
+        $runningTime  = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+        $durationText = $hours > 0
+            ? "{$hours} hr {$minutes} min"
+            : ($minutes > 0 ? "{$minutes} min" : "{$seconds} sec");
 
-        // Get the latest order_id for the current day_id and niti_id
+        // ✅ Get the latest order_id for the current day_id
         $orderIds = NitiManagement::where('day_id', $dayId)
-        ->whereNotNull('order_id')
-        ->pluck('order_id')
-        ->map(fn($id) => floatval($id))
-        ->toArray();
+            ->whereNotNull('order_id')
+            ->pluck('order_id')
+            ->map(fn($id) => floatval($id))
+            ->toArray();
 
         $maxOrderFloat = !empty($orderIds) ? max($orderIds) : 0;
 
-        // Calculate new order id integer part by ceiling maxOrderFloat
+        // New integer order id by ceiling
         $newOrderIdInt = (int) ceil($maxOrderFloat) + 1;
 
         // Format as zero-padded 2-digit string
         $newOrderId = str_pad($newOrderIdInt, 2, '0', STR_PAD_LEFT);
 
-        // Update the activeNiti row with new order_id
+        // ✅ Update the activeNiti row
         $activeNiti->update([
-            'end_user_id'    => $user->sebak_id,
-            'end_time'      => $now->format('H:i:s'),
-            'running_time'  => $runningTime,
-            'duration'      => $durationText,
-            'niti_status'   => 'Completed',
-            'order_id'      => $newOrderId,
-            'date'        => $now->toDateString(),
+            'end_user_id'  => $user->sebak_id,
+            'end_time'     => $now->format('H:i:s'),
+            'running_time' => $runningTime,
+            'duration'     => $durationText,
+            'niti_status'  => 'Completed',
+            'order_id'     => $newOrderId,
+            'date'         => $now->toDateString(),
         ]);
 
-
-        // ✅ Update NitiMaster
+        // ✅ Update NitiMaster (works for festival, other, normal)
         $nitiMaster->update([
             'niti_status' => 'Completed'
         ]);
@@ -653,8 +836,7 @@ public function stopNiti(Request $request)
             $latestNews->update(['niti_notice_status' => 'Completed']);
         }
 
-           // ✅ Step 3: Start Mahaprasad if linked
-        $prasadLog = null;
+        // ✅ Step 3: Start Mahaprasad if linked (same for all types, including festival)
         if ($nitiMaster->connected_mahaprasad_id) {
 
             $existingPrasad = PrasadManagement::where('day_id', $dayId)
@@ -664,7 +846,9 @@ public function stopNiti(Request $request)
 
             if ($existingPrasad) {
                 $existingPrasad->update(['prasad_status' => 'Completed']);
-                TemplePrasad::where('id', $existingPrasad->prasad_id)->update(['prasad_status' => 'Completed']);
+
+                TemplePrasad::where('id', $existingPrasad->prasad_id)
+                    ->update(['prasad_status' => 'Completed']);
             }
 
             // Create new PrasadManagement entry
@@ -683,22 +867,22 @@ public function stopNiti(Request $request)
         }
 
         return response()->json([
-            'status' => true,
-            'message' => 'Niti (and linked Darshan if any) stopped successfully.',
-            'data' => [
-                'niti'    => $activeNiti,
-                'darshan'=> $darshanCompleted,
-                'prasad_management'  => $prasadLog
+            'status'  => true,
+            'message' => "{$typeLabel} (and linked Darshan if any) stopped successfully.",
+            'data'    => [
+                'niti'              => $activeNiti,
+                'darshan'           => $darshanCompleted,
+                'prasad_management' => $prasadLog
             ]
         ], 200);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Failed to stop Niti.',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+    } catch (\Exception $e) {
+        return response()->json([
+            'status'  => false,
+            'message' => 'Failed to stop Niti.',
+            'error'   => $e->getMessage()
+        ], 500);
+    }
 }
 
 public function completedNiti()
@@ -1309,7 +1493,7 @@ public function getHundi()
     }
 }
 
- public function deleteHundi($id)
+public function deleteHundi($id)
 {
     try {
         $hundi = TempleHundi::find($id);
@@ -1863,90 +2047,90 @@ public function resetNiti(Request $request)
     ]);
 }
 
-public function markNitiAsNotStarted(Request $request)
-{
-    $request->validate([
-        'niti_id' => 'required|string|exists:temple__niti_details,niti_id',
-    ]);
+    public function markNitiAsNotStarted(Request $request)
+    {
+        $request->validate([
+            'niti_id' => 'required|string|exists:temple__niti_details,niti_id',
+        ]);
 
-    $user = Auth::guard('niti_admin')->user();
-    if (!$user) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Unauthorized access.'
-        ], 401);
-    }
+        $user = Auth::guard('niti_admin')->user();
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized access.'
+            ], 401);
+        }
 
-    $nitiMaster = NitiMaster::where('niti_id', $request->niti_id)->first();
+        $nitiMaster = NitiMaster::where('niti_id', $request->niti_id)->first();
 
-    if (!$nitiMaster || !$nitiMaster->day_id) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Niti not found or day_id missing.'
-        ], 404);
-    }
+        if (!$nitiMaster || !$nitiMaster->day_id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Niti not found or day_id missing.'
+            ], 404);
+        }
 
-    if ($nitiMaster->niti_status !== 'Upcoming') {
-        return response()->json([
-            'status' => false,
-            'message' => 'Only Upcoming Nitis can be marked as Not Started.'
-        ], 400);
-    }
+        if ($nitiMaster->niti_status !== 'Upcoming') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Only Upcoming Nitis can be marked as Not Started.'
+            ], 400);
+        }
 
-    $dayId = $nitiMaster->day_id;
-    $now = Carbon::now('Asia/Kolkata');
+        $dayId = $nitiMaster->day_id;
+        $now = Carbon::now('Asia/Kolkata');
 
-    // ✅ Update NitiMaster status to NotStarted
-    $nitiMaster->update([
-        'niti_status' => 'NotStarted'
-    ]);
+        // ✅ Update NitiMaster status to NotStarted
+        $nitiMaster->update([
+            'niti_status' => 'NotStarted'
+        ]);
 
-    // ✅ Always create a new NitiManagement entry
-    $management = NitiManagement::create([
-        'niti_id'               => $request->niti_id,
-        'not_done_user_id'      => $user->sebak_id,
-        'day_id'                => $dayId,
-        'start_time'             => Carbon::now('Asia/Kolkata')->format('H:i:s'),
-        'end_time'               => Carbon::now('Asia/Kolkata')->format('H:i:s'),
-        'date'                  => $now->toDateString(),
-        'niti_status'           => 'NotStarted',
-        'niti_not_done_reason'  => $request->niti_not_done_reason,
-    ]);
-
-    return response()->json([
-        'status' => true,
-        'message' => 'Niti marked as Not Started.',
-        'data' => [
-            'niti_id' => $request->niti_id,
-            'day_id'  => $dayId,
-            'reason'  => $request->niti_not_done_reason,
-            'entry_id' => $management->id
-        ]
-    ]);
-}
-
-public function getStartedDarshanData()
-{
-    try {
-        // Get the first started darshan (object) or null if none
-        $startedDarshan = DarshanDetails::where('status', 'active')->get();
+        // ✅ Always create a new NitiManagement entry
+        $management = NitiManagement::create([
+            'niti_id'               => $request->niti_id,
+            'not_done_user_id'      => $user->sebak_id,
+            'day_id'                => $dayId,
+            'start_time'             => Carbon::now('Asia/Kolkata')->format('H:i:s'),
+            'end_time'               => Carbon::now('Asia/Kolkata')->format('H:i:s'),
+            'date'                  => $now->toDateString(),
+            'niti_status'           => 'NotStarted',
+            'niti_not_done_reason'  => $request->niti_not_done_reason,
+        ]);
 
         return response()->json([
             'status' => true,
-            'message' => 'Started darshan detail fetched successfully.',
-            'data' => $startedDarshan,  // object or null
-        ], 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Failed to fetch started darshan detail.',
-            'error' => $e->getMessage(),
-        ], 500);
+            'message' => 'Niti marked as Not Started.',
+            'data' => [
+                'niti_id' => $request->niti_id,
+                'day_id'  => $dayId,
+                'reason'  => $request->niti_not_done_reason,
+                'entry_id' => $management->id
+            ]
+        ]);
     }
-}
 
- public function todayFestivalNitiList(Request $request)
+    public function getStartedDarshanData()
+    {
+        try {
+            // Get the first started darshan (object) or null if none
+            $startedDarshan = DarshanDetails::where('status', 'active')->get();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Started darshan detail fetched successfully.',
+                'data' => $startedDarshan,  // object or null
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to fetch started darshan detail.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function todayFestivalNitiList(Request $request)
     {
         try {
             // Today (app timezone)
@@ -1973,5 +2157,93 @@ public function getStartedDarshanData()
             ], 500);
         }
     }
+
+    public function startFestivalNiti(Request $request)
+    {
+        try {
+            // 1) Validate input
+            $request->validate([
+                'niti_id' => 'required|string|exists:temple__niti_details,niti_id',
+            ]);
+
+            // 2) Auth check (same as your other APIs)
+            $user = Auth::guard('niti_admin')->user();
+            if (!$user) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Unauthorized.',
+                ], 401);
+            }
+
+            $now   = Carbon::now('Asia/Kolkata');
+            $today = $now->toDateString();
+
+            // 3) Fetch the festival Niti for today
+            $festivalNiti = NitiMaster::where('niti_id', $request->niti_id)
+                ->where('niti_type', 'festival')
+                ->where('status', 'active')          // same as your todayFestivalNitiList
+                ->whereDate('date_time', $today)
+                ->first();
+
+            if (!$festivalNiti) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Festival Niti not found for today or not active.',
+                ], 404);
+            }
+
+            if (!$festivalNiti->day_id) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'day_id is missing for this Festival Niti.',
+                ], 422);
+            }
+
+            $dayId = $festivalNiti->day_id;
+
+            // 4) (Optional but useful) Close any already running record of this Niti for today
+            $running = NitiManagement::where('niti_id', $festivalNiti->niti_id)
+                ->where('day_id', $dayId)
+                ->whereDate('date', $today)
+                ->where('niti_status', 'Started')
+                ->latest()
+                ->first();
+
+            if ($running) {
+                $running->update([
+                    'niti_status' => 'Completed',
+                    'end_time'    => $now->format('H:i:s'),
+                ]);
+            }
+
+            // 5) Create new management entry as Started
+            $management = NitiManagement::create([
+                'temple_id'   => $festivalNiti->temple_id ?? null,
+                'sebak_id'    => $user->sebak_id ?? null,
+                'day_id'      => $dayId,
+                'niti_id'     => $festivalNiti->niti_id,
+                'date'        => $today,
+                'start_time'  => $now->format('H:i:s'),
+                'niti_status' => 'Started',
+            ]);
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Festival Niti started successfully.',
+                'data'    => [
+                    'niti'       => $festivalNiti,
+                    'management' => $management,
+                ],
+            ], 200);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Failed to start Festival Niti.',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
 }
