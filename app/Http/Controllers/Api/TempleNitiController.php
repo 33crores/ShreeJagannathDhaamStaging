@@ -2159,99 +2159,205 @@ public function resetNiti(Request $request)
     }
 
     public function startFestivalNiti(Request $request)
-{
-    try {
-        // 1) Validate input
-        $request->validate([
-            'niti_id' => 'required|string|exists:temple__niti_details,niti_id',
-        ]);
+    {
+        try {
+            // 1) Validate input
+            $request->validate([
+                'niti_id' => 'required|string|exists:temple__niti_details,niti_id',
+            ]);
 
-        // 2) Auth check (same as your other APIs)
-        $user = Auth::guard('niti_admin')->user();
-        if (!$user) {
+            // 2) Auth check (same as your other APIs)
+            $user = Auth::guard('niti_admin')->user();
+            if (!$user) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Unauthorized.',
+                ], 401);
+            }
+
+            $now   = Carbon::now('Asia/Kolkata');
+            $today = $now->toDateString();
+
+            // 3) Fetch the festival Niti for today
+            $festivalNiti = NitiMaster::where('niti_id', $request->niti_id)
+                ->where('niti_type', 'festival')
+                ->where('status', 'active')          // same as your todayFestivalNitiList
+                ->whereDate('date_time', $today)
+                ->first();
+
+            if (!$festivalNiti) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Festival Niti not found for today or not active.',
+                ], 404);
+            }
+
+            if (!$festivalNiti->day_id) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'day_id is missing for this Festival Niti.',
+                ], 422);
+            }
+
+            $dayId = $festivalNiti->day_id;
+
+            // ✅ If NitiMaster status is Upcoming, change it to Started
+            if ($festivalNiti->niti_status === 'Upcoming') {
+                $festivalNiti->update([
+                    'niti_status' => 'Started',
+                ]);
+            }
+
+            // 4) (Optional but useful) Close any already running record of this Niti for today
+            $running = NitiManagement::where('niti_id', $festivalNiti->niti_id)
+                ->where('day_id', $dayId)
+                ->whereDate('date', $today)
+                ->where('niti_status', 'Started')
+                ->latest()
+                ->first();
+
+            if ($running) {
+                $running->update([
+                    'niti_status' => 'Completed',
+                    'end_time'    => $now->format('H:i:s'),
+                ]);
+            }
+
+            // 5) Create new management entry as Started
+            $management = NitiManagement::create([
+                'temple_id'   => $festivalNiti->temple_id ?? null,
+                'sebak_id'    => $user->sebak_id ?? null,
+                'day_id'      => $dayId,
+                'niti_id'     => $festivalNiti->niti_id,
+                'date'        => $today,
+                'start_time'  => $now->format('H:i:s'),
+                'niti_status' => 'Started',
+            ]);
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Festival Niti started successfully.',
+                'data'    => [
+                    'niti'       => $festivalNiti,
+                    'management' => $management,
+                ],
+            ], 200);
+
+        } catch (\Throwable $e) {
             return response()->json([
                 'status'  => false,
-                'message' => 'Unauthorized.',
-            ], 401);
+                'message' => 'Failed to start Festival Niti.',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
+    }
 
-        $now   = Carbon::now('Asia/Kolkata');
-        $today = $now->toDateString();
+    public function nitiTransactionsByDateRoute(string $from, string $to)
+    {
+        // Parse (accepts dd-mm-YYYY or YYYY-mm-dd; falls back to Carbon)
+        $parseDate = function (?string $value): ?string {
+            if (!$value) return null;
+            $v = trim($value);
 
-        // 3) Fetch the festival Niti for today
-        $festivalNiti = NitiMaster::where('niti_id', $request->niti_id)
-            ->where('niti_type', 'festival')
-            ->where('status', 'active')          // same as your todayFestivalNitiList
-            ->whereDate('date_time', $today)
-            ->first();
+            try { return Carbon::createFromFormat('d-m-Y', $v)->format('Y-m-d'); } catch (\Throwable $e) {}
+            try { return Carbon::createFromFormat('Y-m-d', $v)->format('Y-m-d'); } catch (\Throwable $e) {}
+            try { return Carbon::parse($v)->format('Y-m-d'); } catch (\Throwable $e) {}
 
-        if (!$festivalNiti) {
+            return null;
+        };
+
+        $fromDate = $parseDate($from);
+        $toDate   = $parseDate($to);
+
+        // Validate dates
+        if (!$fromDate || !$toDate) {
             return response()->json([
                 'status'  => false,
-                'message' => 'Festival Niti not found for today or not active.',
-            ], 404);
-        }
-
-        if (!$festivalNiti->day_id) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'day_id is missing for this Festival Niti.',
+                'message' => 'Invalid dates. Use dd-mm-YYYY or YYYY-mm-dd in the URL.',
+                'meta'    => ['received' => ['from' => $from, 'to' => $to]],
             ], 422);
         }
 
-        $dayId = $festivalNiti->day_id;
-
-        // ✅ If NitiMaster status is Upcoming, change it to Started
-        if ($festivalNiti->niti_status === 'Upcoming') {
-            $festivalNiti->update([
-                'niti_status' => 'Started',
-            ]);
+        if ($fromDate > $toDate) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'from date must be earlier than or equal to to date.',
+                'meta'    => ['from' => $fromDate, 'to' => $toDate],
+            ], 422);
         }
 
-        // 4) (Optional but useful) Close any already running record of this Niti for today
-        $running = NitiManagement::where('niti_id', $festivalNiti->niti_id)
-            ->where('day_id', $dayId)
-            ->whereDate('date', $today)
-            ->where('niti_status', 'Started')
-            ->latest()
-            ->first();
+        // Iterate date range; resolve day_id by first entry per date
+        $period   = CarbonPeriod::create($fromDate, $toDate);
+        $response = [];
 
-        if ($running) {
-            $running->update([
-                'niti_status' => 'Completed',
-                'end_time'    => $now->format('H:i:s'),
-            ]);
+        foreach ($period as $day) {
+            $date = $day->format('Y-m-d');
+
+            // FIRST entry for this date (earliest start_time, then id)
+            $firstEntry = NitiManagement::with('master')
+                ->where('date', $date)
+                ->orderBy('start_time', 'asc')
+                ->orderBy('id', 'asc')
+                ->first();
+
+            if (!$firstEntry) {
+                // No entries for this date — skip (or push empty block if you prefer)
+                continue;
+            }
+
+            $dayId = $firstEntry->day_id;
+
+            // ALL entries for that day_id (date used ONLY to resolve day_id)
+            $entries = NitiManagement::with('master')
+                ->where('day_id', $dayId)
+                ->orderByRaw("CASE WHEN order_id IS NULL OR order_id = '' THEN 1 ELSE 0 END ASC")
+                ->orderByRaw("CAST(order_id AS DECIMAL(10,1)) ASC")
+                ->orderBy('end_time', 'asc')
+                ->orderBy('start_time', 'asc')
+                ->orderBy('id', 'asc')
+                ->get()
+                ->map(function ($row) {
+                    return [
+                        'id'                       => $row->id,
+                        'niti_id'                  => $row->niti_id,
+                        'niti_name'                => optional($row->master)->niti_name,
+                        'english_niti_name'        => optional($row->master)->english_niti_name,
+                        'day_id'                   => $row->day_id,
+                        'order_id'                 => $row->order_id,
+                        'date'                     => $row->date,
+                        'start_time'               => $row->start_time,
+                        'pause_time'               => $row->pause_time,
+                        'resume_time'              => $row->resume_time,
+                        'end_time'                 => $row->end_time,
+                        'running_time'             => $row->running_time,
+                        'duration'                 => $row->duration,
+                        'niti_status'              => $row->niti_status,
+                        'start_user_id'            => $row->start_user_id,
+                        'end_user_id'              => $row->end_user_id,
+                        'start_time_edit_user_id'  => $row->start_time_edit_user_id,
+                        'end_time_edit_user_id'    => $row->end_time_edit_user_id,
+                        'not_done_user_id'         => $row->not_done_user_id,
+                        'niti_not_done_reason'     => $row->niti_not_done_reason,
+                    ];
+                })
+                ->values();
+
+            $response[] = [
+            
+                'entries'         => $entries,
+            ];
         }
-
-        // 5) Create new management entry as Started
-        $management = NitiManagement::create([
-            'temple_id'   => $festivalNiti->temple_id ?? null,
-            'sebak_id'    => $user->sebak_id ?? null,
-            'day_id'      => $dayId,
-            'niti_id'     => $festivalNiti->niti_id,
-            'date'        => $today,
-            'start_time'  => $now->format('H:i:s'),
-            'niti_status' => 'Started',
-        ]);
 
         return response()->json([
             'status'  => true,
-            'message' => 'Festival Niti started successfully.',
-            'data'    => [
-                'niti'       => $festivalNiti,
-                'management' => $management,
+            'message' => 'Niti transactions fetched by date range using day_id resolution.',
+            'data'    => $response,
+            'meta'    => [
+                'from_date' => $fromDate,
+                'to_date'   => $toDate,
+                'note'      => 'For each date, the first entry resolves the day_id; then all entries for that day_id are returned.',
             ],
         ], 200);
-
-    } catch (\Throwable $e) {
-        return response()->json([
-            'status'  => false,
-            'message' => 'Failed to start Festival Niti.',
-            'error'   => $e->getMessage(),
-        ], 500);
     }
-}
-
-
 
 }
