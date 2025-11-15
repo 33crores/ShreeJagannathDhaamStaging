@@ -2159,91 +2159,99 @@ public function resetNiti(Request $request)
     }
 
     public function startFestivalNiti(Request $request)
-    {
-        try {
-            // 1) Validate input
-            $request->validate([
-                'niti_id' => 'required|string|exists:temple__niti_details,niti_id',
-            ]);
+{
+    try {
+        // 1) Validate input
+        $request->validate([
+            'niti_id' => 'required|string|exists:temple__niti_details,niti_id',
+        ]);
 
-            // 2) Auth check (same as your other APIs)
-            $user = Auth::guard('niti_admin')->user();
-            if (!$user) {
-                return response()->json([
-                    'status'  => false,
-                    'message' => 'Unauthorized.',
-                ], 401);
-            }
-
-            $now   = Carbon::now('Asia/Kolkata');
-            $today = $now->toDateString();
-
-            // 3) Fetch the festival Niti for today
-            $festivalNiti = NitiMaster::where('niti_id', $request->niti_id)
-                ->where('niti_type', 'festival')
-                ->where('status', 'active')          // same as your todayFestivalNitiList
-                ->whereDate('date_time', $today)
-                ->first();
-
-            if (!$festivalNiti) {
-                return response()->json([
-                    'status'  => false,
-                    'message' => 'Festival Niti not found for today or not active.',
-                ], 404);
-            }
-
-            if (!$festivalNiti->day_id) {
-                return response()->json([
-                    'status'  => false,
-                    'message' => 'day_id is missing for this Festival Niti.',
-                ], 422);
-            }
-
-            $dayId = $festivalNiti->day_id;
-
-            // 4) (Optional but useful) Close any already running record of this Niti for today
-            $running = NitiManagement::where('niti_id', $festivalNiti->niti_id)
-                ->where('day_id', $dayId)
-                ->whereDate('date', $today)
-                ->where('niti_status', 'Started')
-                ->latest()
-                ->first();
-
-            if ($running) {
-                $running->update([
-                    'niti_status' => 'Completed',
-                    'end_time'    => $now->format('H:i:s'),
-                ]);
-            }
-
-            // 5) Create new management entry as Started
-            $management = NitiManagement::create([
-                'temple_id'   => $festivalNiti->temple_id ?? null,
-                'sebak_id'    => $user->sebak_id ?? null,
-                'day_id'      => $dayId,
-                'niti_id'     => $festivalNiti->niti_id,
-                'date'        => $today,
-                'start_time'  => $now->format('H:i:s'),
-                'niti_status' => 'Started',
-            ]);
-
-            return response()->json([
-                'status'  => true,
-                'message' => 'Festival Niti started successfully.',
-                'data'    => [
-                    'niti'       => $festivalNiti,
-                    'management' => $management,
-                ],
-            ], 200);
-
-        } catch (\Throwable $e) {
+        // 2) Auth check (same as your other APIs)
+        $user = Auth::guard('niti_admin')->user();
+        if (!$user) {
             return response()->json([
                 'status'  => false,
-                'message' => 'Failed to start Festival Niti.',
-                'error'   => $e->getMessage(),
-            ], 500);
+                'message' => 'Unauthorized.',
+            ], 401);
         }
+
+        $now   = Carbon::now('Asia/Kolkata');
+        $today = $now->toDateString();
+
+        // 3) Fetch the festival Niti for today
+        $festivalNiti = NitiMaster::where('niti_id', $request->niti_id)
+            ->where('niti_type', 'festival')
+            ->where('status', 'active')          // same as your todayFestivalNitiList
+            ->whereDate('date_time', $today)
+            ->first();
+
+        if (!$festivalNiti) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Festival Niti not found for today or not active.',
+            ], 404);
+        }
+
+        if (!$festivalNiti->day_id) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'day_id is missing for this Festival Niti.',
+            ], 422);
+        }
+
+        $dayId = $festivalNiti->day_id;
+
+        // ✅ If NitiMaster status is Upcoming, change it to Started
+        if ($festivalNiti->niti_status === 'Upcoming') {
+            $festivalNiti->update([
+                'niti_status' => 'Started',
+            ]);
+        }
+
+        // 4) (Optional but useful) Close any already running record of this Niti for today
+        $running = NitiManagement::where('niti_id', $festivalNiti->niti_id)
+            ->where('day_id', $dayId)
+            ->whereDate('date', $today)
+            ->where('niti_status', 'Started')
+            ->latest()
+            ->first();
+
+        if ($running) {
+            $running->update([
+                'niti_status' => 'Completed',
+                'end_time'    => $now->format('H:i:s'),
+            ]);
+        }
+
+        // 5) Create new management entry as Started
+        $management = NitiManagement::create([
+            'temple_id'   => $festivalNiti->temple_id ?? null,
+            'sebak_id'    => $user->sebak_id ?? null,
+            'day_id'      => $dayId,
+            'niti_id'     => $festivalNiti->niti_id,
+            'date'        => $today,
+            'start_time'  => $now->format('H:i:s'),
+            'niti_status' => 'Started',
+        ]);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Festival Niti started successfully.',
+            'data'    => [
+                'niti'       => $festivalNiti,
+                'management' => $management,
+            ],
+        ], 200);
+
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status'  => false,
+            'message' => 'Failed to start Festival Niti.',
+            'error'   => $e->getMessage(),
+        ], 500);
     }
+}
+
 
 
 }
