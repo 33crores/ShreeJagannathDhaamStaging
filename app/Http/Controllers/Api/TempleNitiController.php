@@ -1615,44 +1615,58 @@ public function storeByNoticeName(Request $request)
         ], 401);
     }
 
-    // ✅ Validate input (including photo)
+    // ✅ Validate input (including both photos)
     $request->validate([
-        'notice_name'          => 'nullable|string|max:255',
-        'notice_name_english'  => 'nullable|string|max:255',
-        'start_date'           => 'nullable|date',
-        'end_date'             => 'nullable|date|after_or_equal:start_date',
-        'notice_photo'         => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048', // 2MB
+        'notice_name'            => 'nullable|string|max:255',
+        'notice_name_english'    => 'nullable|string|max:255',
+        'start_date'             => 'nullable|date',
+        'end_date'               => 'nullable|date|after_or_equal:start_date',
+        'odia_notice_photo'      => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048',    // 2MB
+        'english_notice_photo'   => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048',   // 2MB
     ]);
 
     try {
-        $photoPath = null;
+        $odiaPhotoPath    = null;
+        $englishPhotoPath = null;
 
-        // ✅ Upload photo if present and valid
-        if ($request->hasFile('notice_photo') && $request->file('notice_photo')->isValid()) {
+        // ✅ Upload Odia photo if present and valid
+        if ($request->hasFile('odia_notice_photo') && $request->file('odia_notice_photo')->isValid()) {
             // Stored at: storage/app/public/temple_notices/xxxx.jpg
-            $photoPath = $request->file('notice_photo')
+            $odiaPhotoPath = $request->file('odia_notice_photo')
+                ->store('temple_notices', 'public');
+        }
+
+        // ✅ Upload English photo if present and valid
+        if ($request->hasFile('english_notice_photo') && $request->file('english_notice_photo')->isValid()) {
+            // Stored at: storage/app/public/temple_notices/xxxx.jpg
+            $englishPhotoPath = $request->file('english_notice_photo')
                 ->store('temple_notices', 'public');
         }
 
         // ✅ Create record
         $news = TempleNews::create([
             'type'                  => 'notice',
-            'temple_id'             => $user->temple_id ?? null,   // adjust if your user doesn't have temple_id
+            'temple_id'             => $user->temple_id ?? null,
 
             'notice_name'           => $request->notice_name,
             'notice_name_english'   => $request->notice_name_english,
             'start_date'            => $request->start_date,
             'end_date'              => $request->end_date,
 
-            'notice_photo'          => $photoPath,                 // only the relative path
+            'odia_notice_photo'     => $odiaPhotoPath,      // relative path
+            'english_notice_photo'  => $englishPhotoPath,   // relative path
 
             'notice_insert_user_id' => $user->sebak_id ?? $user->id ?? null,
-            'status'                => 'active',                   // optional default
+            'status'                => 'active',
         ]);
 
-        // ✅ Optionally add full URL in response (does NOT change DB)
-        if ($news->notice_photo) {
-            $news->notice_photo_url = asset('storage/' . $news->notice_photo);
+        // ✅ Add full URLs in response (does NOT change DB)
+        if ($news->odia_notice_photo) {
+            $news->odia_notice_photo_url = asset('storage/' . $news->odia_notice_photo);
+        }
+
+        if ($news->english_notice_photo) {
+            $news->english_notice_photo_url = asset('storage/' . $news->english_notice_photo);
         }
 
         return response()->json([
@@ -1674,12 +1688,13 @@ public function updateNoticeName(Request $request)
 {
     // ✅ Validation
     $request->validate([
-        'id'                 => 'nullable|exists:temple__news,id',
-        'notice_name'        => 'nullable|string|max:255',
-        'notice_name_english'=> 'nullable|string|max:255',
-        'start_date'         => 'nullable|date',
-        'end_date'           => 'nullable|date|after_or_equal:start_date',
-        'notice_photo'       => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048', // 2MB
+        'id'                   => 'required|exists:temple__news,id',
+        'notice_name'          => 'nullable|string|max:255',
+        'notice_name_english'  => 'nullable|string|max:255',
+        'start_date'           => 'nullable|date',
+        'end_date'             => 'nullable|date|after_or_equal:start_date',
+        'odia_notice_photo'    => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048',   // 2MB
+        'english_notice_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048',   // 2MB
     ]);
 
     // ✅ Auth check
@@ -1696,33 +1711,68 @@ public function updateNoticeName(Request $request)
         // ✅ Find existing record
         $news = TempleNews::findOrFail($request->id);
 
-        // ✅ Handle photo update (optional)
-        if ($request->hasFile('notice_photo') && $request->file('notice_photo')->isValid()) {
+        // ✅ Handle Odia photo update (optional)
+        if ($request->hasFile('odia_notice_photo') && $request->file('odia_notice_photo')->isValid()) {
 
-            // 🔹 Delete old photo if exists
-            if (!empty($news->notice_photo) && Storage::disk('public')->exists($news->notice_photo)) {
-                Storage::disk('public')->delete($news->notice_photo);
+            // 🔹 Delete old Odia photo if exists
+            if (!empty($news->odia_notice_photo) && Storage::disk('public')->exists($news->odia_notice_photo)) {
+                Storage::disk('public')->delete($news->odia_notice_photo);
             }
 
-            // 🔹 Store new photo
-            $newPhotoPath = $request->file('notice_photo')
+            // 🔹 Store new Odia photo
+            $odiaPhotoPath = $request->file('odia_notice_photo')
                 ->store('temple_notices', 'public');
 
-            $news->notice_photo = $newPhotoPath;
+            $news->odia_notice_photo = $odiaPhotoPath;
         }
 
-        // ✅ Update other fields
-        $news->notice_name            = $request->notice_name;
-        $news->notice_name_english    = $request->notice_name_english;
-        $news->start_date             = $request->start_date;
-        $news->end_date               = $request->end_date;
-        $news->notice_update_user_id  = $user->sebak_id ?? $user->id ?? null;
+        // ✅ Handle English photo update (optional)
+        if ($request->hasFile('english_notice_photo') && $request->file('english_notice_photo')->isValid()) {
+
+            // 🔹 Delete old English photo if exists
+            if (!empty($news->english_notice_photo) && Storage::disk('public')->exists($news->english_notice_photo)) {
+                Storage::disk('public')->delete($news->english_notice_photo);
+            }
+
+            // 🔹 Store new English photo
+            $englishPhotoPath = $request->file('english_notice_photo')
+                ->store('temple_notices', 'public');
+
+            $news->english_notice_photo = $englishPhotoPath;
+        }
+
+        // ✅ Update other fields only if provided (so we don't overwrite with null)
+        if (!is_null($request->notice_name)) {
+            $news->notice_name = $request->notice_name;
+        }
+
+        if (!is_null($request->notice_name_english)) {
+            $news->notice_name_english = $request->notice_name_english;
+        }
+
+        if (!is_null($request->start_date)) {
+            $news->start_date = $request->start_date;
+        }
+
+        if (!is_null($request->end_date)) {
+            $news->end_date = $request->end_date;
+        }
+
+        $news->notice_update_user_id = $user->sebak_id ?? $user->id ?? null;
 
         $news->save();
 
         // Optional: add full URL for frontend usage
-        if ($news->notice_photo) {
-            $news->notice_photo_url = asset('storage/' . $news->notice_photo);
+        if ($news->odia_notice_photo) {
+            $news->odia_notice_photo = asset('storage/' . $news->odia_notice_photo);
+        } else {
+            $news->odia_notice_photo = null;
+        }
+
+        if ($news->english_notice_photo) {
+            $news->english_notice_photo = asset('storage/' . $news->english_notice_photo);
+        } else {
+            $news->english_notice_photo = null;
         }
 
         return response()->json([
@@ -1739,6 +1789,7 @@ public function updateNoticeName(Request $request)
         ], 500);
     }
 }
+
 public function getLatestNotice()
 {
     try {
@@ -1755,14 +1806,20 @@ public function getLatestNotice()
             ], 200);
         }
 
-        // ✅ Convert notice_photo to full URL for response
+        // ✅ Convert photo paths to full URLs for response
         $latestNotice->transform(function ($notice) {
-            if (!empty($notice->notice_photo)) {
-                // storage/app/public/... => /storage/...
-                $notice->notice_photo = asset('storage/' . $notice->notice_photo);
+            if (!empty($notice->odia_notice_photo)) {
+                $notice->odia_notice_photo = asset('storage/' . $notice->odia_notice_photo);
             } else {
-                $notice->notice_photo = null;
+                $notice->odia_notice_photo = null;
             }
+
+            if (!empty($notice->english_notice_photo)) {
+                $notice->english_notice_photo = asset('storage/' . $notice->english_notice_photo);
+            } else {
+                $notice->english_notice_photo = null;
+            }
+
             return $notice;
         });
 
@@ -1780,7 +1837,6 @@ public function getLatestNotice()
         ], 500);
     }
 }
-
 
 public function deleteNotice($id)
 {
