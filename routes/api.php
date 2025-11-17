@@ -265,7 +265,6 @@ Route::controller(TempleNitiLoginController::class)->group(function() {
 
 Route::controller(TempleNitiController::class)->group(function () {
   
-  
 Route::get('niti/transactions/{from}/{to}', 'nitiTransactionsByDateRoute')
     ->where([
         // allow digits and hyphens (both 01-10-2025 and 2025-10-01)

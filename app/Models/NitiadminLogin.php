@@ -26,4 +26,5 @@ class NitiadminLogin extends Authenticatable
         'otp_length',
         'channel',
     ];
+    
 }

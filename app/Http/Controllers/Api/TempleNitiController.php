@@ -702,7 +702,6 @@ public function resumeNiti(Request $request)
 //         }
 // }
 
-
 public function stopNiti(Request $request)
 {
     try {
@@ -885,7 +884,6 @@ public function stopNiti(Request $request)
         ], 500);
     }
 }
-
 public function completedNiti()
 {
     try {
@@ -893,7 +891,7 @@ public function completedNiti()
 
         if (!$nitiMaster || !$nitiMaster->day_id) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Niti not found or day_id missing.'
             ], 404);
         }
@@ -901,31 +899,61 @@ public function completedNiti()
         $dayId = $nitiMaster->day_id;
 
         // ✅ Step 1: Get all Started entries
-        $startedEntries = NitiManagement::with('master')
+        $startedEntries = NitiManagement::with([
+                'master',
+                'sebak',
+                'startUser',
+                'endUser',
+                'notDoneUser',
+                'startTimeEditUser',
+                'endTimeEditUser',
+            ])
             ->where('niti_status', 'Started')
             ->where('day_id', $dayId)
-            ->orderByDesc('id') // optional: latest first
+            ->orderByDesc('id')
             ->get()
             ->map(function ($entry) {
                 return [
-                    'id'                       => $entry->id,
-                    'niti_id'                  => $entry->niti_id,
-                    'niti_name'                => optional($entry->master)->niti_name,
-                    'sebak_id'                 => $entry->sebak_id,
-                    'date'                     => $entry->date,
-                    'start_time'               => $entry->start_time,
-                    'end_time'                 => null,
-                    'duration'                 => null,
-                    'niti_status'              => 'Started',
-                    'start_user_id'            => $entry->start_user_id,
-                    'end_user_id'              => $entry->end_user_id,
-                    'start_time_edit_user_id'  => $entry->start_time_edit_user_id,
-                    'end_time_edit_user_id'    => $entry->end_time_edit_user_id,
+                    'id'                          => $entry->id,
+                    'niti_id'                     => $entry->niti_id,
+                    'niti_name'                   => optional($entry->master)->niti_name,
+
+                    'sebak_id'                    => $entry->sebak_id,
+                    'sebak_name'                  => optional($entry->sebak)->name,  // ✅ here
+
+                    'date'                        => $entry->date,
+                    'start_time'                  => $entry->start_time,
+                    'end_time'                    => null,
+                    'duration'                    => null,
+                    'niti_status'                 => 'Started',
+
+                    'start_user_id'               => $entry->start_user_id,
+                    'start_user_name'             => optional($entry->startUser)->name,
+
+                    'end_user_id'                 => $entry->end_user_id,
+                    'end_user_name'               => optional($entry->endUser)->name,
+
+                    'start_time_edit_user_id'     => $entry->start_time_edit_user_id,
+                    'start_time_edit_user_name'   => optional($entry->startTimeEditUser)->name,
+
+                    'end_time_edit_user_id'       => $entry->end_time_edit_user_id,
+                    'end_time_edit_user_name'     => optional($entry->endTimeEditUser)->name,
+
+                    'not_done_user_id'            => $entry->not_done_user_id,
+                    'not_done_user_name'          => optional($entry->notDoneUser)->name,
                 ];
             });
 
         // ✅ Step 2: Get all Completed or NotStarted entries
-        $completedManagement = NitiManagement::with('master')
+        $completedManagement = NitiManagement::with([
+                'master',
+                'sebak',
+                'startUser',
+                'endUser',
+                'notDoneUser',
+                'startTimeEditUser',
+                'endTimeEditUser',
+            ])
             ->whereIn('niti_status', ['Completed', 'NotStarted'])
             ->where('day_id', $dayId)
             ->orderByRaw("CASE WHEN niti_status = 'Started' THEN id ELSE NULL END ASC")
@@ -933,37 +961,50 @@ public function completedNiti()
             ->get()
             ->map(function ($item) {
                 return [
-                    'id'                       => $item->id,
-                    'niti_id'                  => $item->niti_id,
-                    'niti_name'                => optional($item->master)->niti_name,
-                    'sebak_id'                 => $item->sebak_id,
-                    'date'                     => $item->date,
-                    'start_time'               => $item->start_time,
-                    'end_time'                 => $item->end_time,
-                    'duration'                 => $item->duration,
-                    'niti_status'              => $item->niti_status,
-                    'start_user_id'            => $item->start_user_id,
-                    'end_user_id'              => $item->end_user_id,
-                    'start_time_edit_user_id'  => $item->start_time_edit_user_id,
-                    'end_time_edit_user_id'    => $item->end_time_edit_user_id,
-                    'not_done_user_id'    => $item->not_done_user_id,
+                    'id'                          => $item->id,
+                    'niti_id'                     => $item->niti_id,
+                    'niti_name'                   => optional($item->master)->niti_name,
+
+                    'sebak_id'                    => $item->sebak_id,
+                    'sebak_name'                  => optional($item->sebak)->name,  // ✅ here
+
+                    'date'                        => $item->date,
+                    'start_time'                  => $item->start_time,
+                    'end_time'                    => $item->end_time,
+                    'duration'                    => $item->duration,
+                    'niti_status'                 => $item->niti_status,
+
+                    'start_user_id'               => $item->start_user_id,
+                    'start_user_name'             => optional($item->startUser)->name,
+
+                    'end_user_id'                 => $item->end_user_id,
+                    'end_user_name'               => optional($item->endUser)->name,
+
+                    'start_time_edit_user_id'     => $item->start_time_edit_user_id,
+                    'start_time_edit_user_name'   => optional($item->startTimeEditUser)->name,
+
+                    'end_time_edit_user_id'       => $item->end_time_edit_user_id,
+                    'end_time_edit_user_name'     => optional($item->endTimeEditUser)->name,
+
+                    'not_done_user_id'            => $item->not_done_user_id,
+                    'not_done_user_name'          => optional($item->notDoneUser)->name,
                 ];
             });
 
         // ✅ Merge with Started first, then Completed/NotStarted
-       $merged = $completedManagement->merge($startedEntries)->values();
+        $merged = $completedManagement->merge($startedEntries)->values();
 
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Niti data fetched successfully.',
-            'data' => $merged,
+            'data'    => $merged,
         ], 200);
 
     } catch (\Exception $e) {
         return response()->json([
-            'status' => false,
+            'status'  => false,
             'message' => 'Failed to fetch Niti data.',
-            'error' => $e->getMessage(),
+            'error'   => $e->getMessage(),
         ], 500);
     }
 }
