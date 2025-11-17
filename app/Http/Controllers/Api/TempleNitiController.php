@@ -2294,112 +2294,147 @@ public function resetNiti(Request $request)
         }
     }
 
-    public function nitiTransactionsByDateRoute(string $from, string $to)
-    {
-        // Parse (accepts dd-mm-YYYY or YYYY-mm-dd; falls back to Carbon)
-        $parseDate = function (?string $value): ?string {
-            if (!$value) return null;
-            $v = trim($value);
+public function nitiTransactionsByDateRoute(string $from, string $to)
+{
+    // Parse (accepts dd-mm-YYYY or YYYY-mm-dd; falls back to Carbon)
+    $parseDate = function (?string $value): ?string {
+        if (!$value) return null;
+        $v = trim($value);
 
-            try { return Carbon::createFromFormat('d-m-Y', $v)->format('Y-m-d'); } catch (\Throwable $e) {}
-            try { return Carbon::createFromFormat('Y-m-d', $v)->format('Y-m-d'); } catch (\Throwable $e) {}
-            try { return Carbon::parse($v)->format('Y-m-d'); } catch (\Throwable $e) {}
+        try { return Carbon::createFromFormat('d-m-Y', $v)->format('Y-m-d'); } catch (\Throwable $e) {}
+        try { return Carbon::createFromFormat('Y-m-d', $v)->format('Y-m-d'); } catch (\Throwable $e) {}
+        try { return Carbon::parse($v)->format('Y-m-d'); } catch (\Throwable $e) {}
 
-            return null;
-        };
+        return null;
+    };
 
-        $fromDate = $parseDate($from);
-        $toDate   = $parseDate($to);
+    $fromDate = $parseDate($from);
+    $toDate   = $parseDate($to);
 
-        // Validate dates
-        if (!$fromDate || !$toDate) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Invalid dates. Use dd-mm-YYYY or YYYY-mm-dd in the URL.',
-                'meta'    => ['received' => ['from' => $from, 'to' => $to]],
-            ], 422);
-        }
-
-        if ($fromDate > $toDate) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'from date must be earlier than or equal to to date.',
-                'meta'    => ['from' => $fromDate, 'to' => $toDate],
-            ], 422);
-        }
-
-        // Iterate date range; resolve day_id by first entry per date
-        $period   = CarbonPeriod::create($fromDate, $toDate);
-        $response = [];
-
-        foreach ($period as $day) {
-            $date = $day->format('Y-m-d');
-
-            // FIRST entry for this date (earliest start_time, then id)
-            $firstEntry = NitiManagement::with('master')
-                ->where('date', $date)
-                ->orderBy('start_time', 'asc')
-                ->orderBy('id', 'asc')
-                ->first();
-
-            if (!$firstEntry) {
-                // No entries for this date — skip (or push empty block if you prefer)
-                continue;
-            }
-
-            $dayId = $firstEntry->day_id;
-
-            // ALL entries for that day_id (date used ONLY to resolve day_id)
-            $entries = NitiManagement::with('master')
-                ->where('day_id', $dayId)
-                ->orderByRaw("CASE WHEN order_id IS NULL OR order_id = '' THEN 1 ELSE 0 END ASC")
-                ->orderByRaw("CAST(order_id AS DECIMAL(10,1)) ASC")
-                ->orderBy('end_time', 'asc')
-                ->orderBy('start_time', 'asc')
-                ->orderBy('id', 'asc')
-                ->get()
-                ->map(function ($row) {
-                    return [
-                        'id'                       => $row->id,
-                        'niti_id'                  => $row->niti_id,
-                        'niti_name'                => optional($row->master)->niti_name,
-                        'english_niti_name'        => optional($row->master)->english_niti_name,
-                        'day_id'                   => $row->day_id,
-                        'order_id'                 => $row->order_id,
-                        'date'                     => $row->date,
-                        'start_time'               => $row->start_time,
-                        'pause_time'               => $row->pause_time,
-                        'resume_time'              => $row->resume_time,
-                        'end_time'                 => $row->end_time,
-                        'running_time'             => $row->running_time,
-                        'duration'                 => $row->duration,
-                        'niti_status'              => $row->niti_status,
-                        'start_user_id'            => $row->start_user_id,
-                        'end_user_id'              => $row->end_user_id,
-                        'start_time_edit_user_id'  => $row->start_time_edit_user_id,
-                        'end_time_edit_user_id'    => $row->end_time_edit_user_id,
-                        'not_done_user_id'         => $row->not_done_user_id,
-                        'niti_not_done_reason'     => $row->niti_not_done_reason,
-                    ];
-                })
-                ->values();
-
-            $response[] = [
-            
-                'entries'         => $entries,
-            ];
-        }
-
+    // Validate dates
+    if (!$fromDate || !$toDate) {
         return response()->json([
-            'status'  => true,
-            'message' => 'Niti transactions fetched by date range using day_id resolution.',
-            'data'    => $response,
-            'meta'    => [
-                'from_date' => $fromDate,
-                'to_date'   => $toDate,
-                'note'      => 'For each date, the first entry resolves the day_id; then all entries for that day_id are returned.',
-            ],
-        ], 200);
+            'status'  => false,
+            'message' => 'Invalid dates. Use dd-mm-YYYY or YYYY-mm-dd in the URL.',
+            'meta'    => ['received' => ['from' => $from, 'to' => $to]],
+        ], 422);
     }
+
+    if ($fromDate > $toDate) {
+        return response()->json([
+            'status'  => false,
+            'message' => 'from date must be earlier than or equal to to date.',
+            'meta'    => ['from' => $fromDate, 'to' => $toDate],
+        ], 422);
+    }
+
+    // Iterate date range; resolve day_id by first entry per date
+    $period   = CarbonPeriod::create($fromDate, $toDate);
+    $response = [];
+
+    foreach ($period as $day) {
+        $date = $day->format('Y-m-d');
+
+        // FIRST entry for this date (earliest start_time, then id)
+        $firstEntry = NitiManagement::with([
+                'master',
+                'sebak',
+                'startUser',
+                'endUser',
+                'startTimeEditUser',
+                'endTimeEditUser',
+                'notDoneUser',
+            ])
+            ->where('date', $date)
+            ->orderBy('start_time', 'asc')
+            ->orderBy('id', 'asc')
+            ->first();
+
+        if (!$firstEntry) {
+            // No entries for this date — skip
+            continue;
+        }
+
+        $dayId = $firstEntry->day_id;
+
+        // ALL entries for that day_id (date used ONLY to resolve day_id)
+        $entries = NitiManagement::with([
+                'master',
+                'sebak',
+                'startUser',
+                'endUser',
+                'startTimeEditUser',
+                'endTimeEditUser',
+                'notDoneUser',
+            ])
+            ->where('day_id', $dayId)
+            ->orderByRaw("CASE WHEN order_id IS NULL OR order_id = '' THEN 1 ELSE 0 END ASC")
+            ->orderByRaw("CAST(order_id AS DECIMAL(10,1)) ASC")
+            ->orderBy('end_time', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->orderBy('id', 'asc')
+            ->get()
+            ->map(function ($row) {
+                return [
+                    'id'                       => $row->id,
+                    'niti_id'                  => $row->niti_id,
+                    'niti_name'                => optional($row->master)->niti_name,
+                    'english_niti_name'        => optional($row->master)->english_niti_name,
+                    'day_id'                   => $row->day_id,
+                    'order_id'                 => $row->order_id,
+
+                    // Sebak info
+                    'sebak_id'                 => $row->sebak_id,
+                    'sebak_name'               => optional($row->sebak)->name,
+
+                    'date'                     => $row->date,
+                    'start_time'               => $row->start_time,
+                    'pause_time'               => $row->pause_time,
+                    'resume_time'              => $row->resume_time,
+                    'end_time'                 => $row->end_time,
+                    'running_time'             => $row->running_time,
+                    'duration'                 => $row->duration,
+                    'niti_status'              => $row->niti_status,
+
+                    // ✅ User IDs + Names
+                    'start_user_id'            => $row->start_user_id,
+                    'start_user_name'          => optional($row->startUser)->name,
+
+                    'end_user_id'              => $row->end_user_id,
+                    'end_user_name'            => optional($row->endUser)->name,
+
+                    'start_time_edit_user_id'  => $row->start_time_edit_user_id,
+                    'start_time_edit_user_name'=> optional($row->startTimeEditUser)->name,
+
+                    'end_time_edit_user_id'    => $row->end_time_edit_user_id,
+                    'end_time_edit_user_name'  => optional($row->endTimeEditUser)->name,
+
+                    'not_done_user_id'         => $row->not_done_user_id,
+                    'not_done_user_name'       => optional($row->notDoneUser)->name,
+
+                    'niti_not_done_reason'     => $row->niti_not_done_reason,
+                ];
+            })
+            ->values();
+
+        $response[] = [
+            'date'    => $date,
+            'day_id'  => $dayId,
+            'entries' => $entries,
+        ];
+    }
+
+    return response()->json([
+        'status'  => true,
+        'message' => 'Niti transactions fetched by date range using day_id resolution.',
+        'data'    => $response,
+        'meta'    => [
+            'from_date' => $fromDate,
+            'to_date'   => $toDate,
+            'note'      => 'For each date, the first entry resolves the day_id; then all entries for that day_id are returned.',
+        ],
+    ], 200);
+}
+
 
 }
