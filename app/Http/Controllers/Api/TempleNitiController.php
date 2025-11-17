@@ -1739,7 +1739,6 @@ public function updateNoticeName(Request $request)
         ], 500);
     }
 }
-
 public function getLatestNotice()
 {
     try {
@@ -1756,15 +1755,16 @@ public function getLatestNotice()
             ], 200);
         }
 
-        // ✅ Add full photo URL for each notice
-        foreach ($latestNotice as $notice) {
+        // ✅ Convert notice_photo to full URL for response
+        $latestNotice->transform(function ($notice) {
             if (!empty($notice->notice_photo)) {
-                // storage/app/public/...  =>  /storage/...
-                $notice->notice_photo_url = asset('storage/' . $notice->notice_photo);
+                // storage/app/public/... => /storage/...
+                $notice->notice_photo = asset('storage/' . $notice->notice_photo);
             } else {
-                $notice->notice_photo_url = null;
+                $notice->notice_photo = null;
             }
-        }
+            return $notice;
+        });
 
         return response()->json([
             'status'  => true,
