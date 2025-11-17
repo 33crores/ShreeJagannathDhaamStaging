@@ -1617,9 +1617,9 @@ public function storeByNoticeName(Request $request)
 
     // ✅ Validate input (including photo)
     $request->validate([
-        'notice_name'          => 'required|string|max:255',
+        'notice_name'          => 'nullable|string|max:255',
         'notice_name_english'  => 'nullable|string|max:255',
-        'start_date'           => 'required|date',
+        'start_date'           => 'nullable|date',
         'end_date'             => 'nullable|date|after_or_equal:start_date',
         'notice_photo'         => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048', // 2MB
     ]);
@@ -1674,8 +1674,8 @@ public function updateNoticeName(Request $request)
 {
     // ✅ Validation
     $request->validate([
-        'id'                 => 'required|exists:temple__news,id',
-        'notice_name'        => 'required|string|max:255',
+        'id'                 => 'nullable|exists:temple__news,id',
+        'notice_name'        => 'nullable|string|max:255',
         'notice_name_english'=> 'nullable|string|max:255',
         'start_date'         => 'nullable|date',
         'end_date'           => 'nullable|date|after_or_equal:start_date',
