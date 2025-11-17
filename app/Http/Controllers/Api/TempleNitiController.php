@@ -21,6 +21,7 @@ use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Illuminate\Support\Facades\DB;
 use Carbon\CarbonPeriod;
+use Illuminate\Support\Facades\Storage;
 
 class TempleNitiController extends Controller
 {
@@ -1604,78 +1605,137 @@ public function updateHundiCollection(Request $request)
 
 public function storeByNoticeName(Request $request)
 {
+    // ✅ Auth check
     $user = Auth::guard('niti_admin')->user();
 
     if (!$user) {
         return response()->json([
             'status'  => false,
-            'message' => 'Unauthorized access.'
+            'message' => 'Unauthorized access.',
         ], 401);
     }
 
+    // ✅ Validate input (including photo)
+    $request->validate([
+        'notice_name'          => 'required|string|max:255',
+        'notice_name_english'  => 'nullable|string|max:255',
+        'start_date'           => 'required|date',
+        'end_date'             => 'nullable|date|after_or_equal:start_date',
+        'notice_photo'         => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048', // 2MB
+    ]);
+
     try {
+        $photoPath = null;
+
+        // ✅ Upload photo if present and valid
+        if ($request->hasFile('notice_photo') && $request->file('notice_photo')->isValid()) {
+            // Stored at: storage/app/public/temple_notices/xxxx.jpg
+            $photoPath = $request->file('notice_photo')
+                ->store('temple_notices', 'public');
+        }
+
+        // ✅ Create record
         $news = TempleNews::create([
-            'type'                 => 'notice',
-            'notice_name'          => $request->notice_name,
-            'notice_name_english'  => $request->notice_name_english,
-            'start_date'           => $request->start_date,
-            'end_date'             => $request->end_date,
-            'notice_insert_user_id'=> $user->sebak_id,
+            'type'                  => 'notice',
+            'temple_id'             => $user->temple_id ?? null,   // adjust if your user doesn't have temple_id
+
+            'notice_name'           => $request->notice_name,
+            'notice_name_english'   => $request->notice_name_english,
+            'start_date'            => $request->start_date,
+            'end_date'              => $request->end_date,
+
+            'notice_photo'          => $photoPath,                 // only the relative path
+
+            'notice_insert_user_id' => $user->sebak_id ?? $user->id ?? null,
+            'status'                => 'active',                   // optional default
         ]);
+
+        // ✅ Optionally add full URL in response (does NOT change DB)
+        if ($news->notice_photo) {
+            $news->notice_photo_url = asset('storage/' . $news->notice_photo);
+        }
 
         return response()->json([
             'status'  => true,
             'message' => 'Temple news created successfully.',
-            'data'    => $news
+            'data'    => $news,
         ], 200);
 
     } catch (\Exception $e) {
         return response()->json([
             'status'  => false,
             'message' => 'Something went wrong!',
-            'error'   => $e->getMessage()
+            'error'   => $e->getMessage(),
         ], 500);
     }
 }
 
 public function updateNoticeName(Request $request)
 {
+    // ✅ Validation
     $request->validate([
-        'id' => 'required|exists:temple__news,id',
-        'notice_name' => 'required|string|max:255',
+        'id'                 => 'required|exists:temple__news,id',
+        'notice_name'        => 'required|string|max:255',
+        'notice_name_english'=> 'nullable|string|max:255',
+        'start_date'         => 'nullable|date',
+        'end_date'           => 'nullable|date|after_or_equal:start_date',
+        'notice_photo'       => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048', // 2MB
     ]);
 
-     $user = Auth::guard('niti_admin')->user();
+    // ✅ Auth check
+    $user = Auth::guard('niti_admin')->user();
 
     if (!$user) {
         return response()->json([
-            'status' => false,
-            'message' => 'Unauthorized access.'
+            'status'  => false,
+            'message' => 'Unauthorized access.',
         ], 401);
     }
 
     try {
+        // ✅ Find existing record
         $news = TempleNews::findOrFail($request->id);
-        $news->notice_name = $request->notice_name;
-        $news->notice_name_english = $request->notice_name_english;
-        $news->start_date = $request->start_date;
-        $news->end_date = $request->end_date;
-        $news->notice_update_user_id = $user->sebak_id;
+
+        // ✅ Handle photo update (optional)
+        if ($request->hasFile('notice_photo') && $request->file('notice_photo')->isValid()) {
+
+            // 🔹 Delete old photo if exists
+            if (!empty($news->notice_photo) && Storage::disk('public')->exists($news->notice_photo)) {
+                Storage::disk('public')->delete($news->notice_photo);
+            }
+
+            // 🔹 Store new photo
+            $newPhotoPath = $request->file('notice_photo')
+                ->store('temple_notices', 'public');
+
+            $news->notice_photo = $newPhotoPath;
+        }
+
+        // ✅ Update other fields
+        $news->notice_name            = $request->notice_name;
+        $news->notice_name_english    = $request->notice_name_english;
+        $news->start_date             = $request->start_date;
+        $news->end_date               = $request->end_date;
+        $news->notice_update_user_id  = $user->sebak_id ?? $user->id ?? null;
 
         $news->save();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Notice name updated successfully.',
-            'data' => $news
-        ],200);
+        // Optional: add full URL for frontend usage
+        if ($news->notice_photo) {
+            $news->notice_photo_url = asset('storage/' . $news->notice_photo);
+        }
 
-        
+        return response()->json([
+            'status'  => true,
+            'message' => 'Notice updated successfully.',
+            'data'    => $news,
+        ], 200);
+
     } catch (\Exception $e) {
         return response()->json([
-            'status' => false,
-            'message' => 'Failed to update notice name.',
-            'error' => $e->getMessage()
+            'status'  => false,
+            'message' => 'Failed to update notice.',
+            'error'   => $e->getMessage(),
         ], 500);
     }
 }
@@ -1692,23 +1752,35 @@ public function getLatestNotice()
             return response()->json([
                 'status'  => true,
                 'message' => 'No notice found.',
+                'data'    => [],
             ], 200);
+        }
+
+        // ✅ Add full photo URL for each notice
+        foreach ($latestNotice as $notice) {
+            if (!empty($notice->notice_photo)) {
+                // storage/app/public/...  =>  /storage/...
+                $notice->notice_photo_url = asset('storage/' . $notice->notice_photo);
+            } else {
+                $notice->notice_photo_url = null;
+            }
         }
 
         return response()->json([
             'status'  => true,
             'message' => 'Latest notice fetched successfully.',
-            'data'    => $latestNotice
+            'data'    => $latestNotice,
         ], 200);
 
     } catch (\Exception $e) {
         return response()->json([
             'status'  => false,
             'message' => 'Failed to fetch latest notice.',
-            'error'   => $e->getMessage()
+            'error'   => $e->getMessage(),
         ], 500);
     }
 }
+
 
 public function deleteNotice($id)
 {
@@ -2294,147 +2366,147 @@ public function resetNiti(Request $request)
         }
     }
 
-public function nitiTransactionsByDateRoute(string $from, string $to)
-{
-    // Parse (accepts dd-mm-YYYY or YYYY-mm-dd; falls back to Carbon)
-    $parseDate = function (?string $value): ?string {
-        if (!$value) return null;
-        $v = trim($value);
+    public function nitiTransactionsByDateRoute(string $from, string $to)
+    {
+        // Parse (accepts dd-mm-YYYY or YYYY-mm-dd; falls back to Carbon)
+        $parseDate = function (?string $value): ?string {
+            if (!$value) return null;
+            $v = trim($value);
 
-        try { return Carbon::createFromFormat('d-m-Y', $v)->format('Y-m-d'); } catch (\Throwable $e) {}
-        try { return Carbon::createFromFormat('Y-m-d', $v)->format('Y-m-d'); } catch (\Throwable $e) {}
-        try { return Carbon::parse($v)->format('Y-m-d'); } catch (\Throwable $e) {}
+            try { return Carbon::createFromFormat('d-m-Y', $v)->format('Y-m-d'); } catch (\Throwable $e) {}
+            try { return Carbon::createFromFormat('Y-m-d', $v)->format('Y-m-d'); } catch (\Throwable $e) {}
+            try { return Carbon::parse($v)->format('Y-m-d'); } catch (\Throwable $e) {}
 
-        return null;
-    };
+            return null;
+        };
 
-    $fromDate = $parseDate($from);
-    $toDate   = $parseDate($to);
+        $fromDate = $parseDate($from);
+        $toDate   = $parseDate($to);
 
-    // Validate dates
-    if (!$fromDate || !$toDate) {
-        return response()->json([
-            'status'  => false,
-            'message' => 'Invalid dates. Use dd-mm-YYYY or YYYY-mm-dd in the URL.',
-            'meta'    => ['received' => ['from' => $from, 'to' => $to]],
-        ], 422);
-    }
-
-    if ($fromDate > $toDate) {
-        return response()->json([
-            'status'  => false,
-            'message' => 'from date must be earlier than or equal to to date.',
-            'meta'    => ['from' => $fromDate, 'to' => $toDate],
-        ], 422);
-    }
-
-    // Iterate date range; resolve day_id by first entry per date
-    $period   = CarbonPeriod::create($fromDate, $toDate);
-    $response = [];
-
-    foreach ($period as $day) {
-        $date = $day->format('Y-m-d');
-
-        // FIRST entry for this date (earliest start_time, then id)
-        $firstEntry = NitiManagement::with([
-                'master',
-                'sebak',
-                'startUser',
-                'endUser',
-                'startTimeEditUser',
-                'endTimeEditUser',
-                'notDoneUser',
-            ])
-            ->where('date', $date)
-            ->orderBy('start_time', 'asc')
-            ->orderBy('id', 'asc')
-            ->first();
-
-        if (!$firstEntry) {
-            // No entries for this date — skip
-            continue;
+        // Validate dates
+        if (!$fromDate || !$toDate) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Invalid dates. Use dd-mm-YYYY or YYYY-mm-dd in the URL.',
+                'meta'    => ['received' => ['from' => $from, 'to' => $to]],
+            ], 422);
         }
 
-        $dayId = $firstEntry->day_id;
+        if ($fromDate > $toDate) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'from date must be earlier than or equal to to date.',
+                'meta'    => ['from' => $fromDate, 'to' => $toDate],
+            ], 422);
+        }
 
-        // ALL entries for that day_id (date used ONLY to resolve day_id)
-        $entries = NitiManagement::with([
-                'master',
-                'sebak',
-                'startUser',
-                'endUser',
-                'startTimeEditUser',
-                'endTimeEditUser',
-                'notDoneUser',
-            ])
-            ->where('day_id', $dayId)
-            ->orderByRaw("CASE WHEN order_id IS NULL OR order_id = '' THEN 1 ELSE 0 END ASC")
-            ->orderByRaw("CAST(order_id AS DECIMAL(10,1)) ASC")
-            ->orderBy('end_time', 'asc')
-            ->orderBy('start_time', 'asc')
-            ->orderBy('id', 'asc')
-            ->get()
-            ->map(function ($row) {
-                return [
-                    'id'                       => $row->id,
-                    'niti_id'                  => $row->niti_id,
-                    'niti_name'                => optional($row->master)->niti_name,
-                    'english_niti_name'        => optional($row->master)->english_niti_name,
-                    'day_id'                   => $row->day_id,
-                    'order_id'                 => $row->order_id,
+        // Iterate date range; resolve day_id by first entry per date
+        $period   = CarbonPeriod::create($fromDate, $toDate);
+        $response = [];
 
-                    // Sebak info
-                    'sebak_id'                 => $row->sebak_id,
-                    'sebak_name'               => optional($row->sebak)->name,
+        foreach ($period as $day) {
+            $date = $day->format('Y-m-d');
 
-                    'date'                     => $row->date,
-                    'start_time'               => $row->start_time,
-                    'pause_time'               => $row->pause_time,
-                    'resume_time'              => $row->resume_time,
-                    'end_time'                 => $row->end_time,
-                    'running_time'             => $row->running_time,
-                    'duration'                 => $row->duration,
-                    'niti_status'              => $row->niti_status,
+            // FIRST entry for this date (earliest start_time, then id)
+            $firstEntry = NitiManagement::with([
+                    'master',
+                    'sebak',
+                    'startUser',
+                    'endUser',
+                    'startTimeEditUser',
+                    'endTimeEditUser',
+                    'notDoneUser',
+                ])
+                ->where('date', $date)
+                ->orderBy('start_time', 'asc')
+                ->orderBy('id', 'asc')
+                ->first();
 
-                    // ✅ User IDs + Names
-                    'start_user_id'            => $row->start_user_id,
-                    'start_user_name'          => optional($row->startUser)->name,
+            if (!$firstEntry) {
+                // No entries for this date — skip
+                continue;
+            }
 
-                    'end_user_id'              => $row->end_user_id,
-                    'end_user_name'            => optional($row->endUser)->name,
+            $dayId = $firstEntry->day_id;
 
-                    'start_time_edit_user_id'  => $row->start_time_edit_user_id,
-                    'start_time_edit_user_name'=> optional($row->startTimeEditUser)->name,
+            // ALL entries for that day_id (date used ONLY to resolve day_id)
+            $entries = NitiManagement::with([
+                    'master',
+                    'sebak',
+                    'startUser',
+                    'endUser',
+                    'startTimeEditUser',
+                    'endTimeEditUser',
+                    'notDoneUser',
+                ])
+                ->where('day_id', $dayId)
+                ->orderByRaw("CASE WHEN order_id IS NULL OR order_id = '' THEN 1 ELSE 0 END ASC")
+                ->orderByRaw("CAST(order_id AS DECIMAL(10,1)) ASC")
+                ->orderBy('end_time', 'asc')
+                ->orderBy('start_time', 'asc')
+                ->orderBy('id', 'asc')
+                ->get()
+                ->map(function ($row) {
+                    return [
+                        'id'                       => $row->id,
+                        'niti_id'                  => $row->niti_id,
+                        'niti_name'                => optional($row->master)->niti_name,
+                        'english_niti_name'        => optional($row->master)->english_niti_name,
+                        'day_id'                   => $row->day_id,
+                        'order_id'                 => $row->order_id,
 
-                    'end_time_edit_user_id'    => $row->end_time_edit_user_id,
-                    'end_time_edit_user_name'  => optional($row->endTimeEditUser)->name,
+                        // Sebak info
+                        'sebak_id'                 => $row->sebak_id,
+                        'sebak_name'               => optional($row->sebak)->name,
 
-                    'not_done_user_id'         => $row->not_done_user_id,
-                    'not_done_user_name'       => optional($row->notDoneUser)->name,
+                        'date'                     => $row->date,
+                        'start_time'               => $row->start_time,
+                        'pause_time'               => $row->pause_time,
+                        'resume_time'              => $row->resume_time,
+                        'end_time'                 => $row->end_time,
+                        'running_time'             => $row->running_time,
+                        'duration'                 => $row->duration,
+                        'niti_status'              => $row->niti_status,
 
-                    'niti_not_done_reason'     => $row->niti_not_done_reason,
-                ];
-            })
-            ->values();
+                        // ✅ User IDs + Names
+                        'start_user_id'            => $row->start_user_id,
+                        'start_user_name'          => optional($row->startUser)->name,
 
-        $response[] = [
-            'date'    => $date,
-            'day_id'  => $dayId,
-            'entries' => $entries,
-        ];
+                        'end_user_id'              => $row->end_user_id,
+                        'end_user_name'            => optional($row->endUser)->name,
+
+                        'start_time_edit_user_id'  => $row->start_time_edit_user_id,
+                        'start_time_edit_user_name'=> optional($row->startTimeEditUser)->name,
+
+                        'end_time_edit_user_id'    => $row->end_time_edit_user_id,
+                        'end_time_edit_user_name'  => optional($row->endTimeEditUser)->name,
+
+                        'not_done_user_id'         => $row->not_done_user_id,
+                        'not_done_user_name'       => optional($row->notDoneUser)->name,
+
+                        'niti_not_done_reason'     => $row->niti_not_done_reason,
+                    ];
+                })
+                ->values();
+
+            $response[] = [
+                'date'    => $date,
+                'day_id'  => $dayId,
+                'entries' => $entries,
+            ];
+        }
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Niti transactions fetched by date range using day_id resolution.',
+            'data'    => $response,
+            'meta'    => [
+                'from_date' => $fromDate,
+                'to_date'   => $toDate,
+                'note'      => 'For each date, the first entry resolves the day_id; then all entries for that day_id are returned.',
+            ],
+        ], 200);
     }
-
-    return response()->json([
-        'status'  => true,
-        'message' => 'Niti transactions fetched by date range using day_id resolution.',
-        'data'    => $response,
-        'meta'    => [
-            'from_date' => $fromDate,
-            'to_date'   => $toDate,
-            'note'      => 'For each date, the first entry resolves the day_id; then all entries for that day_id are returned.',
-        ],
-    ], 200);
-}
 
 
 }
