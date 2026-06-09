@@ -56,7 +56,6 @@ use App\Http\Controllers\TempleUser\TempleNearByTempleController;
 use App\Http\Controllers\TempleUser\TempleCommuteController;
 use App\Http\Controllers\TempleUser\TempleEmergencyController;
 use App\Http\Controllers\TempleUser\TemplePublicServiceController;
-use App\Http\Controllers\TempleUser\TempleGalleryController;
 use App\Http\Controllers\TempleUser\TempleLostAndFoundController;
 use App\Http\Controllers\TempleUser\RathaYatraEventController;
 use App\Http\Controllers\TempleUser\RathaYatraActiveController;
@@ -72,19 +71,9 @@ Route::get('/tms', function () {
     return view('index');
 });
 
-// Route::get('/puri-dham', function () {
-//     return view('website.index');
-// });
-
-
 Route::get('/puri-municipality', function () {
     return view('website.puri-municipalty');
 });
-
-
-// Route::get('/puri-dhams', function () {
-//     return view('website.index2');
-// });
 
 Route::get('/contact', function () {
     return view('contactus');
@@ -97,6 +86,11 @@ Route::get('/package', function () {
 Route::get('/about', function () {
     return view('about');
 });
+
+ Route::controller(HomeSectionController::class)->group(function() {
+        Route::get('/puri-dhams', 'puriWebsite');
+    });
+
 
     Route::get('/lang/{locale}', function ($locale) {
         if (in_array($locale, ['English', 'Odia'])) {
