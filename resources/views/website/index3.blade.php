@@ -923,15 +923,7 @@
             'alt' => 'Railway Station',
             'type' => 'fa',
         ],
-        [
-            'url' => $serviceUrl('police_station'),
-            'title1' => $language === 'Odia' ? 'ପୋଲିସ୍' : 'Police',
-            'title2' => $language === 'Odia' ? 'ଷ୍ଟେସନ୍' : 'Station',
-            'desc' => $language === 'Odia' ? 'ସୁରକ୍ଷା ସହାୟତା ସୂଚନା' : 'Security help information',
-            'icon' => 'fa-solid fa-shield-halved',
-            'alt' => 'Police Station',
-            'type' => 'fa',
-        ],
+      
 
                 [
             'url' => route('services.byType', 'hospital'),
