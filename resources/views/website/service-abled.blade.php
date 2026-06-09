@@ -11,10 +11,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(180deg, #fff7ed 0%, #f8f3ff 100%);
+            background:
+                radial-gradient(circle at 8% 8%, rgba(255, 138, 0, 0.14), transparent 28%),
+                radial-gradient(circle at 90% 12%, rgba(52, 21, 81, 0.12), transparent 30%),
+                linear-gradient(180deg, #fff7ed 0%, #f8f3ff 55%, #fff8f3 100%);
             overflow-x: hidden;
             color: #1f2937;
         }
@@ -26,19 +33,81 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            border-radius: 0 0 36px 36px;
+            border-radius: 0 0 38px 38px;
+            background:
+                radial-gradient(circle at 18% 20%, rgba(255, 196, 87, 0.38), transparent 28%),
+                radial-gradient(circle at 82% 18%, rgba(255, 138, 0, 0.32), transparent 26%),
+                radial-gradient(circle at 50% 100%, rgba(255, 255, 255, 0.18), transparent 32%),
+                linear-gradient(135deg, #341551 0%, #5f1e60 38%, #db4d30 74%, #ff8a00 100%);
+            box-shadow: 0 18px 45px rgba(52, 21, 81, 0.22);
         }
 
         .hero-section::before {
             content: "";
             position: absolute;
+            width: 260px;
+            height: 260px;
+            left: -90px;
+            top: -100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.11);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .hero-section::after {
+            content: "";
+            position: absolute;
+            width: 210px;
+            height: 210px;
+            right: -70px;
+            bottom: -80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.13);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+        }
+
+        .hero-pattern {
+            position: absolute;
             inset: 0;
-            background:
-                linear-gradient(135deg, rgba(52, 21, 81, 0.94), rgba(219, 77, 48, 0.80)),
-                url("{{ asset('website/fest.jpg') }}");
-            background-size: cover;
-            background-position: center;
-            transform: scale(1.04);
+            opacity: 0.18;
+            background-image:
+                linear-gradient(45deg, rgba(255, 255, 255, 0.18) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(255, 255, 255, 0.12) 25%, transparent 25%);
+            background-size: 42px 42px;
+            pointer-events: none;
+        }
+
+        .hero-orb-one,
+        .hero-orb-two,
+        .hero-orb-three {
+            position: absolute;
+            border-radius: 999px;
+            filter: blur(1px);
+            pointer-events: none;
+        }
+
+        .hero-orb-one {
+            width: 90px;
+            height: 90px;
+            top: 72px;
+            left: 12%;
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .hero-orb-two {
+            width: 68px;
+            height: 68px;
+            bottom: 80px;
+            right: 18%;
+            background: rgba(255, 196, 87, 0.28);
+        }
+
+        .hero-orb-three {
+            width: 46px;
+            height: 46px;
+            top: 105px;
+            right: 28%;
+            background: rgba(255, 255, 255, 0.18);
         }
 
         .hero-content {
@@ -58,8 +127,38 @@
             background: rgba(255, 255, 255, 0.16);
             border: 1px solid rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             font-size: 14px;
             margin-bottom: 18px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .hero-icon-card {
+            width: 86px;
+            height: 86px;
+            margin: 0 auto 20px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 18px 38px rgba(0, 0, 0, 0.20);
+        }
+
+        .hero-icon-card i {
+            font-size: 42px;
+            color: #fff7ed;
+        }
+
+        .hero-content h1 {
+            text-shadow: 0 8px 28px rgba(0, 0, 0, 0.30);
+        }
+
+        .hero-content p {
+            text-shadow: 0 4px 16px rgba(0, 0, 0, 0.20);
         }
 
         .main-card {
@@ -122,7 +221,9 @@
         }
 
         .contact-card {
-            background: linear-gradient(135deg, #341551, #db4d30);
+            background:
+                radial-gradient(circle at top right, rgba(255, 138, 0, 0.35), transparent 34%),
+                linear-gradient(135deg, #341551, #db4d30);
             color: white;
             border-radius: 24px;
             box-shadow: 0 18px 38px rgba(219, 77, 48, 0.26);
@@ -135,11 +236,13 @@
             font-weight: 800;
             box-shadow: 0 14px 28px rgba(219, 77, 48, 0.35);
             transition: 0.25s;
+            text-decoration: none;
         }
 
         .call-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 18px 36px rgba(219, 77, 48, 0.42);
+            color: white;
         }
 
         .note-card {
@@ -158,7 +261,7 @@
 
         @media (max-width: 640px) {
             .hero-section {
-                min-height: 360px;
+                min-height: 365px;
                 border-radius: 0 0 26px 26px;
             }
 
@@ -169,6 +272,17 @@
 
             .hero-content p {
                 font-size: 15px;
+            }
+
+            .hero-icon-card {
+                width: 74px;
+                height: 74px;
+                border-radius: 24px;
+                margin-bottom: 16px;
+            }
+
+            .hero-icon-card i {
+                font-size: 34px;
             }
 
             .main-card {
@@ -190,210 +304,219 @@
 
 <body>
 
-    @php
-        $language = session('app_language', 'English');
-    @endphp
+@php
+    $language = session('app_language', 'English');
+@endphp
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="hero-content max-w-4xl mx-auto">
-            <div class="glass-badge">
-                <i class="fa-solid fa-wheelchair-move"></i>
-                {{ $language === 'Odia' ? 'ଭକ୍ତଙ୍କ ପାଇଁ ସହାୟତା ସେବା' : 'Assistance Service for Devotees' }}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-pattern"></div>
+    <div class="hero-orb-one"></div>
+    <div class="hero-orb-two"></div>
+    <div class="hero-orb-three"></div>
+
+    <div class="hero-content max-w-4xl mx-auto">
+        <div class="hero-icon-card">
+            <i class="fa-solid fa-wheelchair-move"></i>
+        </div>
+
+        <div class="glass-badge">
+            <i class="fa-solid fa-hand-holding-heart"></i>
+            {{ $language === 'Odia' ? 'ଭକ୍ତଙ୍କ ପାଇଁ ସହାୟତା ସେବା' : 'Assistance Service for Devotees' }}
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-black drop-shadow-lg">
+            {{ $language === 'Odia' ? 'ବିଶେଷ କ୍ଷମତା ବିଶିଷ୍ଟ ବ୍ୟକ୍ତି' : 'Specially Abled Person' }}
+        </h1>
+
+        <p class="mt-5 text-base sm:text-lg md:text-xl text-orange-50 max-w-2xl mx-auto leading-relaxed">
+            {{ $language === 'Odia'
+                ? 'ବିଶେଷ କ୍ଷମତା ବିଶିଷ୍ଟ ଏବଂ ବୟସ୍କ ଭକ୍ତଙ୍କ ପାଇଁ ମନ୍ଦିର ସହାୟତା ସୂଚନା ।'
+                : 'Important assistance information for specially abled and senior citizen devotees visiting the temple.' }}
+        </p>
+
+        <div class="mt-8">
+            <a href="tel:06752252527" class="call-btn inline-flex items-center gap-3 px-7 py-4">
+                <i class="fa-solid fa-phone-volume"></i>
+                {{ $language === 'Odia' ? 'ସହାୟତା ପାଇଁ କଲ୍ କରନ୍ତୁ' : 'Call for Assistance' }}
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<main class="px-4 sm:px-6 lg:px-8 pb-16 -mt-12 relative z-10">
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Main Card -->
+        <section class="main-card p-6 sm:p-8 md:p-10 text-center">
+            <div class="icon-3d">
+                <i class="fa-solid fa-wheelchair"></i>
             </div>
 
-            <h1 class="text-4xl sm:text-5xl md:text-6xl font-black drop-shadow-lg">
-                {{ $language === 'Odia' ? 'ବିଶେଷ କ୍ଷମତା ବିଶିଷ୍ଟ ବ୍ୟକ୍ତି' : 'Specially Abled Person' }}
-            </h1>
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-[#341551] mt-6">
+                {{ $language === 'Odia' ? 'ବିଶେଷ କ୍ଷମତା ବିଶିଷ୍ଟ ଭକ୍ତ ସେବା' : 'Specially Abled Devotee Services' }}
+            </h2>
 
-            <p class="mt-5 text-base sm:text-lg md:text-xl text-orange-50 max-w-2xl mx-auto leading-relaxed">
-                {{ $language === 'Odia'
-                    ? 'ବିଶେଷ କ୍ଷମତା ବିଶିଷ୍ଟ ଏବଂ ବୟସ୍କ ଭକ୍ତଙ୍କ ପାଇଁ ମନ୍ଦିର ସହାୟତା ସୂଚନା ।'
-                    : 'Important assistance information for specially abled and senior citizen devotees visiting the temple.' }}
+            <p class="text-gray-600 text-base sm:text-lg leading-relaxed mt-5 max-w-4xl mx-auto">
+                {!! $language === 'Odia'
+                    ? 'ହ୍ୱିଲ୍‌ଚେୟାର କେବଳ ମନ୍ଦିରର ମୁଖ୍ୟ ଦ୍ୱାର ପର୍ଯ୍ୟନ୍ତ ଅନୁମତିପ୍ରାପ୍ତ ଅଟେ। <strong>ଜଗନ୍ନାଥ ବଲ୍ଲଭ ପାର୍କିଂ / ମାର୍କେଟ୍ ସ୍କୱାର</strong> ରୁ <strong>ମନ୍ଦିରର ମୁଖ୍ୟ ଦ୍ୱାର / ଉତ୍ତର ଦ୍ୱାର</strong> ପର୍ଯ୍ୟନ୍ତ ବୟସ୍କ ଏବଂ ଶାରୀରିକ ଭାବେ ଅସମର୍ଥ ଭକ୍ତଙ୍କ ପାଇଁ <strong>ବ୍ୟାଟେରୀ ଚାଳିତ ଯାନ</strong> ସେବା ମାଗଣା ଉପଲବ୍ଧ।'
+                    : 'Wheelchairs are allowed only up to the main gate of the temple. Free <strong>battery-operated vehicle</strong> service is available from <strong>Jagannatha Ballav Parking / Market Square</strong> to the <strong>Temple Main Gate / North Gate</strong> for senior citizens and physically challenged devotees.' !!}
             </p>
 
-            <div class="mt-8">
-                <a href="tel:06752252527" class="call-btn inline-flex items-center gap-3 px-7 py-4">
-                    <i class="fa-solid fa-phone-volume"></i>
-                    {{ $language === 'Odia' ? 'ସହାୟତା ପାଇଁ କଲ୍ କରନ୍ତୁ' : 'Call for Assistance' }}
-                </a>
+            <!-- Contact Box -->
+            <div class="contact-card mt-8 p-6 sm:p-8">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+                        <div class="w-16 h-16 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
+                            <i class="fa-solid fa-headset text-3xl text-orange-100"></i>
+                        </div>
+
+                        <div>
+                            <p class="text-orange-100 text-sm font-semibold uppercase tracking-wide">
+                                {{ $language === 'Odia' ? 'ସହାୟତା ନମ୍ବର' : 'Assistance Contact' }}
+                            </p>
+                            <a href="tel:06752252527" class="text-3xl sm:text-4xl font-black tracking-wide">
+                                06752 - 252527
+                            </a>
+                            <p class="text-orange-100 text-sm mt-1">
+                                {{ $language === 'Odia'
+                                    ? 'ମନ୍ଦିର ସୁପରିଭାଇଜର୍ / ଅସିଷ୍ଟେଣ୍ଟ ସୁପରିଭାଇଜର୍'
+                                    : 'Temple Supervisor / Assistant Supervisor' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <a href="tel:06752252527" class="call-btn inline-flex items-center justify-center gap-2 px-7 py-4 w-full md:w-auto">
+                        <i class="fa-solid fa-phone"></i>
+                        {{ $language === 'Odia' ? 'କଲ୍ କରନ୍ତୁ' : 'Call Now' }}
+                    </a>
+                </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Main Content -->
-    <main class="px-4 sm:px-6 lg:px-8 pb-16 -mt-12 relative z-10">
-        <div class="max-w-6xl mx-auto">
+            <!-- Highlight -->
+            <div class="info-highlight text-left mt-8 p-5 sm:p-6">
+                <div class="flex items-start gap-4">
+                    <div class="service-icon shrink-0">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </div>
 
-            <!-- Main Card -->
-            <section class="main-card p-6 sm:p-8 md:p-10 text-center">
-                <div class="icon-3d">
-                    <i class="fa-solid fa-wheelchair"></i>
+                    <div>
+                        <h3 class="text-xl font-black text-[#341551]">
+                            {{ $language === 'Odia' ? 'ସେବା ସୂଚନା' : 'Service Information' }}
+                        </h3>
+                        <p class="text-gray-600 mt-2 leading-relaxed">
+                            {!! $language === 'Odia'
+                                ? '<strong>ହ୍ୱିଲଚେୟାର୍</strong> ବ୍ୟବହାର କରିବା ପାଇଁ ଭକ୍ତମାନେ <strong>ମନ୍ଦିର ସୁପରିଭାଇଜର୍ / ଅସିଷ୍ଟେଣ୍ଟ ସୁପରିଭାଇଜର୍</strong>ଙ୍କୁ <strong>06752 - 252527</strong> ରେ ସମ୍ପର୍କ କରିପାରିବେ।'
+                                : 'For availing wheelchair assistance, devotees can contact the <strong>Temple Supervisor / Assistant Supervisor</strong> at <strong>06752 - 252527</strong>.' !!}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Grid -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-8">
+
+            <div class="service-card p-6">
+                <div class="service-icon">
+                    <i class="fa-solid fa-car-side"></i>
                 </div>
 
-                <h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-[#341551] mt-6">
-                    {{ $language === 'Odia' ? 'ବିଶେଷ କ୍ଷମତା ବିଶିଷ୍ଟ ଭକ୍ତ ସେବା' : 'Specially Abled Devotee Services' }}
-                </h2>
+                <h3 class="font-black text-[#341551] text-xl mt-5">
+                    {{ $language === 'Odia' ? 'ବ୍ୟାଟେରୀ ଯାନ ସେବା' : 'Battery Vehicle Service' }}
+                </h3>
 
-                <p class="text-gray-600 text-base sm:text-lg leading-relaxed mt-5 max-w-4xl mx-auto">
-                    {!! $language === 'Odia'
-                        ? 'ହ୍ୱିଲ୍‌ଚେୟାର କେବଳ ମନ୍ଦିରର ମୁଖ୍ୟ ଦ୍ୱାର ପର୍ଯ୍ୟନ୍ତ ଅନୁମତିପ୍ରାପ୍ତ ଅଟେ। <strong>ଜଗନ୍ନାଥ ବଲ୍ଲଭ ପାର୍କିଂ / ମାର୍କେଟ୍ ସ୍କୱାର</strong> ରୁ <strong>ମନ୍ଦିରର ମୁଖ୍ୟ ଦ୍ୱାର / ଉତ୍ତର ଦ୍ୱାର</strong> ପର୍ଯ୍ୟନ୍ତ ବୟସ୍କ ଏବଂ ଶାରୀରିକ ଭାବେ ଅସମର୍ଥ ଭକ୍ତଙ୍କ ପାଇଁ <strong>ବ୍ୟାଟେରୀ ଚାଳିତ ଯାନ</strong> ସେବା ମାଗଣା ଉପଲବ୍ଧ।'
-                        : 'Wheelchairs are allowed only up to the main gate of the temple. Free <strong>battery-operated vehicle</strong> service is available from <strong>Jagannatha Ballav Parking / Market Square</strong> to the <strong>Temple Main Gate / North Gate</strong> for senior citizens and physically challenged devotees.' !!}
+                <p class="text-gray-500 mt-3 leading-relaxed">
+                    {{ $language === 'Odia'
+                        ? 'ଜଗନ୍ନାଥ ବଲ୍ଲଭ ପାର୍କିଂରୁ ମନ୍ଦିର ଦ୍ୱାର ପର୍ଯ୍ୟନ୍ତ ସେବା ଉପଲବ୍ଧ।'
+                        : 'Available from Jagannatha Ballav Parking to Temple Main Gate / North Gate.' }}
                 </p>
+            </div>
 
-                <!-- Contact Box -->
-                <div class="contact-card mt-8 p-6 sm:p-8">
-                    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div class="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
-                            <div class="w-16 h-16 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
-                                <i class="fa-solid fa-headset text-3xl text-orange-100"></i>
-                            </div>
-
-                            <div>
-                                <p class="text-orange-100 text-sm font-semibold uppercase tracking-wide">
-                                    {{ $language === 'Odia' ? 'ସହାୟତା ନମ୍ବର' : 'Assistance Contact' }}
-                                </p>
-                                <a href="tel:06752252527" class="text-3xl sm:text-4xl font-black tracking-wide">
-                                    06752 - 252527
-                                </a>
-                                <p class="text-orange-100 text-sm mt-1">
-                                    {{ $language === 'Odia'
-                                        ? 'ମନ୍ଦିର ସୁପରିଭାଇଜର୍ / ଅସିଷ୍ଟେଣ୍ଟ ସୁପରିଭାଇଜର୍'
-                                        : 'Temple Supervisor / Assistant Supervisor' }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <a href="tel:06752252527" class="call-btn inline-flex items-center justify-center gap-2 px-7 py-4 w-full md:w-auto">
-                            <i class="fa-solid fa-phone"></i>
-                            {{ $language === 'Odia' ? 'କଲ୍ କରନ୍ତୁ' : 'Call Now' }}
-                        </a>
-                    </div>
+            <div class="service-card p-6">
+                <div class="service-icon">
+                    <i class="fa-solid fa-wheelchair-move"></i>
                 </div>
 
-                <!-- Highlight -->
-                <div class="info-highlight text-left mt-8 p-5 sm:p-6">
-                    <div class="flex items-start gap-4">
-                        <div class="service-icon shrink-0">
-                            <i class="fa-solid fa-circle-info"></i>
-                        </div>
+                <h3 class="font-black text-[#341551] text-xl mt-5">
+                    {{ $language === 'Odia' ? 'ହ୍ୱିଲଚେୟାର୍ ସହାୟତା' : 'Wheelchair Assistance' }}
+                </h3>
 
-                        <div>
-                            <h3 class="text-xl font-black text-[#341551]">
-                                {{ $language === 'Odia' ? 'ସେବା ସୂଚନା' : 'Service Information' }}
-                            </h3>
-                            <p class="text-gray-600 mt-2 leading-relaxed">
-                                {!! $language === 'Odia'
-                                    ? '<strong>ହ୍ୱିଲଚେୟାର୍</strong> ବ୍ୟବହାର କରିବା ପାଇଁ ଭକ୍ତମାନେ <strong>ମନ୍ଦିର ସୁପରିଭାଇଜର୍ / ଅସିଷ୍ଟେଣ୍ଟ ସୁପରିଭାଇଜର୍</strong>ଙ୍କୁ <strong>06752 - 252527</strong> ରେ ସମ୍ପର୍କ କରିପାରିବେ।'
-                                    : 'For availing wheelchair assistance, devotees can contact the <strong>Temple Supervisor / Assistant Supervisor</strong> at <strong>06752 - 252527</strong>.' !!}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                <p class="text-gray-500 mt-3 leading-relaxed">
+                    {{ $language === 'Odia'
+                        ? 'ହ୍ୱିଲଚେୟାର୍ କେବଳ ମନ୍ଦିରର ମୁଖ୍ୟ ଦ୍ୱାର ପର୍ଯ୍ୟନ୍ତ ଅନୁମତିପ୍ରାପ୍ତ।'
+                        : 'Wheelchair movement is allowed only up to the main gate of the temple.' }}
+                </p>
+            </div>
 
-            <!-- Services Grid -->
-            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-8">
-
-                <div class="service-card p-6">
-                    <div class="service-icon">
-                        <i class="fa-solid fa-car-side"></i>
-                    </div>
-
-                    <h3 class="font-black text-[#341551] text-xl mt-5">
-                        {{ $language === 'Odia' ? 'ବ୍ୟାଟେରୀ ଯାନ ସେବା' : 'Battery Vehicle Service' }}
-                    </h3>
-
-                    <p class="text-gray-500 mt-3 leading-relaxed">
-                        {{ $language === 'Odia'
-                            ? 'ଜଗନ୍ନାଥ ବଲ୍ଲଭ ପାର୍କିଂରୁ ମନ୍ଦିର ଦ୍ୱାର ପର୍ଯ୍ୟନ୍ତ ସେବା ଉପଲବ୍ଧ।'
-                            : 'Available from Jagannatha Ballav Parking to Temple Main Gate / North Gate.' }}
-                    </p>
+            <div class="service-card p-6">
+                <div class="service-icon">
+                    <i class="fa-solid fa-user-shield"></i>
                 </div>
 
-                <div class="service-card p-6">
-                    <div class="service-icon">
-                        <i class="fa-solid fa-wheelchair-move"></i>
+                <h3 class="font-black text-[#341551] text-xl mt-5">
+                    {{ $language === 'Odia' ? 'ବୟସ୍କ ଭକ୍ତ ସହାୟତା' : 'Senior Citizen Support' }}
+                </h3>
+
+                <p class="text-gray-500 mt-3 leading-relaxed">
+                    {{ $language === 'Odia'
+                        ? 'ବୟସ୍କ ଭକ୍ତଙ୍କ ପାଇଁ ମନ୍ଦିର ଯାତ୍ରାରେ ସହାୟତା ଉପଲବ୍ଧ।'
+                        : 'Support is available for senior citizens during temple visit movement.' }}
+                </p>
+            </div>
+
+        </section>
+
+        <!-- Important Notes -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-8">
+
+            <div class="note-card p-5 sm:p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-red-100 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-triangle-exclamation text-red-600 text-xl"></i>
                     </div>
-
-                    <h3 class="font-black text-[#341551] text-xl mt-5">
-                        {{ $language === 'Odia' ? 'ହ୍ୱିଲଚେୟାର୍ ସହାୟତା' : 'Wheelchair Assistance' }}
-                    </h3>
-
-                    <p class="text-gray-500 mt-3 leading-relaxed">
-                        {{ $language === 'Odia'
-                            ? 'ହ୍ୱିଲଚେୟାର୍ କେବଳ ମନ୍ଦିରର ମୁଖ୍ୟ ଦ୍ୱାର ପର୍ଯ୍ୟନ୍ତ ଅନୁମତିପ୍ରାପ୍ତ।'
-                            : 'Wheelchair movement is allowed only up to the main gate of the temple.' }}
-                    </p>
-                </div>
-
-                <div class="service-card p-6">
-                    <div class="service-icon">
-                        <i class="fa-solid fa-user-shield"></i>
-                    </div>
-
-                    <h3 class="font-black text-[#341551] text-xl mt-5">
-                        {{ $language === 'Odia' ? 'ବୟସ୍କ ଭକ୍ତ ସହାୟତା' : 'Senior Citizen Support' }}
-                    </h3>
-
-                    <p class="text-gray-500 mt-3 leading-relaxed">
-                        {{ $language === 'Odia'
-                            ? 'ବୟସ୍କ ଭକ୍ତଙ୍କ ପାଇଁ ମନ୍ଦିର ଯାତ୍ରାରେ ସହାୟତା ଉପଲବ୍ଧ।'
-                            : 'Support is available for senior citizens during temple visit movement.' }}
-                    </p>
-                </div>
-
-            </section>
-
-            <!-- Important Notes -->
-            <section class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-8">
-
-                <div class="note-card p-5 sm:p-6">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-2xl bg-red-100 flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-triangle-exclamation text-red-600 text-xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-black text-lg">
-                                {{ $language === 'Odia' ? 'ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ ନୋଟ୍' : 'Important Note' }}
-                            </h4>
-                            <p class="mt-2 text-sm sm:text-base leading-relaxed">
-                                {{ $language === 'Odia'
-                                    ? 'ହ୍ୱିଲଚେୟାର୍ କେବଳ ଶାରୀରିକ ଭାବରେ ଅସମର୍ଥ ଭକ୍ତଙ୍କ ପାଇଁ ଉପଲବ୍ଧ।'
-                                    : 'Wheelchairs are available only for differently abled devotees.' }}
-                            </p>
-                        </div>
+                    <div>
+                        <h4 class="font-black text-lg">
+                            {{ $language === 'Odia' ? 'ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ ନୋଟ୍' : 'Important Note' }}
+                        </h4>
+                        <p class="mt-2 text-sm sm:text-base leading-relaxed">
+                            {{ $language === 'Odia'
+                                ? 'ହ୍ୱିଲଚେୟାର୍ କେବଳ ଶାରୀରିକ ଭାବରେ ଅସମର୍ଥ ଭକ୍ତଙ୍କ ପାଇଁ ଉପଲବ୍ଧ।'
+                                : 'Wheelchairs are available only for differently abled devotees.' }}
+                        </p>
                     </div>
                 </div>
+            </div>
 
-                <div class="note-card p-5 sm:p-6">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-2xl bg-red-100 flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-ban text-red-600 text-xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-black text-lg">
-                                {{ $language === 'Odia' ? 'ମନ୍ଦିର ନିୟମ' : 'Temple Rule' }}
-                            </h4>
-                            <p class="mt-2 text-sm sm:text-base leading-relaxed">
-                                {{ $language === 'Odia'
-                                    ? 'ଶ୍ରୀମନ୍ଦିର ପ୍ରାଙ୍ଗଣ ଭିତରେ ହ୍ୱିଲଚେୟାର୍ ନେଇଯିବା କଠୋର ଭାବରେ ନିଷେଧ।'
-                                    : 'Wheelchairs are strictly prohibited inside the temple premises.' }}
-                            </p>
-                        </div>
+            <div class="note-card p-5 sm:p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-red-100 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-ban text-red-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-black text-lg">
+                            {{ $language === 'Odia' ? 'ମନ୍ଦିର ନିୟମ' : 'Temple Rule' }}
+                        </h4>
+                        <p class="mt-2 text-sm sm:text-base leading-relaxed">
+                            {{ $language === 'Odia'
+                                ? 'ଶ୍ରୀମନ୍ଦିର ପ୍ରାଙ୍ଗଣ ଭିତରେ ହ୍ୱିଲଚେୟାର୍ ନେଇଯିବା କଠୋର ଭାବରେ ନିଷେଧ।'
+                                : 'Wheelchairs are strictly prohibited inside the temple premises.' }}
+                        </p>
                     </div>
                 </div>
+            </div>
 
-            </section>
+        </section>
 
-        </div>
-    </main>
+    </div>
+</main>
 
-    <!-- Floating Mobile Call Button -->
-    <a href="tel:06752252527"
-        class="fixed right-5 bottom-5 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-[#ff8a00] to-[#db4d30] text-white flex items-center justify-center shadow-2xl sm:hidden">
-        <i class="fa-solid fa-phone-volume text-2xl"></i>
-    </a>
+<!-- Floating Mobile Call Button -->
+<a href="tel:06752252527"
+    class="fixed right-5 bottom-5 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-[#ff8a00] to-[#db4d30] text-white flex items-center justify-center shadow-2xl sm:hidden">
+    <i class="fa-solid fa-phone-volume text-2xl"></i>
+</a>
 
 </body>
 
