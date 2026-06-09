@@ -17,9 +17,9 @@
         body {
             margin: 0;
             background:
-                radial-gradient(circle at top left, rgba(255, 122, 26, 0.12), transparent 30%),
-                radial-gradient(circle at top right, rgba(52, 21, 81, 0.08), transparent 32%),
-                linear-gradient(180deg, #fff8f3 0%, #ffffff 48%, #fff7f1 100%);
+                radial-gradient(circle at 8% 10%, rgba(255, 122, 26, 0.18), transparent 28%),
+                radial-gradient(circle at 92% 8%, rgba(52, 21, 81, 0.14), transparent 30%),
+                linear-gradient(180deg, #fff8f0 0%, #ffffff 48%, #fff3ea 100%);
             font-family: Arial, sans-serif;
             color: #222;
         }
@@ -27,41 +27,131 @@
         .parking-page {
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative;
         }
 
+        .parking-page::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(52, 21, 81, 0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(52, 21, 81, 0.035) 1px, transparent 1px);
+            background-size: 34px 34px;
+            opacity: 0.55;
+        }
+
+        /* New attractive header without background image */
         .parking-hero {
             position: relative;
             width: 100%;
-            min-height: 330px;
+            min-height: 350px;
             display: flex;
             align-items: center;
             overflow: hidden;
-        }
-
-        .parking-hero-bg {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scale(1.04);
-        }
-
-        .parking-hero-overlay {
-            position: absolute;
-            inset: 0;
             background:
-                radial-gradient(circle at 85% 15%, rgba(255, 196, 87, 0.34), transparent 32%),
-                linear-gradient(90deg, rgba(52, 21, 81, 0.88), rgba(219, 77, 48, 0.72));
+                radial-gradient(circle at 80% 20%, rgba(255, 196, 87, 0.42), transparent 24%),
+                radial-gradient(circle at 18% 78%, rgba(255, 122, 26, 0.36), transparent 28%),
+                linear-gradient(135deg, #341551 0%, #7d233f 48%, #db4d30 78%, #ff7a1a 100%);
+        }
+
+        .parking-hero::before {
+            content: "";
+            position: absolute;
+            width: 520px;
+            height: 520px;
+            right: -180px;
+            top: -210px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .parking-hero::after {
+            content: "";
+            position: absolute;
+            width: 360px;
+            height: 360px;
+            left: -130px;
+            bottom: -160px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+        }
+
+        .hero-pattern {
+            position: absolute;
+            inset: 0;
+            opacity: 0.22;
+            background-image:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.18) 25%, transparent 25%),
+                linear-gradient(225deg, rgba(255, 255, 255, 0.16) 25%, transparent 25%),
+                linear-gradient(45deg, rgba(255, 255, 255, 0.10) 25%, transparent 25%),
+                linear-gradient(315deg, rgba(255, 255, 255, 0.10) 25%, transparent 25%);
+            background-position: 18px 0, 18px 0, 0 0, 0 0;
+            background-size: 36px 36px;
+        }
+
+        .hero-glow {
+            position: absolute;
+            right: 8%;
+            bottom: 32px;
+            width: 210px;
+            height: 210px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.13);
+            filter: blur(4px);
+        }
+
+        .hero-floating-card {
+            position: absolute;
+            right: 8%;
+            top: 95px;
+            width: 245px;
+            padding: 18px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            color: #ffffff;
+            z-index: 2;
+        }
+
+        .hero-floating-card .icon-box {
+            width: 54px;
+            height: 54px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.20);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            margin-bottom: 13px;
+        }
+
+        .hero-floating-card h4 {
+            margin: 0 0 7px;
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .hero-floating-card p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.45;
+            color: rgba(255, 255, 255, 0.88);
         }
 
         .parking-hero-content {
             position: relative;
-            z-index: 2;
+            z-index: 3;
             width: 100%;
             max-width: 1180px;
             margin: 0 auto;
-            padding: 52px 22px;
+            padding: 58px 22px;
             color: #ffffff;
         }
 
@@ -72,49 +162,82 @@
             padding: 9px 14px;
             border-radius: 999px;
             background: rgba(255, 255, 255, 0.16);
-            border: 1px solid rgba(255, 255, 255, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             font-size: 13px;
             font-weight: 800;
             margin-bottom: 16px;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10);
         }
 
         .parking-hero h1 {
             margin: 0;
-            font-size: 46px;
-            line-height: 1.12;
+            font-size: 48px;
+            line-height: 1.1;
             font-weight: 900;
-            max-width: 720px;
-            letter-spacing: -0.8px;
+            max-width: 690px;
+            letter-spacing: -0.9px;
         }
 
         .parking-hero p {
-            margin: 14px 0 0;
+            margin: 15px 0 0;
             font-size: 17px;
             line-height: 1.6;
-            max-width: 720px;
-            color: rgba(255, 255, 255, 0.90);
+            max-width: 680px;
+            color: rgba(255, 255, 255, 0.92);
+        }
+
+        .hero-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 26px;
+        }
+
+        .hero-stat {
+            min-width: 138px;
+            padding: 13px 15px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .hero-stat strong {
+            display: block;
+            font-size: 20px;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .hero-stat span {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.86);
+            font-weight: 700;
         }
 
         .parking-wrapper {
             width: 100%;
             max-width: 1180px;
-            margin: 28px auto 0;
+            margin: -28px auto 0;
             padding: 0 18px 60px;
             position: relative;
-            z-index: 3;
+            z-index: 4;
         }
 
         .tab-section {
             margin: 0 0 24px;
             padding: 12px;
-            border-radius: 22px;
-            background: rgba(255, 255, 255, 0.92);
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.94);
             border: 1px solid rgba(219, 77, 48, 0.08);
-            box-shadow: 0 14px 34px rgba(52, 21, 81, 0.10);
+            box-shadow: 0 18px 42px rgba(52, 21, 81, 0.14);
             overflow-x: auto;
             scrollbar-width: none;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
         }
 
         .tab-section::-webkit-scrollbar {
@@ -132,9 +255,9 @@
             border: 0;
             outline: 0;
             cursor: pointer;
-            min-height: 48px;
+            min-height: 50px;
             padding: 10px 12px;
-            border-radius: 15px;
+            border-radius: 16px;
             background: #fff7f1;
             color: #341551;
             font-size: 14px;
@@ -154,7 +277,7 @@
         .parking-tab.active {
             color: #ffffff;
             background: linear-gradient(135deg, #341551, #db4d30, #ff7a1a);
-            box-shadow: 0 12px 24px rgba(219, 77, 48, 0.24);
+            box-shadow: 0 12px 24px rgba(219, 77, 48, 0.26);
             transform: translateY(-2px);
         }
 
@@ -396,15 +519,19 @@
             .parking-grid {
                 grid-template-columns: 1fr;
             }
+
+            .hero-floating-card {
+                display: none;
+            }
         }
 
         @media (max-width: 575px) {
             .parking-hero {
-                min-height: 285px;
+                min-height: 325px;
             }
 
             .parking-hero-content {
-                padding: 36px 16px;
+                padding: 42px 16px 58px;
             }
 
             .hero-badge {
@@ -413,7 +540,7 @@
             }
 
             .parking-hero h1 {
-                font-size: 31px;
+                font-size: 32px;
             }
 
             .parking-hero p {
@@ -421,8 +548,23 @@
                 line-height: 1.5;
             }
 
+            .hero-stats {
+                gap: 8px;
+                margin-top: 20px;
+            }
+
+            .hero-stat {
+                min-width: calc(50% - 4px);
+                padding: 11px 12px;
+                border-radius: 15px;
+            }
+
+            .hero-stat strong {
+                font-size: 18px;
+            }
+
             .parking-wrapper {
-                margin-top: 22px;
+                margin-top: -30px;
                 padding: 0 12px 45px;
             }
 
@@ -605,8 +747,22 @@
 <div class="parking-page">
 
     <section class="parking-hero">
-        <img class="parking-hero-bg" src="{{ asset('website/parkings.jpg') }}" alt="Visitor Parking Background">
-        <div class="parking-hero-overlay"></div>
+        <div class="hero-pattern"></div>
+        <div class="hero-glow"></div>
+
+        <div class="hero-floating-card">
+            <div class="icon-box">
+                <i class="fa-solid fa-square-parking"></i>
+            </div>
+
+            <h4>{{ $language === 'Odia' ? 'ସହଜ ପାର୍କିଂ' : 'Easy Parking' }}</h4>
+
+            <p>
+                {{ $language === 'Odia'
+                    ? 'ଯାନ ପ୍ରକାର ଅନୁସାରେ ପାର୍କିଂ ସ୍ଥାନ ଖୋଜନ୍ତୁ।'
+                    : 'Find parking locations by vehicle type with available spots and map direction.' }}
+            </p>
+        </div>
 
         <div class="parking-hero-content">
             <div class="hero-badge">
@@ -623,6 +779,23 @@
                     ? 'ଆପଣ ଆପଣଙ୍କର ଦୁଇ, ତିନି ଏବଂ ଚାରି ଚକିଆ ଯାନ ନିମ୍ନଲିଖିତ ପାର୍କିଂ ସ୍ଥାନଗୁଡିକରେ ପାର୍କ କରିପାରିବେ।'
                     : 'Park your two, three, four wheelers and electric vehicles at available parking locations near the temple.' }}
             </p>
+
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <strong>24/7</strong>
+                    <span>{{ $language === 'Odia' ? 'ପାର୍କିଂ ସୁବିଧା' : 'Parking Facility' }}</span>
+                </div>
+
+                <div class="hero-stat">
+                    <strong>4</strong>
+                    <span>{{ $language === 'Odia' ? 'ଯାନ ପ୍ରକାର' : 'Vehicle Types' }}</span>
+                </div>
+
+                <div class="hero-stat">
+                    <strong><i class="fa-solid fa-location-dot"></i></strong>
+                    <span>{{ $language === 'Odia' ? 'ମ୍ୟାପ ଦିଗନିର୍ଦ୍ଦେଶ' : 'Map Direction' }}</span>
+                </div>
+            </div>
         </div>
     </section>
 
