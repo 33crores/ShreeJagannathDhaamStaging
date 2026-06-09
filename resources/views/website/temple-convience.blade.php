@@ -1,633 +1,917 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('website.web-layouts')
 
-<head>
-    <meta charset="UTF-8">
-    <title>{{ ucfirst(str_replace('_', ' ', $service_type)) }} Services</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@section('content')
 
-    {{-- Only FontAwesome --}}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <style>
-        * {
-            box-sizing: border-box;
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    .temple-convenience {
+        width: 100%;
+        min-height: 100vh;
+        padding: 14px 12px 42px;
+        background:
+            radial-gradient(circle at top left, rgba(255, 154, 64, 0.13), transparent 30%),
+            radial-gradient(circle at top right, rgba(52, 21, 81, 0.09), transparent 28%),
+            linear-gradient(180deg, #fff8f3 0%, #ffffff 48%, #fffaf7 100%);
+        overflow: hidden;
+    }
+
+    .ratha-header {
+        width: 100%;
+        max-width: 540px;
+        margin: 8px auto 24px;
+        position: relative;
+        animation: headerDrop 0.65s ease both;
+    }
+
+    .ratha-header-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 28px;
+        padding: 18px 15px 16px;
+        background:
+            radial-gradient(circle at 92% 8%, rgba(255, 218, 121, 0.32), transparent 28%),
+            radial-gradient(circle at 8% 95%, rgba(255, 122, 26, 0.22), transparent 32%),
+            linear-gradient(135deg, #341551 0%, #8b2348 44%, #db4d30 74%, #ff7a1a 100%);
+        box-shadow:
+            0 20px 38px rgba(52, 21, 81, 0.24),
+            inset 0 1px 0 rgba(255, 255, 255, 0.20);
+    }
+
+    .ratha-header-card::before,
+    .ratha-header-card::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.10);
+        pointer-events: none;
+    }
+
+    .ratha-header-card::before {
+        width: 150px;
+        height: 150px;
+        right: -55px;
+        top: -58px;
+    }
+
+    .ratha-header-card::after {
+        width: 115px;
+        height: 115px;
+        left: -48px;
+        bottom: -48px;
+    }
+
+    .ratha-shine {
+        position: absolute;
+        top: -70%;
+        left: -65%;
+        width: 48%;
+        height: 240%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.28), transparent);
+        transform: rotate(18deg);
+        animation: titleShine 4s ease-in-out infinite;
+        z-index: 1;
+    }
+
+    .ratha-top-row {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .ratha-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.16);
+        color: #fff4df;
+        font-size: 10.5px;
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: 0.7px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        white-space: nowrap;
+    }
+
+    .ratha-badge i {
+        color: #ffd66b;
+        font-size: 12px;
+    }
+
+    .language-selector-box {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .language-check-label {
+        margin: 0;
+        cursor: pointer;
+    }
+
+    .language-check-label input {
+        display: none;
+    }
+
+    .language-check-label span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 9px;
+        border-radius: 999px;
+        font-size: 10.5px;
+        line-height: 1;
+        font-weight: 900;
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.10);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        transition: all 0.25s ease;
+        white-space: nowrap;
+    }
+
+    .language-check-label span::before {
+        content: "";
+        width: 12px;
+        height: 12px;
+        border-radius: 4px;
+        border: 2px solid rgba(255, 255, 255, 0.85);
+        background: rgba(255, 255, 255, 0.10);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+        line-height: 1;
+    }
+
+    .language-check-label input:checked + span {
+        color: #db4d30;
+        background: #ffffff;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.16);
+    }
+
+    .language-check-label input:checked + span::before {
+        content: "✓";
+        color: #ffffff;
+        background: linear-gradient(135deg, #ff7a1a, #db4d30);
+        border-color: #db4d30;
+    }
+
+    .ratha-main {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .ratha-logo-box {
+        width: 104px;
+        height: 104px;
+        min-width: 104px;
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.32);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow:
+            0 18px 36px rgba(0, 0, 0, 0.24),
+            inset 0 1px 0 rgba(255, 255, 255, 0.42),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.12);
+        animation: logoFloat 3s ease-in-out infinite;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .ratha-logo-box::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background:
+            radial-gradient(circle at 28% 20%, rgba(255, 255, 255, 0.35), transparent 32%),
+            linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04));
+        pointer-events: none;
+    }
+
+    .ratha-logo-box img {
+        width: 98px;
+        height: 98px;
+        object-fit: contain;
+        display: block;
+        position: relative;
+        z-index: 2;
+        background: transparent;
+        mix-blend-mode: multiply;
+        filter:
+            drop-shadow(0 8px 12px rgba(0, 0, 0, 0.26))
+            saturate(1.35)
+            contrast(1.12)
+            brightness(1.08);
+    }
+
+    .ratha-title-area {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .ratha-small-text {
+        display: block;
+        margin-bottom: 7px;
+        color: #ffe9bd;
+        font-size: 11px;
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: 0.8px;
+    }
+
+    .ratha-title {
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        padding: 9px 13px;
+        border-radius: 16px;
+        color: #341551;
+        background: linear-gradient(135deg, #ffffff, #ffe8d8);
+        font-size: 22px;
+        line-height: 1.12;
+        font-weight: 1000;
+        letter-spacing: -0.4px;
+        box-shadow:
+            0 12px 22px rgba(0, 0, 0, 0.14),
+            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .ratha-subtitle {
+        margin: 9px 0 0;
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 12px;
+        line-height: 1.45;
+        font-weight: 600;
+    }
+
+    .ratha-chip-row {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        gap: 7px;
+        margin-top: 15px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .ratha-chip-row::-webkit-scrollbar {
+        display: none;
+    }
+
+    .ratha-chip {
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 900;
+        white-space: nowrap;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .convenience-container {
+        width: 100%;
+        max-width: 540px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        padding: 5px 2px;
+    }
+
+    .conv {
+        animation: cardPop 0.6s ease both;
+    }
+
+    .conv a {
+        min-height: 128px;
+        padding: 16px 12px;
+        border-radius: 22px;
+        background: linear-gradient(145deg, #ffffff, #fff4ee);
+        box-shadow:
+            0 12px 22px rgba(52, 21, 81, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(219, 77, 48, 0.08);
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+        transform-style: preserve-3d;
+        transition: all 0.35s ease;
+    }
+
+    .conv a::before {
+        content: "";
+        position: absolute;
+        top: -55%;
+        left: -75%;
+        width: 70%;
+        height: 190%;
+        background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+        transform: rotate(18deg);
+        transition: all 0.65s ease;
+    }
+
+    .conv a::after {
+        content: "";
+        position: absolute;
+        right: -28px;
+        bottom: -28px;
+        width: 82px;
+        height: 82px;
+        border-radius: 50%;
+        background: rgba(244, 123, 32, 0.10);
+        z-index: 0;
+    }
+
+    .conv a:hover,
+    .conv a:active {
+        transform: translateY(-6px) rotateX(4deg) rotateY(-4deg) scale(1.02);
+        box-shadow:
+            0 18px 30px rgba(52, 21, 81, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+
+    .conv a:hover::before,
+    .conv a:active::before {
+        left: 130%;
+    }
+
+    .convenience-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .convenience-text {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .convenience-text h3 {
+        font-size: 16px;
+        line-height: 1.18;
+        font-weight: 900;
+        color: #282828;
+        margin: 0 0 5px;
+    }
+
+    .convenience-text span {
+        display: block;
+        font-size: 12px;
+        line-height: 1.25;
+        font-weight: 500;
+        color: #777777;
+    }
+
+    .convenience-item {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg, #ffefe6, #ffffff);
+        box-shadow:
+            0 8px 14px rgba(219, 77, 48, 0.14),
+            inset 0 -2px 6px rgba(244, 123, 32, 0.10);
+        position: relative;
+        z-index: 2;
+        animation: iconFloat 2.8s ease-in-out infinite;
+    }
+
+    .convenience-item img,
+    .convenience-item svg {
+        max-width: 34px;
+        max-height: 34px;
+        object-fit: contain;
+        filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.12));
+    }
+
+    .convenience-item .fa-card-icon {
+        color: #db4d30;
+        font-size: 27px;
+        filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.12));
+    }
+
+    .free-food-icon svg {
+        width: 34px;
+        height: 34px;
+    }
+
+    .card-arrow {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f47b20, #db4d30);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        font-weight: 900;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 8px 15px rgba(219, 77, 48, 0.22);
+        align-self: flex-end;
+        transition: all 0.3s ease;
+    }
+
+    .conv a:hover .card-arrow,
+    .conv a:active .card-arrow {
+        transform: translateX(4px);
+    }
+
+    @keyframes headerDrop {
+        0% { opacity: 0; transform: translateY(-16px) scale(0.96); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes logoFloat {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-5px) scale(1.04); }
+    }
+
+    @keyframes cardPop {
+        0% { opacity: 0; transform: translateY(24px) scale(0.96); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes iconFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+
+    @keyframes titleShine {
+        0% { left: -55%; }
+        45%, 100% { left: 130%; }
+    }
+
+    @media (max-width: 420px) {
+        .temple-convenience {
+            padding: 13px 10px 35px;
         }
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            color: #222;
-            background:
-                radial-gradient(circle at 12% 8%, rgba(255, 122, 26, 0.16), transparent 28%),
-                radial-gradient(circle at 88% 10%, rgba(52, 21, 81, 0.12), transparent 30%),
-                radial-gradient(circle at 50% 95%, rgba(219, 77, 48, 0.10), transparent 34%),
-                linear-gradient(180deg, #fff8f3 0%, #ffffff 46%, #fff4ec 100%);
-        }
-
-        .service-page {
-            min-height: 100vh;
-            overflow-x: hidden;
-            padding-bottom: 50px;
-        }
-
-        .page-heading-section {
-            position: relative;
-            width: 100%;
-            padding: 44px 16px 42px;
-            background:
-                radial-gradient(circle at 18% 20%, rgba(255, 213, 109, 0.34), transparent 28%),
-                radial-gradient(circle at 85% 18%, rgba(255, 122, 26, 0.30), transparent 26%),
-                linear-gradient(135deg, #341551 0%, #64205c 42%, #db4d30 76%, #ff7a1a 100%);
-            color: #ffffff;
-            text-align: center;
-            overflow: hidden;
-            box-shadow: 0 16px 36px rgba(52, 21, 81, 0.20);
-        }
-
-        .page-heading-section::before {
-            content: "";
-            position: absolute;
-            width: 210px;
-            height: 210px;
-            left: -70px;
-            top: -80px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.10);
-        }
-
-        .page-heading-section::after {
-            content: "";
-            position: absolute;
-            width: 170px;
-            height: 170px;
-            right: -54px;
-            bottom: -70px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .heading-inner {
-            position: relative;
-            z-index: 2;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .page-heading-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 15px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.16);
-            border: 1px solid rgba(255, 255, 255, 0.24);
-            font-size: 13px;
-            font-weight: 800;
-            margin-bottom: 14px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .page-heading-section h1 {
-            margin: 0;
-            font-size: 42px;
-            line-height: 1.14;
-            font-weight: 900;
-            letter-spacing: -0.7px;
-            text-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
-        }
-
-        .page-heading-section p {
-            margin: 12px auto 0;
-            max-width: 720px;
-            font-size: 16px;
-            line-height: 1.58;
-            color: rgba(255, 255, 255, 0.92);
-        }
-
-        .service-wrapper {
-            width: 100%;
-            max-width: 1180px;
-            margin: 30px auto 0;
-            padding: 0 18px;
-            position: relative;
-            z-index: 3;
-        }
-
-        .service-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 26px;
-        }
-
-        .service-card-new {
-            background: #ffffff;
+        .ratha-header-card {
             border-radius: 24px;
-            overflow: hidden;
-            border: 1px solid rgba(219, 77, 48, 0.08);
-            box-shadow: 0 18px 40px rgba(52, 21, 81, 0.10);
-            transition: all 0.35s ease;
+            padding: 15px 13px 14px;
         }
 
-        .service-card-new:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 24px 52px rgba(52, 21, 81, 0.16);
-        }
-
-        .service-image-wrap {
-            position: relative;
-            width: 100%;
-            height: 270px;
-            overflow: hidden;
-            background: #fff3e8;
-        }
-
-        .service-image {
-            width: 100%;
-            height: 270px;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.4s ease;
-        }
-
-        .service-card-new:hover .service-image {
-            transform: scale(1.04);
-        }
-
-        .service-tag {
-            position: absolute;
-            top: 14px;
-            left: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.94);
-            color: #db4d30;
-            font-size: 12px;
-            font-weight: 900;
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
-        }
-
-        .available-tag {
-            position: absolute;
-            right: 14px;
-            bottom: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 9px 13px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.95);
-            color: #15803d;
-            font-size: 12px;
-            font-weight: 900;
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
-        }
-
-        .service-content {
-            padding: 17px 18px 18px;
-        }
-
-        .service-title-row {
-            display: flex;
+        .ratha-top-row {
             align-items: flex-start;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 14px;
-        }
-
-        .service-title-row h5 {
-            margin: 0;
-            color: #341551;
-            font-size: 21px;
-            line-height: 1.28;
-            font-weight: 900;
-        }
-
-        .type-pill {
-            padding: 7px 10px;
-            border-radius: 999px;
-            background: rgba(255, 122, 26, 0.10);
-            color: #db4d30;
-            font-size: 11px;
-            font-weight: 900;
-            white-space: nowrap;
-        }
-
-        .info-list {
-            display: grid;
-            gap: 11px;
-            margin-bottom: 16px;
-        }
-
-        .info-row {
-            display: flex;
-            gap: 10px;
-            color: #404040;
-            font-size: 14px;
-            line-height: 1.45;
-        }
-
-        .info-row i {
-            width: 32px;
-            height: 32px;
-            min-width: 32px;
-            border-radius: 50%;
-            background: #fff2e9;
-            color: #db4d30;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .info-row strong {
-            display: block;
-            color: #222222;
-            font-size: 13px;
-            margin-bottom: 1px;
-        }
-
-        .action-row {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-        }
-
-        .action-btn {
-            border: 0;
-            outline: 0;
-            min-height: 46px;
-            border-radius: 14px;
-            padding: 12px 14px;
-            text-decoration: none;
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 900;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
             gap: 8px;
-            background: linear-gradient(135deg, #341551, #db4d30, #ff7a1a);
-            box-shadow: 0 12px 22px rgba(219, 77, 48, 0.24);
-            transition: all 0.25s ease;
         }
 
-        .action-btn:hover {
-            color: #ffffff;
-            text-decoration: none;
-            transform: translateY(-2px);
+        .ratha-badge {
+            padding: 7px 9px;
+            font-size: 9.5px;
         }
 
-        .action-btn.disabled {
-            opacity: 0.55;
-            pointer-events: none;
+        .language-selector-box {
+            gap: 4px;
+            padding: 4px;
         }
 
-        .fallback-img {
-            object-fit: contain !important;
-            padding: 35px;
-            background: #fff7f2;
+        .language-check-label span {
+            padding: 6px 8px;
+            font-size: 10px;
         }
 
-        .empty-box {
-            grid-column: 1 / -1;
-            background: #ffffff;
+        .ratha-main {
+            gap: 11px;
+        }
+
+        .ratha-logo-box {
+            width: 86px;
+            height: 86px;
+            min-width: 86px;
+            border-radius: 26px;
+        }
+
+        .ratha-logo-box img {
+            width: 80px;
+            height: 80px;
+        }
+
+        .ratha-title {
+            font-size: 19px;
+            padding: 8px 11px;
+            border-radius: 14px;
+        }
+
+        .ratha-subtitle {
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .convenience-container {
+            gap: 13px;
+        }
+
+        .conv a {
+            min-height: 122px;
+            padding: 14px 10px;
+            border-radius: 20px;
+        }
+
+        .convenience-text h3 {
+            font-size: 15px;
+        }
+
+        .convenience-text span {
+            font-size: 11px;
+        }
+
+        .convenience-item {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 15px;
+        }
+
+        .convenience-item img,
+        .convenience-item svg {
+            max-width: 31px;
+            max-height: 31px;
+        }
+
+        .convenience-item .fa-card-icon {
+            font-size: 24px;
+        }
+
+        .card-arrow {
+            width: 28px;
+            height: 28px;
+            font-size: 15px;
+        }
+    }
+
+    @media (max-width: 340px) {
+        .ratha-main {
+            align-items: flex-start;
+        }
+
+        .ratha-logo-box {
+            width: 74px;
+            height: 74px;
+            min-width: 74px;
             border-radius: 22px;
-            padding: 45px 20px;
-            text-align: center;
-            box-shadow: 0 18px 40px rgba(52, 21, 81, 0.10);
         }
 
-        .empty-box i {
-            font-size: 44px;
-            color: #db4d30;
-            margin-bottom: 12px;
+        .ratha-logo-box img {
+            width: 68px;
+            height: 68px;
         }
 
-        .empty-box h3 {
-            color: #341551;
-            font-size: 22px;
-            font-weight: 900;
-            margin: 0 0 8px;
+        .ratha-title {
+            font-size: 17px;
         }
 
-        .empty-box p {
-            color: #777777;
-            margin: 0;
+        .ratha-badge {
+            font-size: 9px;
         }
 
-        @media (max-width: 991px) {
-            .service-grid {
-                grid-template-columns: 1fr;
-            }
+        .language-check-label span {
+            padding: 5px 7px;
+            font-size: 9.5px;
         }
 
-        @media (max-width: 575px) {
-            .page-heading-section {
-                padding: 34px 14px 30px;
-            }
-
-            .page-heading-badge {
-                font-size: 11px;
-                padding: 8px 12px;
-            }
-
-            .page-heading-section h1 {
-                font-size: 29px;
-            }
-
-            .page-heading-section p {
-                font-size: 14px;
-                line-height: 1.5;
-            }
-
-            .service-wrapper {
-                margin-top: 22px;
-                padding: 0 12px;
-            }
-
-            .service-card-new {
-                border-radius: 20px;
-            }
-
-            .service-image-wrap,
-            .service-image {
-                height: 220px;
-            }
-
-            .service-title-row {
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .service-title-row h5 {
-                font-size: 19px;
-            }
+        .convenience-container {
+            gap: 10px;
         }
 
-        @media (max-width: 360px) {
-            .page-heading-section h1 {
-                font-size: 27px;
-            }
-
-            .service-image-wrap,
-            .service-image {
-                height: 200px;
-            }
-
-            .service-content {
-                padding: 15px;
-            }
+        .conv a {
+            padding: 12px 9px;
         }
-    </style>
-</head>
 
-<body>
+        .convenience-text h3 {
+            font-size: 14px;
+        }
+
+        .ratha-chip {
+            font-size: 10px;
+            padding: 6px 9px;
+        }
+    }
+</style>
 
 @php
-    $language = $language ?? request('language', session('app_language', 'English'));
+    $language = request('language', $language ?? session('app_language', 'English'));
     $language = $language === 'Odia' ? 'Odia' : 'English';
 
-    $rawTitle = ucfirst(str_replace('_', ' ', $service_type));
-    $normalizedTitle = strtolower(str_replace('_', ' ', $service_type));
+    $serviceUrl = function ($type) use ($language) {
+        return route('services.byType', ['service_type' => $type, 'language' => $language]);
+    };
 
-    $odiaTitles = [
-        'drinking water' => 'ବିଶୁଦ୍ଧ ପାନୀୟ ଜଳ',
-        'emergency' => 'ଜରୁରୀ ସେବା',
-        'specially abled person' => 'ବିଶେଷ କ୍ଷମତା ବ୍ୟକ୍ତି',
-        'abled person' => 'ଦିବ୍ୟାଙ୍ଗ ସହାୟତା',
-        'ratha yatra mela' => 'ରଥ ଯାତ୍ରା ରୁଟ ମାନଚିତ୍ର',
-        'route map' => 'ମାର୍ଗ ମାନଚିତ୍ର',
-        'lost and found booth' => 'ହଜିବା ଓ ଖୋଜିବା କେନ୍ଦ୍ର',
-        'toilet' => 'ଶୌଚାଳୟ',
-        'beach' => 'ବେଳାଭୂମି',
-        'life guard booth' => 'ଲାଇଫ ଗାର୍ଡ ସେବା',
-        'charging station' => 'ଚାର୍ଜିଂ ଷ୍ଟେସନ୍',
-        'petrol pump' => 'ପେଟ୍ରୋଲ ପମ୍ପ',
-        'atm' => 'ଏଟିଏମ୍',
-        'free food' => 'ମାଗଣା ଖାଦ୍ୟ',
+    $cards = [
+        [
+            'url' => route('parking.list', ['language' => $language]),
+            'title1' => $language === 'Odia' ? 'ପାର୍କିଂ' : 'Parking',
+            'title2' => $language === 'Odia' ? 'ସ୍ଥଳ' : 'Areas',
+            'desc' => $language === 'Odia' ? '୨, ୩, ୪ ଚକା ବାହନ' : '2, 3, 4 Wheelers',
+            'icon' => asset('website/park.png'),
+            'alt' => 'Parking',
+            'type' => 'image',
+        ],
+        [
+            'url' => route('lockershoe.list', ['language' => $language]),
+            'title1' => $language === 'Odia' ? 'ଲକର ଓ' : 'Locker &',
+            'title2' => $language === 'Odia' ? 'ଜୋତା ଷ୍ଟାଣ୍ଡ' : 'Shoe Stand',
+            'desc' => $language === 'Odia' ? 'ନିଃଶୁଳ୍କ ସେବା' : 'Free Services',
+            'icon' => asset('website/lck.png'),
+            'alt' => 'Locker and Shoe Stand',
+            'type' => 'image',
+        ],
+        [
+            'url' => $serviceUrl('toilet'),
+            'title1' => $language === 'Odia' ? 'ସାଧାରଣ' : 'Public',
+            'title2' => $language === 'Odia' ? 'ଶୌଚାଳୟ' : 'Toilet',
+            'desc' => $language === 'Odia' ? 'ନିକଟସ୍ଥ ଶୌଚାଳୟ ସୁବିଧା' : 'Nearby toilet facility',
+            'icon' => asset('website/latin.png'),
+            'alt' => 'Toilet',
+            'type' => 'image',
+        ],
+        [
+            'url' => $serviceUrl('drinking_water'),
+            'title1' => $language === 'Odia' ? 'ପାନୀୟ' : 'Drinking',
+            'title2' => $language === 'Odia' ? 'ଜଳ' : 'Water',
+            'desc' => $language === 'Odia' ? 'ନିକଟସ୍ଥ ପାଣି ସୁବିଧା' : 'Find nearby water points',
+            'icon' => asset('website/drinkingWater32.png'),
+            'alt' => 'Drinking Water',
+            'type' => 'image',
+        ],
+        [
+            'url' => $serviceUrl('free_food'),
+            'title1' => $language === 'Odia' ? 'ମାଗଣା' : 'Free',
+            'title2' => $language === 'Odia' ? 'ଖାଦ୍ୟ' : 'Food',
+            'desc' => $language === 'Odia' ? 'ଭକ୍ତମାନଙ୍କ ପାଇଁ ସେବା' : 'Food facility for devotees',
+            'icon' => '',
+            'alt' => 'Free Food',
+            'type' => 'food',
+        ],
+        [
+            'url' => route('bhaktanibas.list', ['language' => $language]),
+            'title1' => $language === 'Odia' ? 'ଭକ୍ତ' : 'Bhakta',
+            'title2' => $language === 'Odia' ? 'ନିବାସ' : 'Nivas',
+            'desc' => $language === 'Odia' ? 'ତୀର୍ଥଯାତ୍ରୀଙ୍କ ରହିବା ସ୍ଥାନ' : 'Properties for pilgrims',
+            'icon' => asset('website/niwas.png'),
+            'alt' => 'Bhakta Nivas',
+            'type' => 'image',
+        ],
+        [
+            'url' => route('services.emergency', ['language' => $language]),
+            'title1' => $language === 'Odia' ? 'ଜରୁରୀ' : 'Emergency',
+            'title2' => $language === 'Odia' ? 'ସହାୟତା' : 'Help',
+            'desc' => $language === 'Odia' ? 'ତୁରନ୍ତ ସହାୟତା ସମ୍ପର୍କ' : 'Quick support contacts',
+            'icon' => asset('website/ph.png'),
+            'alt' => 'Emergency',
+            'type' => 'image',
+        ],
+        [
+            'url' => route('services.abled_person', ['language' => $language]),
+            'title1' => $language === 'Odia' ? 'ଦିବ୍ୟାଙ୍ଗ' : 'Special',
+            'title2' => $language === 'Odia' ? 'ସହାୟତା' : 'Abled',
+            'desc' => $language === 'Odia' ? 'ସହାୟତା ସୁବିଧା' : 'Assistance facilities',
+            'icon' => asset('website/physical21.png'),
+            'alt' => 'Special Abled',
+            'type' => 'image',
+        ],
+        [
+            'url' => 'https://www.google.com/maps/dir/?api=1&destination=Shree%20Jagannath%20Temple%2C%20Puri%2C%20Odisha%2C%20India&travelmode=driving',
+            'title1' => $language === 'Odia' ? 'ରୁଟ' : 'Route',
+            'title2' => $language === 'Odia' ? 'ମାନଚିତ୍ର' : 'Map',
+            'desc' => $language === 'Odia' ? 'ଶ୍ରୀମନ୍ଦିରକୁ ରୁଟ ଦେଖନ୍ତୁ' : 'Route to Shree Jagannath Temple',
+            'icon' => asset('website/map.png'),
+            'alt' => 'Route Map',
+            'type' => 'image',
+            'external' => true,
+        ],
+        [
+            'url' => $serviceUrl('lost_and_found_booth'),
+            'title1' => $language === 'Odia' ? 'ହଜିଥିବା' : 'Lost &',
+            'title2' => $language === 'Odia' ? 'ସାମଗ୍ରୀ' : 'Found',
+            'desc' => $language === 'Odia' ? 'ସାମଗ୍ରୀ ଖୋଜନ୍ତୁ କିମ୍ବା ଜଣାନ୍ତୁ' : 'Report or find items',
+            'icon' => asset('website/lost.png'),
+            'alt' => 'Lost and Found',
+            'type' => 'image',
+        ],
+        [
+            'url' => $serviceUrl('beach'),
+            'title1' => $language === 'Odia' ? 'ପୁରୀ' : 'Puri',
+            'title2' => $language === 'Odia' ? 'ବେଳାଭୂମି' : 'Beaches',
+            'desc' => $language === 'Odia' ? 'ବେଳାଭୂମି ଅଞ୍ଚଳ ଦେଖନ୍ତୁ' : 'Explore beach areas',
+            'icon' => asset('website/sea.png'),
+            'alt' => 'Beaches',
+            'type' => 'image',
+        ],
+        [
+            'url' => $serviceUrl('life_guard_booth'),
+            'title1' => $language === 'Odia' ? 'ଲାଇଫ' : 'Life',
+            'title2' => $language === 'Odia' ? 'ଗାର୍ଡ' : 'Guards',
+            'desc' => $language === 'Odia' ? 'ସୁରକ୍ଷା ବୁଥ ବିବରଣୀ' : 'Safety booth details',
+            'icon' => asset('website/guard.png'),
+            'alt' => 'Life Guards',
+            'type' => 'image',
+        ],
+        [
+            'url' => $serviceUrl('atm'),
+            'title1' => $language === 'Odia' ? 'ଏଟିଏମ୍' : 'ATM',
+            'title2' => $language === 'Odia' ? 'ସୁବିଧା' : 'Facility',
+            'desc' => $language === 'Odia' ? 'ନିକଟସ୍ଥ ଏଟିଏମ୍ ଖୋଜନ୍ତୁ' : 'Find nearby ATM points',
+            'icon' => 'fa-solid fa-building-columns',
+            'alt' => 'ATM',
+            'type' => 'fa',
+        ],
+        [
+            'url' => $serviceUrl('petrol_pump'),
+            'title1' => $language === 'Odia' ? 'ପେଟ୍ରୋଲ' : 'Petrol',
+            'title2' => $language === 'Odia' ? 'ପମ୍ପ' : 'Pump',
+            'desc' => $language === 'Odia' ? 'ନିକଟସ୍ଥ ଇନ୍ଧନ ସୁବିଧା' : 'Nearby fuel stations',
+            'icon' => 'fa-solid fa-gas-pump',
+            'alt' => 'Petrol Pump',
+            'type' => 'fa',
+        ],
+        [
+            'url' => $serviceUrl('bus_stand'),
+            'title1' => $language === 'Odia' ? 'ବସ୍' : 'Bus',
+            'title2' => $language === 'Odia' ? 'ଷ୍ଟାଣ୍ଡ' : 'Stand',
+            'desc' => $language === 'Odia' ? 'ବସ୍ ଷ୍ଟାଣ୍ଡ ଓ ରୁଟ ସୂଚନା' : 'Bus stand and route info',
+            'icon' => 'fa-solid fa-bus',
+            'alt' => 'Bus Stand',
+            'type' => 'fa',
+        ],
+        [
+            'url' => $serviceUrl('railway_station'),
+            'title1' => $language === 'Odia' ? 'ରେଳୱେ' : 'Railway',
+            'title2' => $language === 'Odia' ? 'ଷ୍ଟେସନ୍' : 'Station',
+            'desc' => $language === 'Odia' ? 'ରେଳ ଷ୍ଟେସନ୍ ଦିଗ ନିର୍ଦ୍ଦେଶ' : 'Railway station directions',
+            'icon' => 'fa-solid fa-train-subway',
+            'alt' => 'Railway Station',
+            'type' => 'fa',
+        ],
+        [
+            'url' => $serviceUrl('police_station'),
+            'title1' => $language === 'Odia' ? 'ପୋଲିସ୍' : 'Police',
+            'title2' => $language === 'Odia' ? 'ଷ୍ଟେସନ୍' : 'Station',
+            'desc' => $language === 'Odia' ? 'ସୁରକ୍ଷା ସହାୟତା ସୂଚନା' : 'Security help information',
+            'icon' => 'fa-solid fa-shield-halved',
+            'alt' => 'Police Station',
+            'type' => 'fa',
+        ],
     ];
-
-    $localizedTitle = $language === 'Odia'
-        ? ($odiaTitles[$normalizedTitle] ?? $rawTitle)
-        : $rawTitle;
-
-    /*
-        Correct folder:
-        public/uploads/public_services
-
-        Browser URL:
-        /uploads/public_services/image-name.jpg
-    */
-    $publicServicePhotoFolder = 'uploads/public_services';
-
-    $fallbackImage = 'data:image/svg+xml;charset=UTF-8,' . rawurlencode('
-        <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450">
-            <rect width="100%" height="100%" fill="#fff3e8"/>
-            <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
-                  font-family="Arial" font-size="28" fill="#db4d30">
-                Service Image
-            </text>
-        </svg>
-    ');
-
-    $encodeAssetUrl = function ($path) {
-        $parts = explode('/', $path);
-        $encodedParts = array_map('rawurlencode', $parts);
-
-        return url(implode('/', $encodedParts));
-    };
-
-    $getServicePhotos = function ($photoValue) {
-        if (is_array($photoValue)) {
-            return array_values(array_filter($photoValue));
-        }
-
-        $photoValue = trim((string) $photoValue);
-
-        if ($photoValue === '') {
-            return [];
-        }
-
-        $decoded = json_decode($photoValue, true);
-
-        if (json_last_error() === JSON_ERROR_NONE) {
-            if (is_array($decoded)) {
-                return array_values(array_filter($decoded));
-            }
-
-            if (is_string($decoded) && trim($decoded) !== '') {
-                return [trim($decoded)];
-            }
-        }
-
-        $photoValue = str_replace(['\\/', '\\'], '/', $photoValue);
-
-        preg_match_all('/[^,"\[\]]+\.(jpg|jpeg|png|webp|gif)/i', $photoValue, $matches);
-
-        if (!empty($matches[0])) {
-            return array_values(array_filter(array_map('trim', $matches[0])));
-        }
-
-        return [$photoValue];
-    };
-
-    $serviceImageUrl = function ($photo) use ($publicServicePhotoFolder, $fallbackImage, $encodeAssetUrl) {
-        $photo = trim((string) $photo);
-
-        if ($photo === '') {
-            return $fallbackImage;
-        }
-
-        $photo = trim($photo, " \t\n\r\0\x0B\"'");
-        $photo = str_replace(['\\/', '\\'], '/', $photo);
-
-        if (preg_match('/^https?:\/\//i', $photo)) {
-            $path = parse_url($photo, PHP_URL_PATH);
-            $filename = basename($path);
-        } else {
-            $filename = basename($photo);
-        }
-
-        $filename = trim(rawurldecode($filename), " \t\n\r\0\x0B\"'");
-
-        if ($filename === '' || $filename === '.' || $filename === '/') {
-            return $fallbackImage;
-        }
-
-        return $encodeAssetUrl($publicServicePhotoFolder . '/' . $filename);
-    };
 @endphp
 
-<div class="service-page">
+<section class="temple-convenience">
+    <div class="ratha-header">
+        <div class="ratha-header-card">
+            <div class="ratha-shine"></div>
 
-    <section class="page-heading-section">
-        <div class="heading-inner">
-            <div class="page-heading-badge">
-                <i class="fa-solid fa-location-dot"></i>
-                {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ' : 'Shree Jagannatha Dham' }}
+            <div class="ratha-top-row">
+                <div class="ratha-badge">
+                    <i class="fa-solid fa-flag"></i>
+                    {{ $language === 'Odia' ? 'ଜୟ ଶ୍ରୀ ଜଗନ୍ନାଥ' : 'JAY SHREE JAGANNATHA' }}
+                </div>
+
+                <div class="language-selector-box">
+                    <label class="language-check-label">
+                        <input type="checkbox" class="language-check" value="English" {{ $language === 'English' ? 'checked' : '' }}>
+                        <span>English</span>
+                    </label>
+
+                    <label class="language-check-label">
+                        <input type="checkbox" class="language-check" value="Odia" {{ $language === 'Odia' ? 'checked' : '' }}>
+                        <span>ଓଡ଼ିଆ</span>
+                    </label>
+                </div>
             </div>
 
-            <h1>{{ $localizedTitle }}</h1>
-
-            <p>
-                {{ $language === 'Odia'
-                    ? 'ଏଠାରେ ଉପଲବ୍ଧ ସମସ୍ତ ସେବା, ସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
-                    : 'Explore available facilities, locations and directions near Shree Jagannatha Dham.' }}
-            </p>
-        </div>
-    </section>
-
-    <main class="service-wrapper">
-
-        <div class="service-grid">
-            @forelse ($services as $service)
-                @php
-                    $photos = $getServicePhotos($service->photo ?? null);
-                    $firstPhoto = $photos[0] ?? null;
-                    $servicePhoto = $firstPhoto ? $serviceImageUrl($firstPhoto) : $fallbackImage;
-
-                    $addressParts = array_filter([
-                        $service->landmark ?? null,
-                        $service->city_village ?? null,
-                        $service->district ?? null,
-                        $service->state ?? null,
-                    ]);
-
-                    $address = count($addressParts) ? implode(', ', $addressParts) : 'N/A';
-
-                    $serviceTypeText = ucwords(str_replace('_', ' ', $service->service_type ?? $service_type));
-
-                    $mapUrl = $service->google_map_link
-                        ?? $service->map_url
-                        ?? $service->google_map_url
-                        ?? null;
-                @endphp
-
-                <article class="service-card-new">
-                    <div class="service-image-wrap">
-                        <img
-                            src="{{ $servicePhoto }}"
-                            alt="{{ $service->service_name ?? $localizedTitle }}"
-                            class="service-image"
-                            onerror="this.onerror=null; this.src='{{ $fallbackImage }}'; this.classList.add('fallback-img');"
-                        >
-
-                        <div class="service-tag">
-                            <i class="fa-solid fa-building-circle-check"></i>
-                            {{ $serviceTypeText }}
-                        </div>
-
-                        <div class="available-tag">
-                            <i class="fa-solid fa-circle-check"></i>
-                            {{ $language === 'Odia' ? 'ଉପଲବ୍ଧ' : 'Available' }}
-                        </div>
-                    </div>
-
-                    <div class="service-content">
-                        <div class="service-title-row">
-                            <h5>{{ $service->service_name ?? $localizedTitle }}</h5>
-                            <span class="type-pill">{{ $serviceTypeText }}</span>
-                        </div>
-
-                        <div class="info-list">
-                            <div class="info-row">
-                                <i class="fa-solid fa-location-dot"></i>
-                                <div>
-                                    <strong>{{ $language === 'Odia' ? 'ଠିକଣା' : 'Address' }}</strong>
-                                    {{ $address }}
-                                </div>
-                            </div>
-
-                            @if(!empty($service->opening_time) || !empty($service->closing_time))
-                                <div class="info-row">
-                                    <i class="fa-solid fa-clock"></i>
-                                    <div>
-                                        <strong>{{ $language === 'Odia' ? 'ସମୟ' : 'Timing' }}</strong>
-                                        {{ $service->opening_time ?? 'N/A' }} - {{ $service->closing_time ?? 'N/A' }}
-                                    </div>
-                                </div>
-                            @endif
-
-                            @if(!empty($service->contact_no))
-                                <div class="info-row">
-                                    <i class="fa-solid fa-phone"></i>
-                                    <div>
-                                        <strong>{{ $language === 'Odia' ? 'ଯୋଗାଯୋଗ' : 'Contact' }}</strong>
-                                        {{ $service->contact_no }}
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-
-                        <div class="action-row">
-                            @if(!empty($mapUrl))
-                                <a href="{{ $mapUrl }}" class="action-btn" target="_blank" rel="noopener noreferrer">
-                                    <i class="fa-solid fa-location-arrow"></i>
-                                    {{ $language === 'Odia' ? 'ଦିଗ ନିର୍ଦ୍ଦେଶ' : 'Directions' }}
-                                </a>
-                            @else
-                                <a href="javascript:void(0)" class="action-btn disabled">
-                                    <i class="fa-solid fa-location-arrow"></i>
-                                    {{ $language === 'Odia' ? 'ଲିଙ୍କ ନାହିଁ' : 'No Direction Link' }}
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                </article>
-            @empty
-                <div class="empty-box">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                    <h3>{{ $language === 'Odia' ? 'କୌଣସି ସେବା ମିଳିଲା ନାହିଁ' : 'No Services Found' }}</h3>
-                    <p>{{ $language === 'Odia' ? 'ଦୟାକରି ପରେ ପୁଣି ଯାଞ୍ଚ କରନ୍ତୁ।' : 'Please check again later.' }}</p>
+            <div class="ratha-main">
+                <div class="ratha-logo-box">
+                    <img src="{{ asset('website/logoo.png') }}" alt="Shree Jagannath Logo">
                 </div>
-            @endforelse
-        </div>
-    </main>
-</div>
 
-</body>
-</html>
+                <div class="ratha-title-area">
+                    <span class="ratha-small-text">
+                        {{ $language === 'Odia' ? 'ଭକ୍ତ ସୁବିଧା ଗାଇଡ୍' : 'DEVOTEE FACILITY GUIDE' }}
+                    </span>
+
+                    <h2 class="ratha-title">
+                        {{ $language === 'Odia' ? 'ରଥ ଯାତ୍ରା - ୨୦୨୬' : 'Ratha Yatra - 2026' }}
+                    </h2>
+
+                    <p class="ratha-subtitle">
+                        {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ ପାଖରେ ଆବଶ୍ୟକ ସୁବିଧା ସହଜରେ ଖୋଜନ୍ତୁ।' : 'Find important facilities around Shree Jagannatha Dham easily.' }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="ratha-chip-row">
+                <span class="ratha-chip">{{ $language === 'Odia' ? 'ପାର୍କିଂ' : 'Parking' }}</span>
+                <span class="ratha-chip">{{ $language === 'Odia' ? 'ଏଟିଏମ୍' : 'ATM' }}</span>
+                <span class="ratha-chip">{{ $language === 'Odia' ? 'ପେଟ୍ରୋଲ ପମ୍ପ' : 'Petrol Pump' }}</span>
+                <span class="ratha-chip">{{ $language === 'Odia' ? 'ବସ୍ ଷ୍ଟାଣ୍ଡ' : 'Bus Stand' }}</span>
+                <span class="ratha-chip">{{ $language === 'Odia' ? 'ରେଳୱେ ଷ୍ଟେସନ୍' : 'Railway Station' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="convenience-container">
+        @foreach ($cards as $card)
+            <div class="conv" style="animation-delay: {{ number_format(($loop->index + 1) * 0.05, 2) }}s;">
+                <a href="{{ $card['url'] }}" @if(!empty($card['external'])) target="_blank" rel="noopener noreferrer" @endif>
+                    <div class="convenience-card-top">
+                        <div class="convenience-text">
+                            <h3>
+                                {{ $card['title1'] }}<br>
+                                {{ $card['title2'] }}
+                            </h3>
+                            <span>{{ $card['desc'] }}</span>
+                        </div>
+
+                        <div class="convenience-item {{ $card['type'] === 'food' ? 'free-food-icon' : '' }}">
+                            @if ($card['type'] === 'food')
+                                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-label="Free Food Icon">
+                                    <circle cx="32" cy="32" r="29" fill="#fff3e8"/>
+                                    <path d="M18 33c0-8.2 6.3-14.8 14-14.8S46 24.8 46 33H18Z" fill="#ff7a1a"/>
+                                    <path d="M15 34h34c0 8.6-7.6 15.8-17 15.8S15 42.6 15 34Z" fill="#db4d30"/>
+                                    <path d="M19 34h26" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+                                    <path d="M24 15c0-3.2 2.6-5.8 5.8-5.8h4.4c3.2 0 5.8 2.6 5.8 5.8" fill="none" stroke="#db4d30" stroke-width="4" stroke-linecap="round"/>
+                                    <path d="M48 20v18" stroke="#ff7a1a" stroke-width="4" stroke-linecap="round"/>
+                                    <path d="M54 20v18" stroke="#db4d30" stroke-width="4" stroke-linecap="round"/>
+                                    <path d="M10 20v10c0 3 2.4 5.4 5.4 5.4H17V20" fill="none" stroke="#ff7a1a" stroke-width="4" stroke-linecap="round"/>
+                                </svg>
+                            @elseif ($card['type'] === 'fa')
+                                <i class="{{ $card['icon'] }} fa-card-icon" aria-label="{{ $card['alt'] }}"></i>
+                            @else
+                                <img src="{{ $card['icon'] }}" alt="{{ $card['alt'] }}">
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="card-arrow">›</div>
+                </a>
+            </div>
+        @endforeach
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const languageChecks = document.querySelectorAll('.language-check');
+
+        languageChecks.forEach(function (checkbox) {
+            checkbox.addEventListener('change', function () {
+                if (!this.checked) {
+                    this.checked = true;
+                    return;
+                }
+
+                languageChecks.forEach(function (other) {
+                    if (other !== checkbox) {
+                        other.checked = false;
+                    }
+                });
+
+                const url = new URL(window.location.href);
+                url.searchParams.set('language', this.value);
+                window.location.href = url.toString();
+            });
+        });
+    });
+</script>
+
+@endsection

@@ -56,6 +56,10 @@ use App\Http\Controllers\TempleUser\TempleNearByTempleController;
 use App\Http\Controllers\TempleUser\TempleCommuteController;
 use App\Http\Controllers\TempleUser\TempleEmergencyController;
 use App\Http\Controllers\TempleUser\TemplePublicServiceController;
+use App\Http\Controllers\TempleUser\PublicServiceController;
+
+
+
 use App\Http\Controllers\TempleUser\TempleLostAndFoundController;
 use App\Http\Controllers\TempleUser\RathaYatraEventController;
 use App\Http\Controllers\TempleUser\RathaYatraActiveController;
@@ -86,6 +90,9 @@ Route::get('/package', function () {
 Route::get('/about', function () {
     return view('about');
 });
+
+Route::get('/temple-services/{service_type}', [PublicServiceController::class, 'showByServiceType'])
+    ->name('services.byType');
 
  Route::controller(HomeSectionController::class)->group(function() {
         Route::get('/puri-dhams', 'puriWebsite');
