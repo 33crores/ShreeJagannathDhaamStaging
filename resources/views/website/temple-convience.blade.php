@@ -434,15 +434,28 @@
         : $rawTitle;
 
     /*
-        Correct public service image folder:
+        Final image folder:
         public/assets/uploads/public_services
 
-        Browser URL:
+        Browser image URL:
         /assets/uploads/public_services/image-name.jpg
     */
 
     $publicServicePhotoFolder = 'assets/uploads/public_services';
-    $fallbackImage = asset('website/parking.jpeg');
+
+    /*
+        Removed old parking.jpeg fallback.
+        This blank SVG will show only when image is missing.
+    */
+    $fallbackImage = 'data:image/svg+xml;charset=UTF-8,' . rawurlencode('
+        <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450">
+            <rect width="100%" height="100%" fill="#fff3e8"/>
+            <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
+                  font-family="Arial" font-size="28" fill="#db4d30">
+                Service Image
+            </text>
+        </svg>
+    ');
 
     $getServicePhotos = function ($photoValue) {
         if (is_array($photoValue)) {
@@ -475,12 +488,15 @@
         $photo = str_replace(['\\/', '\\'], '/', $photo);
 
         /*
-            DB may contain:
+            Whatever old path exists in DB, take only filename.
+
+            Old DB examples:
+            assets/uploads/parking_photo/abc.jpg
             assets/uploads/public_services/abc.jpg
             uploads/public_services/abc.jpg
             public_services/abc.jpg
             abc.jpg
-            full URL
+            https://domain.com/assets/uploads/parking_photo/abc.jpg
 
             Final output:
             /assets/uploads/public_services/abc.jpg
