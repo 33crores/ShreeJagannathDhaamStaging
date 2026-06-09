@@ -466,6 +466,15 @@
             filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.12));
         }
 
+        .convenience-item i {
+            font-size: 28px;
+            color: #db4d30;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .free-food-icon svg {
             width: 34px;
             height: 34px;
@@ -717,6 +726,10 @@
         $language = $language === 'Odia' ? 'Odia' : 'English';
         $langQuery = 'language=' . urlencode($language);
 
+        $serviceUrl = function ($type) {
+            return route('services.byType', $type);
+        };
+
         $cards = [
             [
                 'url' => route('parking.list'),
@@ -920,15 +933,15 @@
             'type' => 'fa',
         ],
 
-        [
-    'url' => route('services.byType', 'hospital'),
-    'title1' => $language === 'Odia' ? 'ହସ୍ପିଟାଲ୍' : 'Hospital',
-    'title2' => $language === 'Odia' ? 'ସୁବିଧା' : 'Facility',
-    'desc' => $language === 'Odia' ? 'ନିକଟସ୍ଥ ହସ୍ପିଟାଲ୍ ଖୋଜନ୍ତୁ' : 'Find nearby hospital facilities',
-    'icon' => 'fa-solid fa-hospital',
-    'alt' => 'Hospital',
-    'type' => 'fa',
-],
+                [
+            'url' => route('services.byType', 'hospital'),
+            'title1' => $language === 'Odia' ? 'ହସ୍ପିଟାଲ୍' : 'Hospital',
+            'title2' => $language === 'Odia' ? 'ସୁବିଧା' : 'Facility',
+            'desc' => $language === 'Odia' ? 'ନିକଟସ୍ଥ ହସ୍ପିଟାଲ୍ ଖୋଜନ୍ତୁ' : 'Find nearby hospital facilities',
+            'icon' => 'fa-solid fa-hospital',
+            'alt' => 'Hospital',
+            'type' => 'fa',
+        ],
         
         ];
     @endphp
@@ -1012,6 +1025,8 @@
                                         <path d="M10 20v10c0 3 2.4 5.4 5.4 5.4H17V20" fill="none" stroke="#ff7a1a"
                                             stroke-width="4" stroke-linecap="round" />
                                     </svg>
+                                @elseif ($card['type'] === 'fa')
+                                    <i class="{{ $card['icon'] }}" aria-hidden="true"></i>
                                 @else
                                     <img src="{{ $card['icon'] }}" alt="{{ $card['alt'] }}">
                                 @endif
