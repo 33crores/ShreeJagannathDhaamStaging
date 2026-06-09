@@ -6,8 +6,7 @@
     <title>{{ ucfirst(str_replace('_', ' ', $service_type)) }} Services</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="{{ asset('front-assets/frontend/css/dham-header.css') }}">
-    <link rel="stylesheet" href="{{ asset('front-assets/frontend/css/footer.css') }}">
+    {{-- Only FontAwesome --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -28,81 +27,54 @@
         .service-page {
             min-height: 100vh;
             overflow-x: hidden;
+            padding-bottom: 50px;
         }
 
-        .service-hero {
-            position: relative;
+        .page-heading-section {
             width: 100%;
-            min-height: 330px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-        }
-
-        .service-hero-bg {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scale(1.04);
-        }
-
-        .service-hero-overlay {
-            position: absolute;
-            inset: 0;
+            padding: 36px 16px 28px;
             background:
-                radial-gradient(circle at 85% 15%, rgba(255, 196, 87, 0.34), transparent 32%),
-                linear-gradient(90deg, rgba(52, 21, 81, 0.88), rgba(219, 77, 48, 0.72));
-        }
-
-        .service-hero-content {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            max-width: 1180px;
-            margin: 0 auto;
-            padding: 52px 22px;
+                radial-gradient(circle at 85% 15%, rgba(255, 196, 87, 0.30), transparent 32%),
+                linear-gradient(135deg, #341551 0%, #7a2354 45%, #db4d30 78%, #ff7a1a 100%);
             color: #ffffff;
+            text-align: center;
+            box-shadow: 0 14px 34px rgba(52, 21, 81, 0.18);
         }
 
-        .hero-badge {
+        .page-heading-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 9px 14px;
+            padding: 9px 15px;
             border-radius: 999px;
             background: rgba(255, 255, 255, 0.16);
             border: 1px solid rgba(255, 255, 255, 0.22);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             font-size: 13px;
             font-weight: 800;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
-        .service-hero h1 {
+        .page-heading-section h1 {
             margin: 0;
-            font-size: 46px;
-            line-height: 1.12;
+            font-size: 38px;
+            line-height: 1.15;
             font-weight: 900;
-            max-width: 760px;
-            letter-spacing: -0.8px;
+            letter-spacing: -0.6px;
         }
 
-        .service-hero p {
-            margin: 14px 0 0;
-            font-size: 17px;
-            line-height: 1.6;
+        .page-heading-section p {
+            margin: 12px auto 0;
             max-width: 720px;
+            font-size: 16px;
+            line-height: 1.55;
             color: rgba(255, 255, 255, 0.90);
         }
 
         .service-wrapper {
             width: 100%;
             max-width: 1180px;
-            margin: -48px auto 0;
-            padding: 0 18px 60px;
+            margin: 26px auto 0;
+            padding: 0 18px;
             position: relative;
             z-index: 3;
         }
@@ -115,13 +87,11 @@
         }
 
         .summary-card {
-            background: rgba(255, 255, 255, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.70);
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid rgba(219, 77, 48, 0.08);
             border-radius: 18px;
             padding: 16px;
-            box-shadow: 0 14px 32px rgba(52, 21, 81, 0.12);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 14px 32px rgba(52, 21, 81, 0.10);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -369,31 +339,27 @@
         }
 
         @media (max-width: 575px) {
-            .service-hero {
-                min-height: 285px;
+            .page-heading-section {
+                padding: 30px 14px 24px;
             }
 
-            .service-hero-content {
-                padding: 36px 16px;
-            }
-
-            .hero-badge {
+            .page-heading-badge {
                 font-size: 11px;
                 padding: 8px 12px;
             }
 
-            .service-hero h1 {
-                font-size: 31px;
+            .page-heading-section h1 {
+                font-size: 29px;
             }
 
-            .service-hero p {
+            .page-heading-section p {
                 font-size: 14px;
                 line-height: 1.5;
             }
 
             .service-wrapper {
-                margin-top: -34px;
-                padding: 0 12px 45px;
+                margin-top: 20px;
+                padding: 0 12px;
             }
 
             .summary-card {
@@ -421,8 +387,8 @@
         }
 
         @media (max-width: 360px) {
-            .service-hero h1 {
-                font-size: 28px;
+            .page-heading-section h1 {
+                font-size: 27px;
             }
 
             .service-image-wrap,
@@ -438,8 +404,6 @@
 </head>
 
 <body>
-
-@include('partials.header-puri-dham')
 
 @php
     $language = $language ?? request('language', session('app_language', 'English'));
@@ -469,7 +433,16 @@
         ? ($odiaTitles[$normalizedTitle] ?? $rawTitle)
         : $rawTitle;
 
-    $uploadBaseUrl = 'https://shreejagannathdham.com';
+    /*
+        Correct public service image folder:
+        public/assets/uploads/public_services
+
+        Browser URL:
+        /assets/uploads/public_services/image-name.jpg
+    */
+
+    $publicServicePhotoFolder = 'assets/uploads/public_services';
+    $fallbackImage = asset('website/parking.jpeg');
 
     $getServicePhotos = function ($photoValue) {
         if (is_array($photoValue)) {
@@ -491,94 +464,58 @@
         return [$photoValue];
     };
 
-    $serviceImageUrl = function ($photo) use ($uploadBaseUrl) {
-        $fallback = asset('website/parking.jpeg');
-
+    $serviceImageUrl = function ($photo) use ($publicServicePhotoFolder, $fallbackImage) {
         $photo = trim((string) $photo);
 
         if ($photo === '') {
-            return $fallback;
+            return $fallbackImage;
         }
 
+        $photo = trim($photo, " \t\n\r\0\x0B\"'");
         $photo = str_replace(['\\/', '\\'], '/', $photo);
-        $photo = ltrim($photo, '/');
+
+        /*
+            DB may contain:
+            assets/uploads/public_services/abc.jpg
+            uploads/public_services/abc.jpg
+            public_services/abc.jpg
+            abc.jpg
+            full URL
+
+            Final output:
+            /assets/uploads/public_services/abc.jpg
+        */
 
         if (preg_match('/^https?:\/\//i', $photo)) {
-            $urlPath = parse_url($photo, PHP_URL_PATH);
-
-            if ($urlPath && strpos($urlPath, '/assets/uploads/') === 0) {
-                return $uploadBaseUrl . $urlPath;
-            }
-
-            if ($urlPath && strpos($urlPath, '/uploads/') === 0) {
-                return $uploadBaseUrl . '/assets' . $urlPath;
-            }
-
-            return $photo;
+            $path = parse_url($photo, PHP_URL_PATH);
+            $filename = basename($path);
+        } else {
+            $filename = basename($photo);
         }
 
-        if (strpos($photo, 'assets/uploads/') === 0) {
-            return $uploadBaseUrl . '/' . $photo;
+        if (!$filename || $filename === '.' || $filename === '/') {
+            return $fallbackImage;
         }
 
-        if (strpos($photo, 'uploads/') === 0) {
-            return $uploadBaseUrl . '/assets/' . $photo;
-        }
-
-        if (
-            strpos($photo, 'public_services/') === 0 ||
-            strpos($photo, 'public_service/') === 0
-        ) {
-            return $uploadBaseUrl . '/assets/uploads/' . $photo;
-        }
-
-        if (
-            strpos($photo, 'website/') === 0 ||
-            strpos($photo, 'front-assets/') === 0 ||
-            strpos($photo, 'storage/') === 0
-        ) {
-            return asset($photo);
-        }
-
-        if (strpos($photo, '/') === false) {
-            return $uploadBaseUrl . '/assets/uploads/public_services/' . $photo;
-        }
-
-        return $fallback;
+        return asset($publicServicePhotoFolder . '/' . $filename);
     };
-
-    $fallbackImage = asset('website/parking.jpeg');
-
-    $heroPhoto = null;
-
-    if(isset($services) && $services->count() > 0) {
-        $firstServicePhotos = $getServicePhotos($services->first()->photo ?? null);
-        $heroPhoto = $firstServicePhotos[0] ?? null;
-    }
-
-    $heroImage = $heroPhoto ? $serviceImageUrl($heroPhoto) : $fallbackImage;
 @endphp
 
 <div class="service-page">
 
-    <section class="service-hero">
-        <img class="service-hero-bg" src="{{ $heroImage }}" alt="{{ $localizedTitle }} Background">
-        <div class="service-hero-overlay"></div>
-
-        <div class="service-hero-content">
-            <div class="hero-badge">
-                <i class="fa-solid fa-location-dot"></i>
-                {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ' : 'Shree Jagannatha Dham' }}
-            </div>
-
-            <h1>{{ $localizedTitle }}</h1>
-
-            <p>
-                {{ $language === 'Odia'
-                    ? 'ଏଠାରେ ଉପଲବ୍ଧ ସମସ୍ତ ସେବା, ସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
-                    : 'Explore available facilities, locations and directions near Shree Jagannatha Dham.' }}
-            </p>
+    <section class="page-heading-section">
+        <div class="page-heading-badge">
+            <i class="fa-solid fa-location-dot"></i>
+            {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ' : 'Shree Jagannatha Dham' }}
         </div>
+
+        <h1>{{ $localizedTitle }}</h1>
+
+        <p>
+            {{ $language === 'Odia'
+                ? 'ଏଠାରେ ଉପଲବ୍ଧ ସମସ୍ତ ସେବା, ସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
+                : 'Explore available facilities, locations and directions near Shree Jagannatha Dham.' }}
+        </p>
     </section>
 
     <main class="service-wrapper">
@@ -721,8 +658,5 @@
     </main>
 </div>
 
-@include('partials.website-footer')
-
 </body>
-
 </html>
