@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             background: linear-gradient(180deg, #fff8f3 0%, #ffffff 48%, #fff7f1 100%);
@@ -91,57 +95,10 @@
         .page-container {
             width: 100%;
             max-width: 1180px;
-            margin: -48px auto 0;
+            margin: 32px auto 0;
             padding: 0 18px 55px;
             position: relative;
             z-index: 3;
-        }
-
-        .summary-strip {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
-            margin-bottom: 26px;
-        }
-
-        .summary-card {
-            background: rgba(255, 255, 255, 0.90);
-            border: 1px solid rgba(255, 255, 255, 0.65);
-            border-radius: 18px;
-            padding: 16px;
-            box-shadow: 0 14px 32px rgba(52, 21, 81, 0.12);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .summary-icon {
-            width: 44px;
-            height: 44px;
-            min-width: 44px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #ff7a1a, #db4d30);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 18px rgba(219, 77, 48, 0.25);
-        }
-
-        .summary-card strong {
-            display: block;
-            color: #341551;
-            font-size: 15px;
-            line-height: 1.2;
-        }
-
-        .summary-card span {
-            display: block;
-            color: #777;
-            font-size: 12px;
-            margin-top: 3px;
         }
 
         .bhakta-grid {
@@ -167,14 +124,14 @@
         .image-section {
             position: relative;
             width: 100%;
-            height: 270px;
+            height: 300px;
             overflow: hidden;
             background: #fff3e8;
         }
 
         .main-display-image {
             width: 100%;
-            height: 270px;
+            height: 300px;
             object-fit: cover;
             display: block;
             transition: transform 0.4s ease;
@@ -210,9 +167,9 @@
         }
 
         .thumbnail {
-            width: 70px;
-            height: 58px;
-            min-width: 70px;
+            width: 76px;
+            height: 62px;
+            min-width: 76px;
             object-fit: cover;
             border-radius: 12px;
             cursor: pointer;
@@ -222,7 +179,8 @@
             transition: all 0.25s ease;
         }
 
-        .thumbnail:hover {
+        .thumbnail:hover,
+        .thumbnail.active {
             transform: scale(1.05);
             border-color: #db4d30;
         }
@@ -403,10 +361,6 @@
             .bhakta-grid {
                 grid-template-columns: 1fr;
             }
-
-            .summary-strip {
-                grid-template-columns: 1fr;
-            }
         }
 
         @media (max-width: 575px) {
@@ -432,13 +386,8 @@
             }
 
             .page-container {
-                margin-top: -34px;
+                margin-top: 22px;
                 padding: 0 12px 42px;
-            }
-
-            .summary-card {
-                border-radius: 16px;
-                padding: 13px;
             }
 
             .bhakta-card {
@@ -447,7 +396,7 @@
 
             .image-section,
             .main-display-image {
-                height: 220px;
+                height: 230px;
             }
 
             .card-title-row {
@@ -464,9 +413,9 @@
             }
 
             .thumbnail {
-                width: 64px;
+                width: 66px;
                 height: 54px;
-                min-width: 64px;
+                min-width: 66px;
             }
         }
     </style>
@@ -479,12 +428,13 @@
     $language = $language === 'Odia' ? 'Odia' : 'English';
 
     /*
-        Your actual image folder:
+        Image folder:
         public/assets/uploads/accomodation_photos
 
         DB can contain:
         - ["assets\/uploads\/accomodation_photos\/file.jpg"]
         - assets/uploads/accomodation_photos/file.jpg
+        - accomodation_photos/file.jpg
         - file.jpg
         - old full URL
     */
@@ -504,8 +454,22 @@
 
         $decoded = json_decode($photoValue, true);
 
-        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-            return array_values(array_filter($decoded));
+        if (json_last_error() === JSON_ERROR_NONE) {
+            if (is_array($decoded)) {
+                return array_values(array_filter($decoded));
+            }
+
+            if (is_string($decoded) && trim($decoded) !== '') {
+                return [trim($decoded)];
+            }
+        }
+
+        $photoValue = str_replace(['\\/', '\\'], '/', $photoValue);
+
+        preg_match_all('/[^,"\[\]]+\.(jpg|jpeg|png|webp|gif)/i', $photoValue, $matches);
+
+        if (!empty($matches[0])) {
+            return array_values(array_filter(array_map('trim', $matches[0])));
         }
 
         return [$photoValue];
@@ -528,7 +492,9 @@
             $filename = basename($photo);
         }
 
-        if (!$filename || $filename === '.' || $filename === '/') {
+        $filename = trim(rawurldecode($filename), " \t\n\r\0\x0B\"'");
+
+        if ($filename === '' || $filename === '.' || $filename === '/') {
             return $fallbackImage;
         }
 
@@ -562,41 +528,10 @@
 
     <main class="page-container">
 
-        <div class="summary-strip">
-            <div class="summary-card">
-                <div class="summary-icon">
-                    <i class="fa-solid fa-location-dot"></i>
-                </div>
-                <div>
-                    <strong>{{ $language === 'Odia' ? 'ମନ୍ଦିର ପାଖରେ' : 'Near Temple' }}</strong>
-                    <span>{{ $language === 'Odia' ? 'ସହଜ ଯାତାୟାତ' : 'Easy access for devotees' }}</span>
-                </div>
-            </div>
-
-            <div class="summary-card">
-                <div class="summary-icon">
-                    <i class="fa-solid fa-bed"></i>
-                </div>
-                <div>
-                    <strong>{{ $language === 'Odia' ? 'ସୁବିଧାଜନକ ରହିବା' : 'Comfort Stay' }}</strong>
-                    <span>{{ $language === 'Odia' ? 'ଭକ୍ତମାନଙ୍କ ପାଇଁ' : 'Suitable for pilgrims' }}</span>
-                </div>
-            </div>
-
-            <div class="summary-card">
-                <div class="summary-icon">
-                    <i class="fa-solid fa-phone"></i>
-                </div>
-                <div>
-                    <strong>{{ $language === 'Odia' ? 'ସିଧାସଳଖ ସମ୍ପର୍କ' : 'Direct Contact' }}</strong>
-                    <span>{{ $language === 'Odia' ? 'କଲ କରି ବୁକିଂ କରନ୍ତୁ' : 'Call for booking details' }}</span>
-                </div>
-            </div>
-        </div>
-
         <div class="bhakta-grid">
             @forelse ($bhaktaNibas as $item)
                 @php
+                    $cardIndex = $loop->index;
                     $photoArray = $getAccommodationPhotos($item->photo ?? null);
 
                     $firstPhoto = $photoArray[0] ?? null;
@@ -625,7 +560,7 @@
                 <article class="bhakta-card">
                     <div class="image-section">
                         <img
-                            id="mainImage-{{ $loop->index }}"
+                            id="mainImage-{{ $cardIndex }}"
                             class="main-display-image"
                             src="{{ $firstPhotoUrl }}"
                             alt="{{ $item->name ?? 'Bhakta Niwas' }}"
@@ -647,8 +582,9 @@
 
                                 <img
                                     src="{{ $thumbUrl }}"
-                                    class="thumbnail"
-                                    onclick="updateMainImage(@json($thumbUrl), {{ $loop->parent->index }})"
+                                    class="thumbnail {{ $photoIndex === 0 ? 'active' : '' }}"
+                                    data-target="mainImage-{{ $cardIndex }}"
+                                    data-src="{{ $thumbUrl }}"
                                     alt="Thumbnail {{ $photoIndex + 1 }}"
                                     onerror="this.onerror=null; this.style.display='none';"
                                 >
@@ -746,14 +682,37 @@
 </div>
 
 <script>
-    function updateMainImage(src, index) {
-        const mainImg = document.getElementById('mainImage-' + index);
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.thumbnail').forEach(function (thumbnail) {
+            thumbnail.addEventListener('click', function () {
+                const targetId = this.getAttribute('data-target');
+                const imageSrc = this.getAttribute('data-src');
+                const mainImage = document.getElementById(targetId);
 
-        if (mainImg) {
-            mainImg.classList.remove('fallback-img');
-            mainImg.src = src;
-        }
-    }
+                if (!mainImage || !imageSrc) {
+                    return;
+                }
+
+                mainImage.classList.remove('fallback-img');
+                mainImage.src = imageSrc;
+
+                const thumbnailSection = this.closest('.thumbnail-section');
+
+                if (thumbnailSection) {
+                    thumbnailSection.querySelectorAll('.thumbnail').forEach(function (item) {
+                        item.classList.remove('active');
+                    });
+                }
+
+                this.classList.add('active');
+
+                mainImage.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest'
+                });
+            });
+        });
+    });
 </script>
 
 </body>

@@ -10,10 +10,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Existing CSS -->
-    <link rel="stylesheet" href="{{ asset('front-assets/frontend/css/dham-header.css') }}">
-    <link rel="stylesheet" href="{{ asset('front-assets/frontend/css/footer.css') }}">
-
     <style>
         :root {
             --primary: #341551;
@@ -24,6 +20,7 @@
         }
 
         * {
+            box-sizing: border-box;
             scroll-behavior: smooth;
         }
 
@@ -35,45 +32,100 @@
             overflow-x: hidden;
         }
 
-        /* Header */
-        .custom-header {
+        /* Clean Header - No Hamburger */
+        .clean-header {
             position: sticky;
             top: 0;
             z-index: 50;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(16px);
-            box-shadow: 0 8px 30px rgba(52, 21, 81, 0.12);
+            background: #ffffff;
+            box-shadow: 0 8px 24px rgba(52, 21, 81, 0.10);
+            border-bottom: 1px solid rgba(219, 77, 48, 0.08);
         }
 
-        .header-logo-box {
+        .clean-header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .clean-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            min-width: 0;
+        }
+
+        .clean-logo-box {
             width: 46px;
             height: 46px;
-            border-radius: 16px;
-            background: linear-gradient(145deg, var(--primary), var(--secondary));
+            min-width: 46px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--orange));
+            color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
-            box-shadow: 0 10px 24px rgba(52, 21, 81, 0.32);
+            box-shadow: 0 10px 22px rgba(52, 21, 81, 0.25);
         }
 
-        .nav-link {
+        .clean-brand-title {
+            margin: 0;
+            color: var(--primary);
+            font-size: 20px;
+            line-height: 1.15;
+            font-weight: 900;
+        }
+
+        .clean-brand-subtitle {
+            margin: 3px 0 0;
+            color: #6b7280;
+            font-size: 12px;
+            line-height: 1.2;
             font-weight: 600;
-            color: #4b5563;
-            transition: 0.25s;
         }
 
-        .nav-link:hover,
-        .nav-link.active {
-            color: var(--secondary);
+        .clean-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .mobile-menu {
-            display: none;
+        .clean-home-btn,
+        .clean-call-btn {
+            min-height: 40px;
+            padding: 10px 15px;
+            border-radius: 999px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 800;
+            transition: 0.25s ease;
+            white-space: nowrap;
         }
 
-        .mobile-menu.show {
-            display: block;
+        .clean-home-btn {
+            background: #fff7f1;
+            color: var(--primary);
+        }
+
+        .clean-call-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--orange));
+            color: #ffffff;
+            box-shadow: 0 10px 20px rgba(219, 77, 48, 0.24);
+        }
+
+        .clean-home-btn:hover,
+        .clean-call-btn:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
         }
 
         /* Hero */
@@ -131,6 +183,7 @@
             font-weight: 900;
             line-height: 1.05;
             text-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+            margin: 0;
         }
 
         .hero-content p {
@@ -211,11 +264,14 @@
             font-size: 14px;
             box-shadow: 0 12px 22px rgba(219, 77, 48, 0.28);
             transition: 0.25s;
+            text-decoration: none;
         }
 
         .call-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 16px 28px rgba(219, 77, 48, 0.36);
+            color: white;
+            text-decoration: none;
         }
 
         .info-card {
@@ -263,321 +319,314 @@
                 margin-top: 14px;
             }
         }
+
+        @media (max-width: 575px) {
+            .clean-header-inner {
+                padding: 12px 14px;
+            }
+
+            .clean-logo-box {
+                width: 42px;
+                height: 42px;
+                min-width: 42px;
+                border-radius: 14px;
+            }
+
+            .clean-brand-title {
+                font-size: 16px;
+            }
+
+            .clean-brand-subtitle {
+                font-size: 11px;
+            }
+
+            .clean-home-btn {
+                display: none;
+            }
+
+            .clean-call-btn {
+                padding: 9px 12px;
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-    @php
-        $language = session('app_language', 'English');
+@php
+    $language = session('app_language', 'English');
 
-        $contacts = [
-            [
-                'title_en' => 'Police',
-                'title_od' => 'ପୋଲିସ',
-                'number' => '100',
-                'icon' => 'fa-shield-halved',
-                'desc_en' => 'For law and order emergency support',
-                'desc_od' => 'ଆଇନ ଶୃଙ୍ଖଳା ଜରୁରୀ ସହାୟତା ପାଇଁ',
-            ],
-            [
-                'title_en' => 'Ambulance',
-                'title_od' => 'ଅମ୍ବୁଲାନ୍ସ',
-                'number' => '108',
-                'icon' => 'fa-truck-medical',
-                'desc_en' => 'For urgent medical emergency support',
-                'desc_od' => 'ଜରୁରୀ ଚିକିତ୍ସା ସହାୟତା ପାଇଁ',
-            ],
-            [
-                'title_en' => 'Fire Service',
-                'title_od' => 'ଅଗ୍ନିଶମ ସେବା',
-                'number' => '101',
-                'icon' => 'fa-fire-extinguisher',
-                'desc_en' => 'For fire and rescue emergencies',
-                'desc_od' => 'ଅଗ୍ନିକାଣ୍ଡ ଏବଂ ଉଦ୍ଧାର ସହାୟତା ପାଇଁ',
-            ],
-            [
-                'title_en' => 'Elder Person Helpline',
-                'title_od' => 'ବୟସ୍କ ବ୍ୟକ୍ତିଙ୍କ ପାଇଁ ହେଲ୍ପଲାଇନ୍',
-                'number' => '1090',
-                'icon' => 'fa-user-shield',
-                'desc_en' => 'Support for senior citizens',
-                'desc_od' => 'ବୟସ୍କ ବ୍ୟକ୍ତିଙ୍କ ସହାୟତା ପାଇଁ',
-            ],
-            [
-                'title_en' => 'Child Helpline',
-                'title_od' => 'ଶିଶୁଙ୍କ ପାଇଁ ହେଲ୍ପଲାଇନ୍',
-                'number' => '1098',
-                'icon' => 'fa-child-reaching',
-                'desc_en' => 'Emergency support for children',
-                'desc_od' => 'ଶିଶୁଙ୍କ ଜରୁରୀ ସହାୟତା ପାଇଁ',
-            ],
-            [
-                'title_en' => 'Women Helpline',
-                'title_od' => 'ମହିଳାଙ୍କ ହେଲ୍ପଲାଇନ୍',
-                'number' => '1091',
-                'icon' => 'fa-person-dress',
-                'desc_en' => 'Emergency support for women',
-                'desc_od' => 'ମହିଳାଙ୍କ ଜରୁରୀ ସହାୟତା ପାଇଁ',
-            ],
-            [
-                'title_en' => 'Life Guard',
-                'title_od' => 'ଲାଇଫ ଗାର୍ଡ',
-                'number' => '8260777771',
-                'icon' => 'fa-life-ring',
-                'desc_en' => 'For beach and water safety help',
-                'desc_od' => 'ସମୁଦ୍ର କୂଳ ଏବଂ ଜଳ ସୁରକ୍ଷା ପାଇଁ',
-            ],
-            [
-                'title_en' => 'National Highway Helpline',
-                'title_od' => 'ଜାତୀୟ ରାଜପଥ ହେଲ୍ପଲାଇନ୍',
-                'number' => '1033',
-                'icon' => 'fa-road',
-                'desc_en' => 'For highway accident and travel emergency',
-                'desc_od' => 'ରାଜପଥ ଦୁର୍ଘଟଣା ଏବଂ ଯାତ୍ରା ଜରୁରୀ ସହାୟତା ପାଇଁ',
-            ],
-        ];
-    @endphp
+    $contacts = [
+        [
+            'title_en' => 'Police',
+            'title_od' => 'ପୋଲିସ',
+            'number' => '100',
+            'icon' => 'fa-shield-halved',
+            'desc_en' => 'For law and order emergency support',
+            'desc_od' => 'ଆଇନ ଶୃଙ୍ଖଳା ଜରୁରୀ ସହାୟତା ପାଇଁ',
+        ],
+        [
+            'title_en' => 'Ambulance',
+            'title_od' => 'ଅମ୍ବୁଲାନ୍ସ',
+            'number' => '108',
+            'icon' => 'fa-truck-medical',
+            'desc_en' => 'For urgent medical emergency support',
+            'desc_od' => 'ଜରୁରୀ ଚିକିତ୍ସା ସହାୟତା ପାଇଁ',
+        ],
+        [
+            'title_en' => 'Fire Service',
+            'title_od' => 'ଅଗ୍ନିଶମ ସେବା',
+            'number' => '101',
+            'icon' => 'fa-fire-extinguisher',
+            'desc_en' => 'For fire and rescue emergencies',
+            'desc_od' => 'ଅଗ୍ନିକାଣ୍ଡ ଏବଂ ଉଦ୍ଧାର ସହାୟତା ପାଇଁ',
+        ],
+        [
+            'title_en' => 'Elder Person Helpline',
+            'title_od' => 'ବୟସ୍କ ବ୍ୟକ୍ତିଙ୍କ ପାଇଁ ହେଲ୍ପଲାଇନ୍',
+            'number' => '1090',
+            'icon' => 'fa-user-shield',
+            'desc_en' => 'Support for senior citizens',
+            'desc_od' => 'ବୟସ୍କ ବ୍ୟକ୍ତିଙ୍କ ସହାୟତା ପାଇଁ',
+        ],
+        [
+            'title_en' => 'Child Helpline',
+            'title_od' => 'ଶିଶୁଙ୍କ ପାଇଁ ହେଲ୍ପଲାଇନ୍',
+            'number' => '1098',
+            'icon' => 'fa-child-reaching',
+            'desc_en' => 'Emergency support for children',
+            'desc_od' => 'ଶିଶୁଙ୍କ ଜରୁରୀ ସହାୟତା ପାଇଁ',
+        ],
+        [
+            'title_en' => 'Women Helpline',
+            'title_od' => 'ମହିଳାଙ୍କ ହେଲ୍ପଲାଇନ୍',
+            'number' => '1091',
+            'icon' => 'fa-person-dress',
+            'desc_en' => 'Emergency support for women',
+            'desc_od' => 'ମହିଳାଙ୍କ ଜରୁରୀ ସହାୟତା ପାଇଁ',
+        ],
+        [
+            'title_en' => 'Life Guard',
+            'title_od' => 'ଲାଇଫ ଗାର୍ଡ',
+            'number' => '8260777771',
+            'icon' => 'fa-life-ring',
+            'desc_en' => 'For beach and water safety help',
+            'desc_od' => 'ସମୁଦ୍ର କୂଳ ଏବଂ ଜଳ ସୁରକ୍ଷା ପାଇଁ',
+        ],
+        [
+            'title_en' => 'National Highway Helpline',
+            'title_od' => 'ଜାତୀୟ ରାଜପଥ ହେଲ୍ପଲାଇନ୍',
+            'number' => '1033',
+            'icon' => 'fa-road',
+            'desc_en' => 'For highway accident and travel emergency',
+            'desc_od' => 'ରାଜପଥ ଦୁର୍ଘଟଣା ଏବଂ ଯାତ୍ରା ଜରୁରୀ ସହାୟତା ପାଇଁ',
+        ],
+    ];
+@endphp
 
-    <!-- Header -->
-    <header class="custom-header">
-        <div class="max-w-7xl mx-auto px-4 md:px-8">
-            <div class="flex items-center justify-between py-4">
+<!-- Clean Header - No Hamburger -->
+<header class="clean-header">
+    <div class="clean-header-inner">
 
-                <a href="{{ url('/') }}" class="flex items-center gap-3">
-                    <div class="header-logo-box">
-                        <i class="fa-solid fa-om text-xl"></i>
+        <a href="{{ url('/') }}" class="clean-brand">
+            <div class="clean-logo-box">
+                <i class="fa-solid fa-om text-xl"></i>
+            </div>
+
+            <div>
+                <h2 class="clean-brand-title">
+                    {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ' : 'Shree Jagannath Dham' }}
+                </h2>
+                <p class="clean-brand-subtitle">
+                    {{ $language === 'Odia' ? 'ଜରୁରୀ ସହାୟତା' : 'Emergency Assistance' }}
+                </p>
+            </div>
+        </a>
+
+        <div class="clean-header-actions">
+            <a href="{{ url('/') }}" class="clean-home-btn">
+                <i class="fa-solid fa-house"></i>
+                {{ $language === 'Odia' ? 'ହୋମ୍' : 'Home' }}
+            </a>
+
+            <a href="tel:108" class="clean-call-btn">
+                <i class="fa-solid fa-phone-volume"></i>
+                {{ $language === 'Odia' ? 'କଲ୍ କରନ୍ତୁ' : 'Call Now' }}
+            </a>
+        </div>
+
+    </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+    <img class="hero-bg" src="{{ asset('website/fest.jpg') }}" alt="Mandir Background">
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+        <div class="hero-badge">
+            <i class="fa-solid fa-circle-info"></i>
+            {{ $language === 'Odia' ? 'ଭକ୍ତଙ୍କ ପାଇଁ ଜରୁରୀ ସହାୟତା' : 'Emergency support for devotees' }}
+        </div>
+
+        <h1>
+            {{ $language === 'Odia' ? 'ଜରୁରୀକାଳୀନ ଯୋଗାଯୋଗ' : 'Emergency Contact' }}
+        </h1>
+
+        <p>
+            {{ $language === 'Odia'
+                ? 'ପୁରୀ ଧାମରେ ଜରୁରୀ ସହାୟତା ପାଇଁ ଆବଶ୍ୟକୀୟ ହେଲ୍ପଲାଇନ୍ ନମ୍ବର'
+                : 'Important helpline numbers for emergency support at Shree Jagannath Dham.' }}
+        </p>
+
+        <div class="mt-7 flex flex-col sm:flex-row justify-center gap-3">
+            <a href="#helplineNumbers" class="px-7 py-3 rounded-full bg-white text-[#341551] font-bold shadow-lg">
+                <i class="fa-solid fa-list mr-2"></i>
+                {{ $language === 'Odia' ? 'ନମ୍ବର ଦେଖନ୍ତୁ' : 'View Numbers' }}
+            </a>
+
+            <a href="tel:108" class="px-7 py-3 rounded-full bg-[#ff8a00] text-white font-bold shadow-lg">
+                <i class="fa-solid fa-phone mr-2"></i>
+                {{ $language === 'Odia' ? 'ତୁରନ୍ତ କଲ୍' : 'Emergency Call' }}
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Emergency Numbers -->
+<section id="helplineNumbers" class="emergency-section px-4 md:px-8 pb-16">
+    <div class="max-w-7xl mx-auto">
+
+        <div class="bg-white rounded-[28px] shadow-2xl p-5 md:p-8 mb-8">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+                <div>
+                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-[#db4d30] font-bold text-sm mb-3">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        {{ $language === 'Odia' ? 'ସୁରକ୍ଷା ସୂଚନା' : 'Safety Information' }}
+                    </span>
+
+                    <h2 class="text-2xl md:text-4xl font-extrabold text-[#341551]">
+                        {{ $language === 'Odia' ? 'ଜରୁରୀକାଳୀନ ସହଯୋଗ ସଂଖ୍ୟା' : 'Emergency Helpline Numbers' }}
+                    </h2>
+
+                    <p class="text-gray-500 mt-2 max-w-2xl">
+                        {{ $language === 'Odia'
+                            ? 'ଆବଶ୍ୟକ ସମୟରେ ଏହି ନମ୍ବରଗୁଡିକୁ କଲ୍ କରନ୍ତୁ।'
+                            : 'Use these helpline numbers during medical, police, fire, safety or travel emergencies.' }}
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-3 bg-[#fff7f1] rounded-2xl px-5 py-4">
+                    <div class="w-12 h-12 rounded-full bg-[#db4d30] text-white flex items-center justify-center">
+                        <i class="fa-solid fa-headset"></i>
                     </div>
                     <div>
-                        <h2 class="text-lg md:text-xl font-extrabold text-[#341551] leading-tight">
-                            {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ' : 'Shree Jagannath Dham' }}
-                        </h2>
-                        <p class="text-xs text-gray-500">
-                            {{ $language === 'Odia' ? 'ଜରୁରୀ ସହାୟତା' : 'Emergency Assistance' }}
+                        <p class="text-sm text-gray-500">
+                            {{ $language === 'Odia' ? 'ଦ୍ରୁତ ସହାୟତା' : 'Quick Help' }}
                         </p>
+                        <p class="text-xl font-extrabold text-[#341551]">108</p>
                     </div>
-                </a>
-
-                <nav class="hidden md:flex items-center gap-8">
-                    <a href="{{ url('/') }}" class="nav-link">
-                        {{ $language === 'Odia' ? 'ହୋମ୍' : 'Home' }}
-                    </a>
-                    <a href="{{ url('/services') }}" class="nav-link">
-                        {{ $language === 'Odia' ? 'ସେବା' : 'Services' }}
-                    </a>
-                    <a href="{{ url('/emergency-contact') }}" class="nav-link active">
-                        {{ $language === 'Odia' ? 'ଜରୁରୀକାଳୀନ' : 'Emergency' }}
-                    </a>
-                    <a href="tel:108" class="call-btn">
-                        <i class="fa-solid fa-phone-volume"></i>
-                        {{ $language === 'Odia' ? 'କଲ୍ କରନ୍ତୁ' : 'Call Now' }}
-                    </a>
-                </nav>
-
-                <button onclick="toggleMobileMenu()" class="md:hidden w-11 h-11 rounded-xl bg-[#341551] text-white">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-            </div>
-
-            <div id="mobileMenu" class="mobile-menu md:hidden pb-4">
-                <div class="bg-white rounded-2xl p-4 shadow-lg space-y-3">
-                    <a href="{{ url('/') }}" class="block font-semibold text-gray-700">
-                        <i class="fa-solid fa-house mr-2 text-[#db4d30]"></i>
-                        {{ $language === 'Odia' ? 'ହୋମ୍' : 'Home' }}
-                    </a>
-                    <a href="{{ url('/services') }}" class="block font-semibold text-gray-700">
-                        <i class="fa-solid fa-grid-2 mr-2 text-[#db4d30]"></i>
-                        {{ $language === 'Odia' ? 'ସେବା' : 'Services' }}
-                    </a>
-                    <a href="{{ url('/emergency-contact') }}" class="block font-semibold text-[#db4d30]">
-                        <i class="fa-solid fa-triangle-exclamation mr-2"></i>
-                        {{ $language === 'Odia' ? 'ଜରୁରୀକାଳୀନ' : 'Emergency' }}
-                    </a>
-                    <a href="tel:108" class="call-btn w-full">
-                        <i class="fa-solid fa-phone-volume"></i>
-                        {{ $language === 'Odia' ? 'କଲ୍ କରନ୍ତୁ' : 'Call Now' }}
-                    </a>
                 </div>
             </div>
         </div>
-    </header>
 
-    <!-- Hero -->
-    <section class="hero">
-        <img class="hero-bg" src="{{ asset('website/fest.jpg') }}" alt="Mandir Background">
-        <div class="hero-overlay"></div>
-
-        <div class="hero-content">
-            <div class="hero-badge">
-                <i class="fa-solid fa-circle-info"></i>
-                {{ $language === 'Odia' ? 'ଭକ୍ତଙ୍କ ପାଇଁ ଜରୁରୀ ସହାୟତା' : 'Emergency support for devotees' }}
-            </div>
-
-            <h1>
-                {{ $language === 'Odia' ? 'ଜରୁରୀକାଳୀନ ଯୋଗାଯୋଗ' : 'Emergency Contact' }}
-            </h1>
-
-            <p>
-                {{ $language === 'Odia'
-                    ? 'ପୁରୀ ଧାମରେ ଜରୁରୀ ସହାୟତା ପାଇଁ ଆବଶ୍ୟକୀୟ ହେଲ୍ପଲାଇନ୍ ନମ୍ବର'
-                    : 'Important helpline numbers for emergency support at Shree Jagannath Dham.' }}
-            </p>
-
-            <div class="mt-7 flex flex-col sm:flex-row justify-center gap-3">
-                <a href="#helplineNumbers" class="px-7 py-3 rounded-full bg-white text-[#341551] font-bold shadow-lg">
-                    <i class="fa-solid fa-list mr-2"></i>
-                    {{ $language === 'Odia' ? 'ନମ୍ବର ଦେଖନ୍ତୁ' : 'View Numbers' }}
-                </a>
-
-                <a href="tel:108" class="px-7 py-3 rounded-full bg-[#ff8a00] text-white font-bold shadow-lg">
-                    <i class="fa-solid fa-phone mr-2"></i>
-                    {{ $language === 'Odia' ? 'ତୁରନ୍ତ କଲ୍' : 'Emergency Call' }}
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Emergency Numbers -->
-    <section id="helplineNumbers" class="emergency-section px-4 md:px-8 pb-16">
-        <div class="max-w-7xl mx-auto">
-
-            <div class="bg-white rounded-[28px] shadow-2xl p-5 md:p-8 mb-8">
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-                    <div>
-                        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-[#db4d30] font-bold text-sm mb-3">
-                            <i class="fa-solid fa-shield-heart"></i>
-                            {{ $language === 'Odia' ? 'ସୁରକ୍ଷା ସୂଚନା' : 'Safety Information' }}
-                        </span>
-
-                        <h2 class="text-2xl md:text-4xl font-extrabold text-[#341551]">
-                            {{ $language === 'Odia' ? 'ଜରୁରୀକାଳୀନ ସହଯୋଗ ସଂଖ୍ୟା' : 'Emergency Helpline Numbers' }}
-                        </h2>
-
-                        <p class="text-gray-500 mt-2 max-w-2xl">
-                            {{ $language === 'Odia'
-                                ? 'ଆବଶ୍ୟକ ସମୟରେ ଏହି ନମ୍ବରଗୁଡିକୁ କଲ୍ କରନ୍ତୁ।'
-                                : 'Use these helpline numbers during medical, police, fire, safety or travel emergencies.' }}
-                        </p>
-                    </div>
-
-                    <div class="flex items-center gap-3 bg-[#fff7f1] rounded-2xl px-5 py-4">
-                        <div class="w-12 h-12 rounded-full bg-[#db4d30] text-white flex items-center justify-center">
-                            <i class="fa-solid fa-headset"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">
-                                {{ $language === 'Odia' ? 'ଦ୍ରୁତ ସହାୟତା' : 'Quick Help' }}
-                            </p>
-                            <p class="text-xl font-extrabold text-[#341551]">108</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-                @foreach ($contacts as $contact)
-                    <div class="helpline-card">
-                        <div class="relative z-10">
-                            <div class="flex items-start gap-4">
-                                <div class="icon-box">
-                                    <i class="fa-solid {{ $contact['icon'] }}"></i>
-                                </div>
-
-                                <div class="flex-1">
-                                    <h3 class="text-lg font-extrabold text-[#341551] leading-snug">
-                                        {{ $language === 'Odia' ? $contact['title_od'] : $contact['title_en'] }}
-                                    </h3>
-
-                                    <p class="text-sm text-gray-500 mt-1">
-                                        {{ $language === 'Odia' ? $contact['desc_od'] : $contact['desc_en'] }}
-                                    </p>
-                                </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+            @foreach ($contacts as $contact)
+                <div class="helpline-card">
+                    <div class="relative z-10">
+                        <div class="flex items-start gap-4">
+                            <div class="icon-box">
+                                <i class="fa-solid {{ $contact['icon'] }}"></i>
                             </div>
 
-                            <div class="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                                <div>
-                                    <p class="text-xs uppercase tracking-wider text-gray-400 font-bold">
-                                        {{ $language === 'Odia' ? 'ହେଲ୍ପଲାଇନ୍' : 'Helpline' }}
-                                    </p>
-                                    <p class="text-3xl font-black text-[#db4d30]">
-                                        {{ $contact['number'] }}
-                                    </p>
-                                </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-extrabold text-[#341551] leading-snug">
+                                    {{ $language === 'Odia' ? $contact['title_od'] : $contact['title_en'] }}
+                                </h3>
 
-                                <a href="tel:{{ $contact['number'] }}" class="call-btn">
-                                    <i class="fa-solid fa-phone"></i>
-                                    {{ $language === 'Odia' ? 'କଲ୍' : 'Call' }}
-                                </a>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    {{ $language === 'Odia' ? $contact['desc_od'] : $contact['desc_en'] }}
+                                </p>
                             </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
 
-            <!-- Bottom Info -->
-            <div class="info-card mt-10 p-6 md:p-8">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-                    <div class="lg:col-span-1">
-                        <h3 class="text-2xl md:text-3xl font-extrabold">
-                            {{ $language === 'Odia' ? 'ଜରୁରୀ ସମୟରେ କଣ କରିବେ?' : 'What to do in an emergency?' }}
-                        </h3>
-                        <p class="text-orange-100 mt-3">
-                            {{ $language === 'Odia'
-                                ? 'ଶାନ୍ତ ରୁହନ୍ତୁ ଏବଂ ଠିକ୍ ହେଲ୍ପଲାଇନ୍ ନମ୍ବରକୁ କଲ୍ କରନ୍ତୁ।'
-                                : 'Stay calm, identify the issue and call the correct emergency helpline.' }}
-                        </p>
-                    </div>
+                        <div class="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div>
+                                <p class="text-xs uppercase tracking-wider text-gray-400 font-bold">
+                                    {{ $language === 'Odia' ? 'ହେଲ୍ପଲାଇନ୍' : 'Helpline' }}
+                                </p>
+                                <p class="text-3xl font-black text-[#db4d30]">
+                                    {{ $contact['number'] }}
+                                </p>
+                            </div>
 
-                    <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="quick-chip">
-                            <i class="fa-solid fa-location-dot text-2xl text-orange-200"></i>
-                            <p class="font-bold mt-3">
-                                {{ $language === 'Odia' ? 'ସ୍ଥାନ କୁହନ୍ତୁ' : 'Share Location' }}
-                            </p>
-                            <p class="text-sm text-orange-100 mt-1">
-                                {{ $language === 'Odia' ? 'ଆପଣ କେଉଁଠି ଅଛନ୍ତି କୁହନ୍ତୁ' : 'Tell your exact place' }}
-                            </p>
-                        </div>
-
-                        <div class="quick-chip">
-                            <i class="fa-solid fa-circle-info text-2xl text-orange-200"></i>
-                            <p class="font-bold mt-3">
-                                {{ $language === 'Odia' ? 'ସମସ୍ୟା କୁହନ୍ତୁ' : 'Explain Issue' }}
-                            </p>
-                            <p class="text-sm text-orange-100 mt-1">
-                                {{ $language === 'Odia' ? 'ସଠିକ୍ ସୂଚନା ଦିଅନ୍ତୁ' : 'Give clear information' }}
-                            </p>
-                        </div>
-
-                        <div class="quick-chip">
-                            <i class="fa-solid fa-hand-holding-heart text-2xl text-orange-200"></i>
-                            <p class="font-bold mt-3">
-                                {{ $language === 'Odia' ? 'ସହାୟତା ଅପେକ୍ଷା କରନ୍ତୁ' : 'Wait Safely' }}
-                            </p>
-                            <p class="text-sm text-orange-100 mt-1">
-                                {{ $language === 'Odia' ? 'ସୁରକ୍ଷିତ ସ୍ଥାନରେ ରୁହନ୍ତୁ' : 'Stay in a safe place' }}
-                            </p>
+                            <a href="tel:{{ $contact['number'] }}" class="call-btn">
+                                <i class="fa-solid fa-phone"></i>
+                                {{ $language === 'Odia' ? 'କଲ୍' : 'Call' }}
+                            </a>
                         </div>
                     </div>
                 </div>
-            </div>
-
+            @endforeach
         </div>
-    </section>
 
-    <!-- Floating Mobile Call Button -->
-    <a href="tel:108"
-        class="fixed md:hidden right-5 bottom-5 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-[#ff8a00] to-[#db4d30] text-white flex items-center justify-center shadow-2xl">
-        <i class="fa-solid fa-phone-volume text-2xl"></i>
-    </a>
+        <!-- Bottom Info -->
+        <div class="info-card mt-10 p-6 md:p-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+                <div class="lg:col-span-1">
+                    <h3 class="text-2xl md:text-3xl font-extrabold">
+                        {{ $language === 'Odia' ? 'ଜରୁରୀ ସମୟରେ କଣ କରିବେ?' : 'What to do in an emergency?' }}
+                    </h3>
+                    <p class="text-orange-100 mt-3">
+                        {{ $language === 'Odia'
+                            ? 'ଶାନ୍ତ ରୁହନ୍ତୁ ଏବଂ ଠିକ୍ ହେଲ୍ପଲାଇନ୍ ନମ୍ବରକୁ କଲ୍ କରନ୍ତୁ।'
+                            : 'Stay calm, identify the issue and call the correct emergency helpline.' }}
+                    </p>
+                </div>
 
-    <script>
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            menu.classList.toggle('show');
-        }
-    </script>
+                <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="quick-chip">
+                        <i class="fa-solid fa-location-dot text-2xl text-orange-200"></i>
+                        <p class="font-bold mt-3">
+                            {{ $language === 'Odia' ? 'ସ୍ଥାନ କୁହନ୍ତୁ' : 'Share Location' }}
+                        </p>
+                        <p class="text-sm text-orange-100 mt-1">
+                            {{ $language === 'Odia' ? 'ଆପଣ କେଉଁଠି ଅଛନ୍ତି କୁହନ୍ତୁ' : 'Tell your exact place' }}
+                        </p>
+                    </div>
+
+                    <div class="quick-chip">
+                        <i class="fa-solid fa-circle-info text-2xl text-orange-200"></i>
+                        <p class="font-bold mt-3">
+                            {{ $language === 'Odia' ? 'ସମସ୍ୟା କୁହନ୍ତୁ' : 'Explain Issue' }}
+                        </p>
+                        <p class="text-sm text-orange-100 mt-1">
+                            {{ $language === 'Odia' ? 'ସଠିକ୍ ସୂଚନା ଦିଅନ୍ତୁ' : 'Give clear information' }}
+                        </p>
+                    </div>
+
+                    <div class="quick-chip">
+                        <i class="fa-solid fa-hand-holding-heart text-2xl text-orange-200"></i>
+                        <p class="font-bold mt-3">
+                            {{ $language === 'Odia' ? 'ସହାୟତା ଅପେକ୍ଷା କରନ୍ତୁ' : 'Wait Safely' }}
+                        </p>
+                        <p class="text-sm text-orange-100 mt-1">
+                            {{ $language === 'Odia' ? 'ସୁରକ୍ଷିତ ସ୍ଥାନରେ ରୁହନ୍ତୁ' : 'Stay in a safe place' }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- Floating Mobile Call Button -->
+<a href="tel:108"
+    class="fixed md:hidden right-5 bottom-5 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-[#ff8a00] to-[#db4d30] text-white flex items-center justify-center shadow-2xl">
+    <i class="fa-solid fa-phone-volume text-2xl"></i>
+</a>
 
 </body>
-
 </html>
