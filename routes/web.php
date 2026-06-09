@@ -91,8 +91,6 @@ Route::get('/about', function () {
     return view('about');
 });
 
-Route::get('/temple-services/{service_type}', [PublicServiceController::class, 'showByServiceType'])
-    ->name('services.byType');
 
  Route::controller(HomeSectionController::class)->group(function() {
         Route::get('/puri-dhams', 'puriWebsite');
