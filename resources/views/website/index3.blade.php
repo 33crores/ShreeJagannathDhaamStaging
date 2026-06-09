@@ -2,991 +2,891 @@
 
 @section('content')
 
-    @php
-        $language = session('app_language', 'English');
-    @endphp
+<style>
+    .temple-convenience {
+        width: 100%;
+        min-height: 100vh;
+        padding: 14px 12px 38px;
+        background:
+            radial-gradient(circle at top left, rgba(255, 154, 64, 0.13), transparent 30%),
+            radial-gradient(circle at top right, rgba(52, 21, 81, 0.09), transparent 28%),
+            linear-gradient(180deg, #fff8f3 0%, #ffffff 48%, #fffaf7 100%);
+        overflow: hidden;
+    }
 
-    <section class="banner-sections">
-        <!-- Video Banner -->
-        @if ($latestWebVideo && $latestWebVideo->banner_video)
-            <div class="banner-video">
-                <video id="bannerVideo" autoplay loop playsinline muted preload="metadata"
-                    poster="{{ asset('storage/' . $latestWebVideo->banner_image ?? 'website/d.png') }}">
-                    <source src="{{ asset('website/banner.mp4') }}" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
+    .ratha-header {
+        width: 100%;
+        max-width: 520px;
+        margin: 8px auto 24px;
+        position: relative;
+        animation: headerDrop 0.65s ease both;
+    }
+
+    .ratha-header-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 28px;
+        padding: 18px 15px 16px;
+        background:
+            radial-gradient(circle at 92% 8%, rgba(255, 218, 121, 0.32), transparent 28%),
+            radial-gradient(circle at 8% 95%, rgba(255, 122, 26, 0.22), transparent 32%),
+            linear-gradient(135deg, #341551 0%, #8b2348 44%, #db4d30 74%, #ff7a1a 100%);
+        box-shadow:
+            0 20px 38px rgba(52, 21, 81, 0.24),
+            inset 0 1px 0 rgba(255, 255, 255, 0.20);
+    }
+
+    .ratha-header-card::before {
+        content: "";
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        right: -55px;
+        top: -58px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.11);
+    }
+
+    .ratha-header-card::after {
+        content: "";
+        position: absolute;
+        width: 115px;
+        height: 115px;
+        left: -48px;
+        bottom: -48px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.10);
+    }
+
+    .ratha-shine {
+        position: absolute;
+        top: -70%;
+        left: -65%;
+        width: 48%;
+        height: 240%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.28), transparent);
+        transform: rotate(18deg);
+        animation: titleShine 4s ease-in-out infinite;
+        z-index: 1;
+    }
+
+    .ratha-top-row {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .ratha-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.16);
+        color: #fff4df;
+        font-size: 10.5px;
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: 0.7px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        white-space: nowrap;
+    }
+
+    .ratha-badge i {
+        color: #ffd66b;
+        font-size: 12px;
+    }
+
+    .language-selector-box {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .language-check-label {
+        margin: 0;
+        cursor: pointer;
+    }
+
+    .language-check-label input {
+        display: none;
+    }
+
+    .language-check-label span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 9px;
+        border-radius: 999px;
+        font-size: 10.5px;
+        line-height: 1;
+        font-weight: 900;
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.10);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        transition: all 0.25s ease;
+        white-space: nowrap;
+    }
+
+    .language-check-label span::before {
+        content: "";
+        width: 12px;
+        height: 12px;
+        border-radius: 4px;
+        border: 2px solid rgba(255, 255, 255, 0.85);
+        background: rgba(255, 255, 255, 0.10);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+        line-height: 1;
+    }
+
+    .language-check-label input:checked + span {
+        color: #db4d30;
+        background: #ffffff;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.16);
+    }
+
+    .language-check-label input:checked + span::before {
+        content: "✓";
+        color: #ffffff;
+        background: linear-gradient(135deg, #ff7a1a, #db4d30);
+        border-color: #db4d30;
+    }
+
+    .ratha-main {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    /* Updated Transparent Glass Morphism Logo Box */
+    .ratha-logo-box {
+        width: 104px;
+        height: 104px;
+        min-width: 104px;
+        border-radius: 30px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.32);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+
+        box-shadow:
+            0 18px 36px rgba(0, 0, 0, 0.24),
+            inset 0 1px 0 rgba(255, 255, 255, 0.42),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.12);
+
+        animation: logoFloat 3s ease-in-out infinite;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .ratha-logo-box::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background:
+            radial-gradient(circle at 28% 20%, rgba(255, 255, 255, 0.35), transparent 32%),
+            linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04));
+        pointer-events: none;
+    }
+
+    .ratha-logo-box img {
+        width: 98px;
+        height: 98px;
+        object-fit: contain;
+        display: block;
+        position: relative;
+        z-index: 2;
+
+        background: transparent;
+        mix-blend-mode: multiply;
+
+        filter:
+            drop-shadow(0 8px 12px rgba(0, 0, 0, 0.26))
+            saturate(1.35)
+            contrast(1.12)
+            brightness(1.08);
+    }
+
+    .ratha-title-area {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .ratha-small-text {
+        display: block;
+        margin-bottom: 7px;
+        color: #ffe9bd;
+        font-size: 11px;
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: 0.8px;
+    }
+
+    .ratha-title {
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        padding: 9px 13px;
+        border-radius: 16px;
+        color: #341551;
+        background: linear-gradient(135deg, #ffffff, #ffe8d8);
+        font-size: 22px;
+        line-height: 1.12;
+        font-weight: 1000;
+        letter-spacing: -0.4px;
+        box-shadow:
+            0 12px 22px rgba(0, 0, 0, 0.14),
+            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .ratha-subtitle {
+        margin: 9px 0 0;
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 12px;
+        line-height: 1.45;
+        font-weight: 600;
+    }
+
+    .ratha-chip-row {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        gap: 7px;
+        margin-top: 15px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .ratha-chip-row::-webkit-scrollbar {
+        display: none;
+    }
+
+    .ratha-chip {
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 900;
+        white-space: nowrap;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .convenience-container {
+        width: 100%;
+        max-width: 520px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        padding: 5px 2px;
+    }
+
+    .conv {
+        animation: cardPop 0.6s ease both;
+    }
+
+    .conv:nth-child(1) { animation-delay: 0.05s; }
+    .conv:nth-child(2) { animation-delay: 0.10s; }
+    .conv:nth-child(3) { animation-delay: 0.15s; }
+    .conv:nth-child(4) { animation-delay: 0.20s; }
+    .conv:nth-child(5) { animation-delay: 0.25s; }
+    .conv:nth-child(6) { animation-delay: 0.30s; }
+    .conv:nth-child(7) { animation-delay: 0.35s; }
+    .conv:nth-child(8) { animation-delay: 0.40s; }
+    .conv:nth-child(9) { animation-delay: 0.45s; }
+    .conv:nth-child(10) { animation-delay: 0.50s; }
+    .conv:nth-child(11) { animation-delay: 0.55s; }
+    .conv:nth-child(12) { animation-delay: 0.60s; }
+
+    .conv a {
+        min-height: 128px;
+        padding: 16px 12px;
+        border-radius: 22px;
+        background: linear-gradient(145deg, #ffffff, #fff4ee);
+        box-shadow:
+            0 12px 22px rgba(52, 21, 81, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(219, 77, 48, 0.08);
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+        transform-style: preserve-3d;
+        transition: all 0.35s ease;
+    }
+
+    .conv a::before {
+        content: "";
+        position: absolute;
+        top: -55%;
+        left: -75%;
+        width: 70%;
+        height: 190%;
+        background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+        transform: rotate(18deg);
+        transition: all 0.65s ease;
+    }
+
+    .conv a::after {
+        content: "";
+        position: absolute;
+        right: -28px;
+        bottom: -28px;
+        width: 82px;
+        height: 82px;
+        border-radius: 50%;
+        background: rgba(244, 123, 32, 0.10);
+        z-index: 0;
+    }
+
+    .conv a:hover,
+    .conv a:active {
+        transform: translateY(-6px) rotateX(4deg) rotateY(-4deg) scale(1.02);
+        box-shadow:
+            0 18px 30px rgba(52, 21, 81, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+
+    .conv a:hover::before,
+    .conv a:active::before {
+        left: 130%;
+    }
+
+    .convenience-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .convenience-text {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .convenience-text h3 {
+        font-size: 16px;
+        line-height: 1.18;
+        font-weight: 900;
+        color: #282828;
+        margin: 0 0 5px;
+    }
+
+    .convenience-text span {
+        display: block;
+        font-size: 12px;
+        line-height: 1.25;
+        font-weight: 500;
+        color: #777777;
+    }
+
+    .convenience-item {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg, #ffefe6, #ffffff);
+        box-shadow:
+            0 8px 14px rgba(219, 77, 48, 0.14),
+            inset 0 -2px 6px rgba(244, 123, 32, 0.10);
+        position: relative;
+        z-index: 2;
+        animation: iconFloat 2.8s ease-in-out infinite;
+    }
+
+    .convenience-item img,
+    .convenience-item svg {
+        max-width: 34px;
+        max-height: 34px;
+        object-fit: contain;
+        filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.12));
+    }
+
+    .free-food-icon svg {
+        width: 34px;
+        height: 34px;
+    }
+
+    .card-arrow {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f47b20, #db4d30);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        font-weight: 900;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 8px 15px rgba(219, 77, 48, 0.22);
+        align-self: flex-end;
+        transition: all 0.3s ease;
+    }
+
+    .conv a:hover .card-arrow,
+    .conv a:active .card-arrow {
+        transform: translateX(4px);
+    }
+
+    @keyframes headerDrop {
+        0% {
+            opacity: 0;
+            transform: translateY(-16px) scale(0.96);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @keyframes logoFloat {
+        0%, 100% {
+            transform: translateY(0) scale(1);
+        }
+        50% {
+            transform: translateY(-5px) scale(1.04);
+        }
+    }
+
+    @keyframes cardPop {
+        0% {
+            opacity: 0;
+            transform: translateY(24px) scale(0.96);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @keyframes iconFloat {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-5px);
+        }
+    }
+
+    @keyframes titleShine {
+        0% {
+            left: -55%;
+        }
+        45%, 100% {
+            left: 130%;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .temple-convenience {
+            padding: 13px 10px 35px;
+        }
+
+        .ratha-header-card {
+            border-radius: 24px;
+            padding: 15px 13px 14px;
+        }
+
+        .ratha-top-row {
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .ratha-badge {
+            padding: 7px 9px;
+            font-size: 9.5px;
+        }
+
+        .language-selector-box {
+            gap: 4px;
+            padding: 4px;
+        }
+
+        .language-check-label span {
+            padding: 6px 8px;
+            font-size: 10px;
+        }
+
+        .ratha-main {
+            gap: 11px;
+        }
+
+        .ratha-logo-box {
+            width: 86px;
+            height: 86px;
+            min-width: 86px;
+            border-radius: 26px;
+            background: rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .ratha-logo-box img {
+            width: 80px;
+            height: 80px;
+        }
+
+        .ratha-title {
+            font-size: 19px;
+            padding: 8px 11px;
+            border-radius: 14px;
+        }
+
+        .ratha-subtitle {
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .convenience-container {
+            gap: 13px;
+        }
+
+        .conv a {
+            min-height: 122px;
+            padding: 14px 10px;
+            border-radius: 20px;
+        }
+
+        .convenience-text h3 {
+            font-size: 15px;
+        }
+
+        .convenience-text span {
+            font-size: 11px;
+        }
+
+        .convenience-item {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 15px;
+        }
+
+        .convenience-item img,
+        .convenience-item svg {
+            max-width: 31px;
+            max-height: 31px;
+        }
+
+        .card-arrow {
+            width: 28px;
+            height: 28px;
+            font-size: 15px;
+        }
+    }
+
+    @media (max-width: 340px) {
+        .ratha-main {
+            align-items: flex-start;
+        }
+
+        .ratha-logo-box {
+            width: 74px;
+            height: 74px;
+            min-width: 74px;
+            border-radius: 22px;
+        }
+
+        .ratha-logo-box img {
+            width: 68px;
+            height: 68px;
+        }
+
+        .ratha-title {
+            font-size: 17px;
+        }
+
+        .ratha-badge {
+            font-size: 9px;
+        }
+
+        .language-check-label span {
+            padding: 5px 7px;
+            font-size: 9.5px;
+        }
+
+        .convenience-container {
+            gap: 10px;
+        }
+
+        .conv a {
+            padding: 12px 9px;
+        }
+
+        .convenience-text h3 {
+            font-size: 14px;
+        }
+
+        .ratha-chip {
+            font-size: 10px;
+            padding: 6px 9px;
+        }
+    }
+</style>
+
+@php
+    $language = request('language', $language ?? session('language', 'English'));
+    $language = $language === 'Odia' ? 'Odia' : 'English';
+    $langQuery = 'language=' . urlencode($language);
+
+    $cards = [
+        [
+            'url' => route('parking.list'),
+            'title1' => $language === 'Odia' ? 'ପାର୍କିଂ' : 'Parking',
+            'title2' => $language === 'Odia' ? 'ସ୍ଥଳ' : 'Areas',
+            'desc' => $language === 'Odia' ? '୨, ୩, ୪ ଚକା ବାହନ' : '2, 3, 4 Wheelers',
+            'icon' => asset('website/park.png'),
+            'alt' => 'Parking',
+            'type' => 'image',
+        ],
+        [
+            'url' => route('lockershoe.list'),
+            'title1' => $language === 'Odia' ? 'ଲକର ଓ' : 'Locker &',
+            'title2' => $language === 'Odia' ? 'ଜୋତା ଷ୍ଟାଣ୍ଡ' : 'Shoe Stand',
+            'desc' => $language === 'Odia' ? 'ନିଃଶୁଳ୍କ ସେବା' : 'Free Services',
+            'icon' => asset('website/lck.png'),
+            'alt' => 'Locker and Shoe Stand',
+            'type' => 'image',
+        ],
+        [
+            'url' => route('services.byType', 'toilet'),
+            'title1' => $language === 'Odia' ? 'ସାଧାରଣ' : 'Public',
+            'title2' => $language === 'Odia' ? 'ଶୌଚାଳୟ' : 'Toilet',
+            'desc' => $language === 'Odia' ? 'ନିକଟସ୍ଥ ଶୌଚାଳୟ ସୁବିଧା' : 'Nearby toilet facility',
+            'icon' => asset('website/latin.png'),
+            'alt' => 'Toilet',
+            'type' => 'image',
+        ],
+        [
+            'url' => route('services.byType', 'drinking_water'),
+            'title1' => $language === 'Odia' ? 'ପାନୀୟ' : 'Drinking',
+            'title2' => $language === 'Odia' ? 'ଜଳ' : 'Water',
+            'desc' => $language === 'Odia' ? 'ନିକଟସ୍ଥ ପାଣି ସୁବିଧା' : 'Find nearby water points',
+            'icon' => asset('website/drinkingWater32.png'),
+            'alt' => 'Drinking Water',
+            'type' => 'image',
+        ],
+        [
+            'url' => route('services.byType', 'free_food'),
+            'title1' => $language === 'Odia' ? 'ମାଗଣା' : 'Free',
+            'title2' => $language === 'Odia' ? 'ଖାଦ୍ୟ' : 'Food',
+            'desc' => $language === 'Odia' ? 'ଭକ୍ତମାନଙ୍କ ପାଇଁ ସେବା' : 'Food facility for devotees',
+            'icon' => '',
+            'alt' => 'Free Food',
+            'type' => 'food',
+        ],
+        [
+            'url' => route('bhaktanibas.list'),
+            'title1' => $language === 'Odia' ? 'ଭକ୍ତ' : 'Bhakta',
+            'title2' => $language === 'Odia' ? 'ନିବାସ' : 'Nivas',
+            'desc' => $language === 'Odia' ? 'ତୀର୍ଥଯାତ୍ରୀଙ୍କ ରହିବା ସ୍ଥାନ' : 'Properties for pilgrims',
+            'icon' => asset('website/niwas.png'),
+            'alt' => 'Bhakta Nivas',
+            'type' => 'image',
+        ],
+        [
+            'url' => route('services.emergency'),
+            'title1' => $language === 'Odia' ? 'ଜରୁରୀ' : 'Emergency',
+            'title2' => $language === 'Odia' ? 'ସହାୟତା' : 'Help',
+            'desc' => $language === 'Odia' ? 'ତୁରନ୍ତ ସହାୟତା ସମ୍ପର୍କ' : 'Quick support contacts',
+            'icon' => asset('website/ph.png'),
+            'alt' => 'Emergency',
+            'type' => 'image',
+        ],
+        [
+            'url' => route('services.abled_person'),
+            'title1' => $language === 'Odia' ? 'ଦିବ୍ୟାଙ୍ଗ' : 'Special',
+            'title2' => $language === 'Odia' ? 'ସହାୟତା' : 'Abled',
+            'desc' => $language === 'Odia' ? 'ସହାୟତା ସୁବିଧା' : 'Assistance facilities',
+            'icon' => asset('website/physical21.png'),
+            'alt' => 'Special Abled',
+            'type' => 'image',
+        ],
+        [
+            'url' => route('services.byType', 'ratha_yatra_mela'),
+            'title1' => $language === 'Odia' ? 'ରୁଟ' : 'Route',
+            'title2' => $language === 'Odia' ? 'ମାନଚିତ୍ର' : 'Map',
+            'desc' => $language === 'Odia' ? 'ରୁଟ ଦିଗ ଦେଖନ୍ତୁ' : 'View route direction',
+            'icon' => asset('website/map.png'),
+            'alt' => 'Route Map',
+            'type' => 'image',
+        ],
+        [
+            'url' => route('services.byType', 'lost_and_found_booth'),
+            'title1' => $language === 'Odia' ? 'ହଜିଥିବା' : 'Lost &',
+            'title2' => $language === 'Odia' ? 'ସାମଗ୍ରୀ' : 'Found',
+            'desc' => $language === 'Odia' ? 'ସାମଗ୍ରୀ ଖୋଜନ୍ତୁ କିମ୍ବା ଜଣାନ୍ତୁ' : 'Report or find items',
+            'icon' => asset('website/lost.png'),
+            'alt' => 'Lost and Found',
+            'type' => 'image',
+        ],
+        [
+            'url' => route('services.byType', 'beach'),
+            'title1' => $language === 'Odia' ? 'ପୁରୀ' : 'Puri',
+            'title2' => $language === 'Odia' ? 'ବେଳାଭୂମି' : 'Beaches',
+            'desc' => $language === 'Odia' ? 'ବେଳାଭୂମି ଅଞ୍ଚଳ ଦେଖନ୍ତୁ' : 'Explore beach areas',
+            'icon' => asset('website/sea.png'),
+            'alt' => 'Beaches',
+            'type' => 'image',
+        ],
+        [
+            'url' => route('services.byType', 'life_guard_booth'),
+            'title1' => $language === 'Odia' ? 'ଲାଇଫ' : 'Life',
+            'title2' => $language === 'Odia' ? 'ଗାର୍ଡ' : 'Guards',
+            'desc' => $language === 'Odia' ? 'ସୁରକ୍ଷା ବୁଥ ବିବରଣୀ' : 'Safety booth details',
+            'icon' => asset('website/guard.png'),
+            'alt' => 'Life Guards',
+            'type' => 'image',
+        ],
+    ];
+@endphp
+
+<section class="temple-convenience">
+
+    <div class="ratha-header">
+        <div class="ratha-header-card">
+            <div class="ratha-shine"></div>
+
+            <div class="ratha-top-row">
+                <div class="ratha-badge">
+                    <i class="fa-solid fa-flag"></i>
+                    {{ $language === 'Odia' ? 'ଜୟ ଶ୍ରୀ ଜଗନ୍ନାଥ' : 'JAY SHREE JAGANNATHA' }}
+                </div>
+
+                <div class="language-selector-box">
+                    <label class="language-check-label">
+                        <input type="checkbox" class="language-check" value="English" {{ $language === 'English' ? 'checked' : '' }}>
+                        <span>English</span>
+                    </label>
+
+                    <label class="language-check-label">
+                        <input type="checkbox" class="language-check" value="Odia" {{ $language === 'Odia' ? 'checked' : '' }}>
+                        <span>ଓଡ଼ିଆ</span>
+                    </label>
+                </div>
             </div>
-        @else
-            <img src="{{ asset('website/d.png') }}" alt="Default Banner" style="width: 100%;">
-        @endif
 
-        <!-- Background Audio -->
+            <div class="ratha-main">
+                <div class="ratha-logo-box">
+                    <img src="{{ asset('website/logoo.png') }}" alt="Shree Jagannath Logo">
+                </div>
 
-        <audio id="backgroundAudio" preload="auto" loop muted>
-            <source src="{{ asset('website/background.mp3') }}" type="audio/mpeg">
-            Your browser does not support the audio element.
-        </audio>
+                <div class="ratha-title-area">
+                    <span class="ratha-small-text">
+                        {{ $language === 'Odia' ? 'ଭକ୍ତ ସୁବିଧା ଗାଇଡ୍' : 'DEVOTEE FACILITY GUIDE' }}
+                    </span>
 
-        <a href="{{ url('/') }}" class="logo">
-            <img src="{{ asset('website/logoo.png') }}" alt="logo">
-        </a>
-        <!-- Hamburger Icon -->
-        <div class="hamburger-icon">
-            <div class="hamburger-menu">
-                <span></span>
-                <span></span>
-                <span></span>
+                    <h2 class="ratha-title">
+                        {{ $language === 'Odia' ? 'ରଥ ଯାତ୍ରା - ୨୦୨୬' : 'Ratha Yatra - 2026' }}
+                    </h2>
+
+                    <p class="ratha-subtitle">
+                        {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ ପାଖରେ ଆବଶ୍ୟକ ସୁବିଧା ସହଜରେ ଖୋଜନ୍ତୁ।' : 'Find important facilities around Shree Jagannatha Dham easily.' }}
+                    </p>
+                </div>
             </div>
+
         </div>
+    </div>
 
-        <!-- Navigation Menu -->
-        <nav class="nav-menu">
-            <div class="nav-close"><i class="fa fa-times"></i></div>
-            <ul>
-                <!-- Language Switcher -->
-                <li class="has-submenu">
-                    <a href="javascript:void(0)" class="submenu-toggle">
-                        {{ $language === 'Odia' ? 'ଭାଷା' : 'Language' }}
-                        <i class="fa fa-chevron-down ms-2"></i>
-                    </a>
-                    <ul class="submenu">
-                        <li><a href="{{ url('/lang/Odia') }}">ଓଡ଼ିଆ</a></li>
-                        <li><a href="{{ url('/lang/English') }}">English</a></li>
-                    </ul>
-                </li>
+    <div class="convenience-container">
 
-                <li>
-                    <a href="{{ url('/view-all-niti') }}">{{ $language === 'Odia' ? 'ନୀତି' : 'Nitis' }}</a>
-                </li>
+        @foreach ($cards as $card)
+            <div class="conv">
+                <a href="{{ $card['url'] }}?{{ $langQuery }}">
+                    <div class="convenience-card-top">
+                        <div class="convenience-text">
+                            <h3>
+                                {{ $card['title1'] }}<br>
+                                {{ $card['title2'] }}
+                            </h3>
+                            <span>{{ $card['desc'] }}</span>
+                        </div>
 
-                <!-- Quick Services -->
-                <li class="has-submenu">
-                    <a href="javascript:void(0)" class="submenu-toggle">
-                        {{ $language === 'Odia' ? 'ତ୍ଵରିତ ସେବା' : 'Quick Services' }}
-                        <i class="fa fa-chevron-down ms-2"></i>
-                    </a>
-                    <ul class="submenu">
-                        <li><a href="{{ url('/darshan-timeline') }}">{{ $language === 'Odia' ? 'ଦର୍ଶନ' : 'Darshan' }}</a>
-                        </li>
-                        <li><a
-                                href="{{ url('/maha-prasad') }}">{{ $language === 'Odia' ? 'ମହାପ୍ରସାଦ' : 'Mahaprasad' }}</a>
-                        </li>
-                        <li><a
-                                href="{{ url('/view-festival-details') }}">{{ $language === 'Odia' ? 'ପର୍ବପର୍ବାଣୀ' : 'Festival' }}</a>
-                        </li>
-                        <li><a
-                                href="{{ url('/do-and-donts') }}">{{ $language === 'Odia' ? 'କରନ୍ତୁ ଏବଂ କରନ୍ତୁ ନାହିଁ' : "Do's & Don'ts" }}</a>
-                        </li>
-                    </ul>
-                </li>
-
-                <!-- Nearby Temples -->
-                <li class="has-submenu">
-                    <a href="javascript:void(0)" class="submenu-toggle">
-                        {{ $language === 'Odia' ? 'ନିକଟସ୍ଥ ଧାର୍ମିକ ସ୍ଥଳ' : 'Nearby Temples' }}
-                        <i class="fa fa-chevron-down ms-2"></i>
-                    </a>
-                    <ul class="submenu">
-                        @foreach ($temples as $temple)
-                            <li>
-                                <a href="{{ route('nearby-temple-view', $temple->name) }}">
-                                    {{ $temple->name }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </li>
-
-                <!-- Conveniences -->
-                <li class="has-submenu">
-                    <a href="javascript:void(0)" class="submenu-toggle">
-                        {{ $language === 'Odia' ? 'ଯାତ୍ରୀମାନଙ୍କ ଆବଶ୍ୟକତା' : 'Conveniences' }}
-                        <i class="fa fa-chevron-down ms-2"></i>
-                    </a>
-                    <ul class="submenu">
-                        <li><a
-                                href="{{ url('/bhaktanibas-list') }}">{{ $language === 'Odia' ? 'ଭକ୍ତ ନିବାସ' : 'Bhakta Nibas' }}</a>
-                        </li>
-                        <li><a href="{{ url('/parking-list') }}">{{ $language === 'Odia' ? 'ପାର୍କିଂ' : 'Parking' }}</a>
-                        </li>
-                        <li><a
-                                href="{{ url('/locker-shoe-list') }}">{{ $language === 'Odia' ? 'ଲକର ଓ ଜୋତା' : 'Locker & Shoe' }}</a>
-                        </li>
-                        <li><a
-                                href="{{ url('/services/drinking_water') }}">{{ $language === 'Odia' ? 'ପାନୀୟ ଜଳ' : 'Drinking Water' }}</a>
-                        </li>
-                        <li><a
-                                href="{{ url('/services-emergency') }}">{{ $language === 'Odia' ? 'ଜରୁରୀକାଳୀନ ଯୋଗାଯୋଗ' : 'Emergency' }}</a>
-                        </li>
-                        <li><a
-                                href="{{ url('/services-abled') }}">{{ $language === 'Odia' ? 'ବିଶେଷ ସକ୍ଷମ ବ୍ୟକ୍ତି' : 'Special Abled Person' }}</a>
-                        </li>
-                        <li><a href="#">{{ $language === 'Odia' ? 'ଯାତାୟାତ ମାର୍ଗ' : 'Route Map' }}</a></li>
-                        <li><a
-                                href="{{ url('/services/lost_and_found_booth') }}">{{ $language === 'Odia' ? 'ହଜିବା ଓ ଖୋଜିବା କେନ୍ଦ୍ର' : 'Lost & Found' }}</a>
-                        </li>
-                        <li><a href="{{ url('/services/toilet') }}">{{ $language === 'Odia' ? 'ଶୌଚାଳୟ' : 'Toilet' }}</a>
-                        </li>
-                        <li><a href="{{ url('/services/beach') }}">{{ $language === 'Odia' ? 'ବେଳାଭୂମି' : 'Beaches' }}</a>
-                        </li>
-                        <li><a
-                                href="{{ url('/services/life_guard_booth') }}">{{ $language === 'Odia' ? 'ଲାଇଫ ଗାର୍ଡଙ୍କ ଯୋଗାଯୋଗ' : 'Life Guards' }}</a>
-                        </li>
-                        <li><a
-                                href="{{ url('/services/life_guard_booth') }}">{{ $language === 'Odia' ? 'ଲାଇଫ ଗାର୍ଡଙ୍କ ଯୋଗାଯୋଗ' : 'Life Guards' }}</a>
-                        </li>
-                        <li><a href="{{ url('/services/atm') }}">{{ $language === 'Odia' ? 'ଏ.ଟି.ଏମ୍' : 'ATM' }}</a></li>
-                        <li><a
-                                href="{{ url('/services/charging_station') }}">{{ $language === 'Odia' ? 'ଚାର୍ଜିଂ ସ୍ଟେସନ୍' : 'Charging Station' }}</a>
-                        </li>
-                        <li><a
-                                href="{{ url('/bus-railway-station') }}">{{ $language === 'Odia' ? 'ବସ୍/ରେଲୱେ ଷ୍ଟେସନ୍' : 'Bus Stand/Railway Station' }}</a>
-                        </li>
-                        <li><a
-                                href="{{ url('/services/petrol_pump') }}">{{ $language === 'Odia' ? 'ପେଟ୍ରୋଲ ପମ୍ପ' : 'Petrol Pump' }}</a>
-                        </li>
-                    </ul>
-                </li>
-
-                 {{-- <li>
-                    <a href="{{ url('/rath-yatra-special') }}">{{ $language === 'Odia' ? 'ରଥ ଯାତ୍ରା' : 'Ratha Yatra' }}</a>
-                </li> --}}
-
-            </ul>
-        </nav>
-
-        <button id="playPauseButton" class="play-pause-button"><i class="fa fa-pause"></i></button>
-
-        <button id="audioMuteToggle" class="mute-toggle">
-            <i style="height:18px;width: 18px" class="fa fa-volume-up"></i>
-        </button>
-    </section>
-
-    <div class="niti-cards-scroll">
-        <div class="niti-cards">
-            @foreach ($nitis as $niti)
-                <div class="niti-card {{ $loop->first ? 'active' : '' }}">
-                    <div class="niti-content">
-                        <h3 style="font-size: 21px; padding-bottom:5px;">
-                            {{ $niti->display_name }}
-                        </h3>
-
-                        <p
-                            style="padding-top: 5px; font-weight: bold;
-                        color: {{ $niti->niti_status == 'Started' ? '#28a745' : '#333' }};">
-                            @if ($language === 'Odia')
-                                {{ $niti->niti_status === 'Started' ? 'ଆରମ୍ଭ ହୋଇଛି' : 'ଆଗାମୀ' }}
+                        <div class="convenience-item {{ $card['type'] === 'food' ? 'free-food-icon' : '' }}">
+                            @if ($card['type'] === 'food')
+                                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-label="Free Food Icon">
+                                    <circle cx="32" cy="32" r="29" fill="#fff3e8"/>
+                                    <path d="M18 33c0-8.2 6.3-14.8 14-14.8S46 24.8 46 33H18Z" fill="#ff7a1a"/>
+                                    <path d="M15 34h34c0 8.6-7.6 15.8-17 15.8S15 42.6 15 34Z" fill="#db4d30"/>
+                                    <path d="M19 34h26" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+                                    <path d="M24 15c0-3.2 2.6-5.8 5.8-5.8h4.4c3.2 0 5.8 2.6 5.8 5.8" fill="none" stroke="#db4d30" stroke-width="4" stroke-linecap="round"/>
+                                    <path d="M48 20v18" stroke="#ff7a1a" stroke-width="4" stroke-linecap="round"/>
+                                    <path d="M54 20v18" stroke="#db4d30" stroke-width="4" stroke-linecap="round"/>
+                                    <path d="M10 20v10c0 3 2.4 5.4 5.4 5.4H17V20" fill="none" stroke="#ff7a1a" stroke-width="4" stroke-linecap="round"/>
+                                </svg>
                             @else
-                                {{ $niti->niti_status }}
+                                <img src="{{ $card['icon'] }}" alt="{{ $card['alt'] }}">
                             @endif
-                        </p>
+                        </div>
                     </div>
 
-                    <div class="niti-icons">
-
-                        <p style="color: rgb(139, 137, 137)">
-                            <ion-icon name="time-outline" style="margin: 6px; color: #ff0011; font-size: 16px;"></ion-icon>
-                            @php
-                                $startTime = optional($niti->todayStartTime)->start_time;
-                            @endphp
-
-                            @if ($niti->niti_status === 'Upcoming' || !$startTime)
-                                {{ $language === 'Odia' ? 'ଆରମ୍ଭ ହୋଇନାହିଁ' : 'Not Started' }}
-                            @else
-                                @php
-                                    $formattedTime = \Carbon\Carbon::parse($startTime)->format('h:i A');
-                                @endphp
-
-                                {{ $language === 'Odia' ? convertToOdiaTime($formattedTime) : $formattedTime }}
-                            @endif
-                        </p>
-
-                        <p style="color: rgb(139, 137, 137)">
-                            <ion-icon name="calendar-outline"
-                                style="margin: 6px; color: #ff0011; font-size: 16px;"></ion-icon>
-                            @php
-                                $today = \Carbon\Carbon::now();
-                            @endphp
-
-                            {{ $language === 'Odia' ? convertToOdiaDate($today) : $today->format('jS M') }}
-                        </p>
-
-                    </div>
-                </div>
-            @endforeach
-
-            <!-- View All Niti Card -->
-            <div class="niti-card" id="niti-mobile">
-                <div class="niti-content text-center">
-                    <h3 style="font-size: 21px; padding-bottom: 5px;">
-                        <a href="{{ route('all.niti') }}">
-                            {{ $language === 'Odia' ? 'ସମ୍ପୂର୍ଣ୍ଣ ନୀତିକାନ୍ତି' : 'View All Niti' }}
-                        </a>
-                    </h3>
-                </div>
+                    <div class="card-arrow">›</div>
+                </a>
             </div>
-        </div>
+        @endforeach
+
     </div>
-
-    {{--<section class="shree-mandir-section  bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-100">
-
-        <div class="section-container">
-            <img src="{{ asset('website/left.png') }}" alt="Shree Jagannatha Dham">
-            <h2 class="section-titles">Shree Mandir <span class="live-badge"><i class="fa fa-bolt"
-                        style="margin-right: 6px"></i>Live</span></h2>
-            <img src="{{ asset('website/right.png') }}" alt="Shree Jagannatha Dham">
-        </div>
-
-        <div class="mandir-content">
-
-            <div class="radio-card">
-                <div class="card-content">
-                    <a href="{{ route('radio.layout') }}">
-                        <div class="card-icon">
-                            <img src="{{ asset('website/radio.png') }}" style="height: 60px;width: 65px"
-                                alt="Shree Jagannatha Dham">
-                            <h3 style="color: #db4d30">Radio</h3>
-                        </div>
-                    </a>
-                    <p class="paras">Listen to all the live broadcasts from Shree Mandira</p>
-                    <p style="margin-top: 10px">🕒 12:00 pm</p>
-                    <p style="margin-top: 10px">📅 4th Apr</p>
-                </div>
-                <div class="radio-player">
-                    <div class="radio-header">Jay Jagannath</div>
-                    <div class="radio-nav">
-                        <span><i class="fa fa-compass"></i>
-                            <p style="font-size: 10px">Explore</p>
-                        </span>
-                        <span><i class="fa fa-heart"></i>
-                            <p style="font-size: 10px">Favorites</p>
-                        </span>
-                        <span class="active"><i class="fa fa-map"></i>
-                            <p style="font-size: 10px">Browse</p>
-                        </span>
-                        <span><i class="fa fa-search"></i>
-                            <p style="font-size: 10px">Search</p>
-                        </span>
-                        <span><i class="fa fa-bars"></i>
-                            <p style="font-size: 10px">Settings</p>
-                        </span>
-                    </div>
-                    <div class="radio-station">
-                        <!-- Header with Title & Icons -->
-                        <div class="radio-headers">
-                            <h4>Bhajans Name</h4>
-                            <div class="radio-icons">
-                                <i style="color: #ff4e00" class="fas fa-heart"></i>
-                                <i style="color: #ff4e00" class="fas fa-ellipsis-h"></i>
-                            </div>
-                        </div>
-
-                        <!-- Player Controls -->
-                        <div class="radio-controls">
-                            <div class="song">
-                                <img src="{{ asset('website/12.png') }}" alt="Prev">
-                                <img src="{{ asset('website/11.png') }}" alt="Play">
-                                <img src="{{ asset('website/10.png') }}" alt="Next">
-                            </div>
-                            <div class="progress-bar">
-                                <input type="range" min="0" max="100">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TV Section -->
-            <div class="mandir-card">
-                <div class="card-content">
-                    <a href="{{ route('tv.layout') }}">
-                        <div class="card-icon">
-                            <img src="{{ asset('website/tv.png') }}" style="height: 60px;width: 65px"
-                                alt="Shree Jagannatha Dham">
-                            <h3 style="color: #db4d30">TV</h3>
-                        </div>
-                    </a>
-                    <p class="para">Watch all the live broadcasts from Shree Mandira</p>
-                    <p style="margin-top: 10px">🕒 12:00 pm</p>
-                    <p style="margin-top: 10px">📅 4th Apr</p>
-                </div>
-                <a href="{{ route('tv.layout') }}">
-                    <div class="video-container">
-                        <img src="{{ asset('website/60.png') }}" style="height: 250px;width: 400px;border-radius: 10px"
-                            alt="Shree Jagannatha Dham">
-                    </div>
-                </a>
-
-            </div>
-
-            <!-- Radio Section -->
-
-        </div>
-    </section>
-
-     <div class="max-w-6xl mx-auto text-center">
-
-        <div class="flex justify-center items-center gap-5 mt-12">
-            <img src="{{ asset('website/left.png') }}" alt="Shree Jagannatha Dham" class="w-36 h-5">
-            <h2 class="text-2xl text-[#db4d30] flex items-center font-sans">
-                Temple Information
-            </h2>
-            <img src="{{ asset('website/right.png') }}" alt="Shree Jagannatha Dham" class="w-36 h-5">
-        </div>
-
-        <!-- Navigation Tabs -->
-        <div class="flex justify-center items-center gap-6 mt-5 mb-12">
-            <div id="navContainer" class="flex gap-5 overflow-x-auto no-scrollbar">
-                
-                <div class="tab-item text-center min-w-[100px] cursor-pointer active-tab" data-tab="lordSupreme">
-                    <div class="image-wrapper mx-auto w-20 h-20 p-1 rounded-full bg-transparent duration-300">
-                        <img src="{{ asset('website/temple_info/sup.png') }}" class="w-full h-full object-cover rounded-full" />
-                    </div>
-                    <p class="text-gray-500 mt-3">Lord Supreme</p>
-                </div>
-        
-                <div class="tab-item text-center min-w-[100px] cursor-pointer inactive-tab" data-tab="throughAges">
-                    <div class="image-wrapper mx-auto w-20 h-20 p-1 rounded-full bg-transparent transition-all duration-300">
-                        <img src="{{ asset('website/temple_info/age.png') }}" class="w-full h-full object-cover rounded-full" />
-                    </div>
-                    <p class="text-gray-500 mt-3">Through The Ages</p>
-                </div>
-        
-                <div class="tab-item text-center min-w-[100px] cursor-pointer inactive-tab" data-tab="tradition">
-                    <div class="image-wrapper mx-auto w-20 h-20 p-1 rounded-full bg-transparent transition-all duration-300">
-                        <img src="{{ asset('website/temple_info/tradition.png') }}" class="w-full h-full object-cover rounded-full" />
-                    </div>
-                    <p class="text-gray-500 mt-3">Living Tradition</p>
-                </div>
-        
-                <div class="tab-item text-center min-w-[100px] cursor-pointer inactive-tab" data-tab="festivals">
-                    <div class="image-wrapper mx-auto w-20 h-20 p-1 rounded-full bg-transparent transition-all duration-300">
-                        <img src="{{ asset('website/temple_info/festival.jpeg') }}" class="w-full h-full object-cover rounded-full" />
-                    </div>
-                    <p class="text-gray-500 mt-3">Festivals</p>
-                </div>
-        
-                <div class="tab-item text-center min-w-[100px] cursor-pointer inactive-tab" data-tab="ratha">
-                    <div class="image-wrapper mx-auto w-20 h-20 p-1 rounded-full bg-transparent transition-all duration-300">
-                        <img src="{{ asset('website/temple_info/ratha.png') }}" class="w-full h-full object-cover rounded-full" />
-                    </div>
-                    <p class="text-gray-500 mt-3">Ratha Yatra</p>
-                </div>
-        
-                <div class="tab-item text-center min-w-[100px] cursor-pointer inactive-tab" data-tab="services">
-                    <div class="image-wrapper mx-auto w-20 h-20 p-1 rounded-full bg-transparent transition-all duration-300">
-                        <img src="{{ asset('website/temple_info/devt.png') }}" class="w-full h-full object-cover rounded-full" />
-                    </div>
-                    <p class="text-gray-500 mt-3">Visitor Services</p>
-                </div>
-        
-                <div class="tab-item text-center min-w-[100px] cursor-pointer inactive-tab" data-tab="management">
-                    <div class="image-wrapper mx-auto w-20 h-20 p-1 rounded-full bg-transparent transition-all duration-300">
-                        <img src="{{ asset('website/temple_info/management.jpg') }}" class="w-full h-full object-cover rounded-full" />
-                    </div>
-                    <p class="text-gray-500 mt-3">Management</p>
-                </div>
-        
-            </div>
-        </div>
-        
-    </div>
-
-    <section id="dynamicContent" class="bg-100">
-        <div class="max-w-6xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <!-- Image -->
-                <div id="contentImageContainer" class="mt-12" style="height: 350px; width: 450px;">
-                    <img id="contentImage" src="{{ asset('website/temple_info/sup.png') }}" alt="Temple Image"
-                        class="rounded-xl shadow-lg object-cover w-full h-full" />
-                </div>
-
-                <!-- Text Content -->
-                <div style="margin-left: -100px">
-                    <h2 id="contentTitle" class="text-xl font-semi-bold"></h2>
-                    <p id="contentDescription" class="text-gray-500 mt-4 leading-relaxed"></p>
-
-                    <!-- ✅ New: Button area -->
-                    <div id="buttonContainer" class="mt-6 flex flex-wrap gap-3"></div>
-                </div>
-            </div>
-        </div>
-    </section>--}}
-
-    <section class="services-section py-10">
-        <!-- Section Title -->
-        <div class="section-header-row flex flex-row justify-center items-center gap-2 sm:gap-5 text-center sm:mt-8 mb-14"
-            style="margin-left: -7px;">
-            <img src="{{ asset('website/left.png') }}" alt="Shree Jagannatha Dham" class="w-24 sm:w-36 h-5">
-            <h2 class="text-xl sm:text-2xl text-[#db4d30] font-sans font-semibold ">
-                {{ $language === 'Odia' ? 'ତ୍ଵରିତ ସେବା' : 'Quick Services' }}
-            </h2>
-            <img src="{{ asset('website/right.png') }}" alt="Shree Jagannatha Dham" class="w-24 sm:w-36 h-5">
-        </div>
-
-        <!-- Services Layout -->
-        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-start"
-            style="max-width: 1290px !important;">
-
-            <!-- Left Featured Card -->
-            <div class="p-6 sm:p-8 flex flex-col justify-between transition-all duration-500 hover:scale-105 h-[455px] sm:h-[455px] max-h-[455px] overflow-hidden"
-                style="border: 1px solid rgb(213, 213, 213); border-radius: 13px;">
-                <a href="{{ route('darshan.timeline') }}" class="flex flex-col items-center text-center h-full">
-                    <img src="{{ asset('website/darshan34.png') }}" alt="Darshan"
-                        class="mb-2 transition-transform duration-300"
-                        style="width: 200px; height: 230px; border-radius: 25px;">
-                    <h3 class="text-xl sm:text-2xl font-bold text-[#db4d30] mb-2">
-                        {{ $language === 'Odia' ? 'ଦର୍ଶନ' : 'Darshan' }}
-                    </h3>
-                    <div class="text-sm sm:text-base text-gray-700 mb-2 leading-relaxed px-1 line-clamp-5">
-                        <p>
-                            {{ $language === 'Odia'
-                                ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ମହାପ୍ରଭୁଙ୍କ ଦର୍ଶନ ପ୍ରାୟ ପୂରା ଦିନ ଉପଲବ୍ଧ ଅଟେ । ସକାଳ ସମୟରୁ ରାତି ପର୍ଯ୍ୟନ୍ତ ଦର୍ଶନ ହୋଇଥାଏ, କିଛି ପର୍ବ ଅବସର ଛାଡି । ସାଧାରଣତଃ ମନ୍ଦିର ସକାଳ ୫:୩୦ ରେ ଖୋଲାଯାଏ ଏବଂ ଦର୍ଶନ ଆରମ୍ଭ ହୁଏ । ମଙ୍ଗଳ ଆରତି ପରେ ଭକ୍ତମାନେ ଜଗମୋହନ (ଭିତର କାଠା) ଯାଏଁ ପ୍ରବେଶ କରି ଦର୍ଶନ କରିପାରନ୍ତି ।'
-                                : 'Darshan of Shree Jagannatha Mahaprabhu is available almost throughout the day i.e. from early in the morning till late night excepting some festive occasions. Generally, Temple opens and darshan starts at around 5.30 A.M. After offering of the perpetual lamp (Mangal Arati), devotees are allowed entry up to Jagamohan (Bhitara Kaatha) of the temple and darshan from this point is available till completion of “Besha”.' }}
-                        </p>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Right Side Cards -->
-            <div class="flex flex-col gap-6 justify-between h-[450px]">
-                <!-- Maha Prasad -->
-                <a href="{{ route('prasad.timeline') }}"
-                    class="mobile-mb-20 bg-white border-l-4 border-[#db4d30] px-5 py-4 flex items-center gap-5 h-[150px] hover:translate-x-1 duration-300"
-                    style="border: 1px solid rgb(213, 213, 213); border-radius: 13px;">
-                    <img src="{{ asset('website/prasad.png') }}" alt="Maha Prasad" style="height: 70px; width:70px;">
-                    <div>
-                        <h3 class="text-lg font-semibold text-[#db4d30]">
-                            {{ $language === 'Odia' ? 'ମହାପ୍ରସାଦ' : 'Mahaprasad' }}
-                        </h3>
-                        <p class="text-sm text-gray-600">
-                            {{ $language === 'Odia'
-                                ? 'ପବିତ୍ର ମହାପ୍ରସାଦ ଉପଭୋଗ କରନ୍ତୁ ଯାହା ଠାରେ ଈଶ୍ୱରୀୟ ଅନୁଗ୍ରହ ଥାଏ ।'
-                                : 'Savor the sacred offering blessed by the divine presence.' }}
-                        </p>
-                    </div>
-                </a>
-
-                <!-- Temple Festival -->
-                <a href="{{ route('view.festival.details') }}"
-                    class="bg-white border-l-4 border-[#db4d30] px-5 py-4 flex items-center gap-5 h-[150px] hover:translate-x-1 duration-300"
-                    style="border: 1px solid rgb(213, 213, 213); border-radius: 13px;">
-                    <img src="{{ asset('website/festival21.png') }}" alt="Offering" style="height: 70px; width:70px">
-                    <div>
-                        <h3 class="text-lg font-semibold text-[#db4d30]">
-                            {{ $language === 'Odia' ? 'ପର୍ବପର୍ବାଣୀ' : 'Temple Festival' }}
-                        </h3>
-                        <p class="text-sm text-gray-600">
-                            {{ $language === 'Odia'
-                                ? 'ପ୍ରଭୁଙ୍କୁ ଶ୍ରଦ୍ଧା ଓ ଭକ୍ତି ସହିତ ନିଜ ଅର୍ପଣ କରନ୍ତୁ ।'
-                                : 'Make your humble offerings to the Lord with ease and devotion.' }}
-                        </p>
-                    </div>
-                </a>
-
-                <!-- Do and Don'ts -->
-                <a href="{{ url('do-and-donts') }}"
-                    class="bg-white border-l-4 border-[#db4d30] px-5 py-4 flex items-center gap-5 h-[150px] hover:translate-x-1 duration-300"
-                    style="border: 1px solid rgb(213, 213, 213); border-radius: 13px;">
-                    <img src="{{ asset('website/dodonts.png') }}" alt="Do and Don'ts" style="height: 70px; width:70px">
-                    <div>
-                        <h3 class="text-lg font-semibold text-[#db4d30]">
-                            {{ $language === 'Odia' ? 'କରନ୍ତୁ ଏବଂ କରନ୍ତୁ ନାହିଁ' : "Do's and Don'ts" }}
-                        </h3>
-                        <p class="text-sm text-gray-600">
-                            {{ $language === 'Odia'
-                                ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମର ପବିତ୍ରତା ଓ ପାରମ୍ପରିକତା ରକ୍ଷା କରିବା ପାଇଁ ।'
-                                : 'To preserve the sanctity and traditions of Shree Jagannatha Dham.' }}
-                        </p>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <div style="margin-top: 2px"
-        class="section-header-row flex flex-row justify-center items-center gap-2 sm:gap-5 text-center sm:mt-8 mb-14 block md:hidden">
-        <img src="{{ asset('website/left.png') }}" alt="Shree Jagannatha Dham" class="w-36 sm:w-36 h-5">
-        <img src="{{ asset('website/right.png') }}" alt="Shree Jagannatha Dham" class="w-36 sm:w-36 h-5">
-    </div>
-
-    <section class="services-sections">
-        <!-- Bhakta Nibas -->
-        <a href="{{ route('bhaktanibas.list') }}" class="service-cards full-width-card show-desc">
-            <div class="card-top">
-                <div class="card-text">
-                    <div class="card-title">
-                        {{ $language === 'Odia' ? 'ଭକ୍ତ ନିବାସ' : 'Bhakta Nivas' }}
-                    </div>
-                    <div class="card-desc">
-                        {{ $language === 'Odia' ? 'ତୀର୍ଥଯାତ୍ରୀମାନଙ୍କ ପାଇଁ ମନ୍ଦିର ପାଖରେ ରହିବା ସ୍ଥାନ' : 'Temple owned properties for pilgrims to stay' }}
-                    </div>
-                </div>
-                <div class="arrow-icon">
-                    <i class="fa-solid fa-arrow-right"></i>
-                </div>
-            </div>
-            <div class="card-bottom">
-                <div class="card-icons">
-                    <img src="{{ asset('website/niwas.png') }}" alt="Bhakta Nivas">
-                </div>
-                <div class="footer-bar bar-orange"></div>
-            </div>
-        </a>
-
-        <!-- Parking Areas -->
-        <a href="{{ route('parking.list') }}" class="service-cards">
-            <div class="card-top">
-                <div class="card-text">
-                    <div class="card-title">
-                        {{ $language === 'Odia' ? 'ପାର୍କିଂ ସ୍ଥଳ' : 'Parking Areas' }}
-                    </div>
-                    <div class="card-desc">
-                        {{ $language === 'Odia' ? '୨, ୩, ୪ ଚକା ବାହନ' : '2, 3, 4 Wheelers' }}
-                    </div>
-                </div>
-                <div class="arrow-icon">
-                    <i class="fa-solid fa-arrow-right"></i>
-                </div>
-            </div>
-            <div class="card-bottom">
-                <div class="card-icons">
-                    <img src="{{ asset('website/park.png') }}" alt="Parking">
-                </div>
-                <div class="footer-bar bar-red"></div>
-            </div>
-        </a>
-
-        <!-- Locker & Shoes -->
-        <a href="{{ route('lockershoe.list') }}" class="service-cards">
-            <div class="card-top">
-                <div class="card-text">
-                    <div class="card-title">
-                        {{ $language === 'Odia' ? 'ଜୋତା ଷ୍ଟାଣ୍ଡ' : 'Locker & Shoes Stand' }}
-                    </div>
-                    <div class="card-desc">
-                        {{ $language === 'Odia' ? 'ନିଃଶୁଳ୍କ  ସେବା' : 'Free Services' }}
-                    </div>
-                </div>
-                <div class="arrow-icon">
-                    <i class="fa-solid fa-arrow-right"></i>
-                </div>
-            </div>
-            <div class="card-bottom">
-                <div class="card-icons">
-                    <img src="{{ asset('website/lck.png') }}" alt="Locker">
-                </div>
-                <div class="footer-bar bar-blue"></div>
-            </div>
-        </a>
-
-        <!-- Online Donations -->
-        <a href="{{ route('online.donation') }}" class="service-cards">
-            <div class="card-top">
-                <div class="card-text">
-                    <div class="card-title">
-                        {{ $language === 'Odia' ? 'ଅନଲାଇନ୍ ଦାନ' : 'Online Donations' }}
-                    </div>
-                    <div class="card-desc">
-                        {{ $language === 'Odia' ? 'ଦାନ କରନ୍ତୁ' : 'Donate Now' }}
-                    </div>
-                </div>
-                <div class="arrow-icon">
-                    <i class="fa-solid fa-arrow-right"></i>
-                </div>
-            </div>
-            <div class="card-bottom">
-                <div class="card-icons">
-                    <img src="{{ asset('website/donation.png') }}" alt="Donation">
-                </div>
-                <div class="footer-bar bar-cyan"></div>
-            </div>
-        </a>
-
-        <!-- Hundi Collection -->
-        <a href="{{ route('hundi.collection') }}" class="service-cards">
-            <div class="card-top">
-                <div class="card-text">
-                    <div class="card-title">
-                        {{ $language === 'Odia' ? 'ହୁଣ୍ଡି ସଂଗ୍ରହ' : 'Hundi Collection' }}
-                    </div>
-                    <div class="card-desc">
-                        {{ $language === 'Odia' ? convertToOdiaDate(\Carbon\Carbon::today()) : \Carbon\Carbon::today()->format('jS M, Y') }}
-                        <br>
-                        <span style="color:#e75230; font-weight:600;">
-                            ₹{{ number_format($hundi->rupees ?? 0, 2) }}/-
-                        </span>
-                    </div>
-                </div>
-                <div class="arrow-icon">
-                    <i class="fa-solid fa-arrow-right"></i>
-                </div>
-            </div>
-            <div class="card-bottom">
-                <div class="card-icons">
-                    <img src="{{ asset('website/hundic.png') }}" alt="Hundi">
-                </div>
-                <div class="footer-bar bar-green"></div>
-            </div>
-        </a>
-    </section>
-
-    <section class="temple-slider bg-white bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-100">
-
-        <!-- Section Heading -->
-        <div class="flex justify-center items-center gap-5 mt-8">
-            <img src="{{ asset('website/left.png') }}" alt="Shree Jagannatha Dham" class="w-36 h-4">
-            <h2 class="text-xl text-[#db4d30] font-semibold">
-                {{ $language === 'Odia' ? 'ନିକଟସ୍ଥ ଧାର୍ମିକ ସ୍ଥଳ' : 'Nearby Temples' }}
-            </h2>
-            <img src="{{ asset('website/right.png') }}" alt="Shree Jagannatha Dham" class="w-36 h-4">
-        </div>
-
-        <!-- Tab Buttons -->
-        <div class="flex justify-center mt-8 space-x-4">
-            <button id="templeTab" class="tab-button px-4 py-2 text-white bg-orange-500 rounded active">Temple</button>
-            <button id="ritualTab"
-                class="tab-button px-4 py-2 text-orange-500 bg-white border border-orange-500 rounded">Ritual Site</button>
-        </div>
-
-        <!-- Temple Slider -->
-        <div id="templeSlider" class="swiper-container mySwiper mt-12">
-            <div class="swiper-wrapper">
-                @foreach ($templePlaces as $temple)
-                    @php
-                        $photos = json_decode($temple->photo, true);
-                        $firstPhoto = $photos[0] ?? null;
-                    @endphp
-                    @if ($firstPhoto)
-                        <div
-                            class="swiper-slide rounded-xl overflow-hidden shadow-md bg-white transition-transform duration-300 hover:scale-[1.02]">
-                            <a href="{{ url('view-near-by-temple/' . $temple->name) }}" class="block">
-                                <img src="{{ asset($firstPhoto) }}" alt="{{ $temple->name }}"
-                                    class="w-full h-40 sm:h-48 object-cover">
-                                <div class="p-3 text-center bg-white">
-                                    <h3 class="text-sm sm:text-base font-semibold text-[#db4d30] truncate">
-                                        {{ $temple->name }}
-                                    </h3>
-                                </div>
-                            </a>
-                        </div>
-                    @endif
-                @endforeach
-            </div>
-            <div class="swiper-button-next text-orange-500"></div>
-            <div class="swiper-button-prev text-orange-500"></div>
-        </div>
-
-        <!-- Ritual Site Slider (Initially hidden) -->
-        <div id="ritualSlider" class="swiper-container mySwiper mt-12 hidden">
-            <div class="swiper-wrapper">
-                @foreach ($ritualSites as $ritual)
-                    @php
-                        $photos = json_decode($ritual->photo, true);
-                        $firstPhoto = $photos[0] ?? null;
-                    @endphp
-                    @if ($firstPhoto)
-                        <div class="swiper-slide rounded-xl overflow-hidden shadow-lg bg-white">
-                            <a href="{{ url('view-near-by-temple/' . $ritual->name) }}" class="block">
-                                <img src="{{ asset($firstPhoto) }}" alt="{{ $ritual->name }}"
-                                    class="w-full h-48 object-cover hover:scale-105 transition duration-300">
-                                <div class="p-2 text-center bg-white">
-                                    <h3 class="text-sm sm:text-base font-semibold text-[#db4d30]">{{ $ritual->name }}
-                                    </h3>
-                                </div>
-                            </a>
-                        </div>
-                    @endif
-                @endforeach
-            </div>
-            <div class="swiper-button-next text-orange-500"></div>
-            <div class="swiper-button-prev text-orange-500"></div>
-        </div>
-
-    </section>
-
-    <section class="temple-convenience">
-        <!-- Section Header -->
-        <div class="section-header-row flex flex-row justify-center items-center gap-2 sm:gap-5 text-center mt-4 sm:mt-8"
-            style="margin-left: -15px;">
-            <img src="{{ asset('website/left.png') }}" alt="Shree Jagannatha Dham" class="w-24 sm:w-36 h-5">
-            <h2 class="text-base sm:text-2xl text-[#db4d30] font-sans font-semibold whitespace-nowrap">
-                {{ $language === 'Odia' ? 'ଯାତ୍ରୀମାନଙ୍କ ଆବଶ୍ୟକତା' : 'Conveniences' }}
-            </h2>
-            <img src="{{ asset('website/right.png') }}" alt="Shree Jagannatha Dham" class="w-24 sm:w-36 h-5">
-        </div>
-
-
-        <!-- First Row: 6 Items -->
-        <div class="convenience-container" style="margin-top: 50px;">
-
-            <!-- Special Abled -->
-            <div class="conv">
-                <a href="{{ route('services.abled_person') }}">
-                    <div class="convenience-item">
-                        <img src="{{ asset('website/physical21.png') }}" alt="Special Abled">
-                    </div>
-                    <p class="mt-2 text-sm font-medium text-gray-800">{!! $language === 'Odia' ? 'ବିଶେଷ <br>ସକ୍ଷମ ବ୍ୟକ୍ତି' : 'Specially <br> Abled Person' !!}</p>
-                </a>
-            </div>
-
-            <!-- Emergency -->
-            <div class="conv">
-                <a href="{{ route('services.emergency') }}">
-                    <div class="convenience-item">
-                        <img src="{{ asset('website/ph.png') }}" alt="Emergency">
-                    </div>
-                    <p class="mt-2 text-sm font-medium text-gray-800">{!! $language === 'Odia' ? 'ଜରୁରୀକାଳୀନ <br>ଯୋଗାଯୋଗ' : 'Emergency Contact' !!}</p>
-                </a>
-            </div>
-
-            <!-- Life Guards -->
-            <div class="conv">
-                <a href="{{ route('services.byType', 'life_guard_booth') }}">
-                    <div class="convenience-item">
-                        <img src="{{ asset('website/guard.png') }}" alt="Life Guards">
-                    </div>
-                    <p class="mt-2 text-sm font-medium text-gray-800">{!! $language === 'Odia' ? 'ଲାଇଫ <br> ଗାର୍ଡଙ୍କ ଯୋଗାଯୋଗ' : 'Life<br> Guard Contacts' !!}</p>
-                </a>
-            </div>
-
-            <!-- Lost & Found -->
-            <div class="conv">
-                <a href="{{ route('lostAndFound') }}">
-                    <div class="convenience-item">
-                        <img src="{{ asset('website/lost.png') }}" alt="Lost and Found">
-                    </div>
-                    <p class="mt-2 text-sm font-medium text-gray-800">{!! $language === 'Odia' ? 'ହଜିବା ଓ<br> ଖୋଜିବା କେନ୍ଦ୍ର' : 'Lost &<br> Found' !!}</p>
-                </a>
-            </div>
-
-
-            <!-- Drinking Water -->
-            <div class="conv">
-                <a href="{{ route('services.byType', 'drinking_water') }}">
-                    <div class="convenience-item" style="margin-left: 7px">
-                        <img src="{{ asset('website/drinkingWater32.png') }}" alt="Water" style="height: 42px">
-                    </div>
-                    <p>{!! $language === 'Odia' ? 'ପାନୀୟ <br> ଜଳ' : 'Drinking<br>Water' !!}</p>
-
-                </a>
-            </div>
-
-
-            <!-- Toilet -->
-            <div class="conv">
-                <a href="{{ route('services.byType', 'toilet') }}">
-                    <div class="convenience-item">
-                        <img src="{{ asset('website/latin.png') }}" alt="Toilet">
-                    </div>
-                    <p>{{ $language === 'Odia' ? 'ଶୌଚାଳୟ' : 'Toilet' }}</p>
-                </a>
-            </div>
-        </div>
-
-        <!-- Second Row: Next 6 Items -->
-        <div class="convenience-container mt-6">
-
-            <!-- Beach -->
-            <div class="conv">
-                <a href="{{ route('seabeach') }}">
-                    <div class="convenience-item">
-                        <img src="{{ asset('website/sea.png') }}" alt="Beach">
-                    </div>
-                    <p>{{ $language === 'Odia' ? 'ବେଳାଭୂମି' : 'Beaches' }}</p>
-                </a>
-            </div>
-
-            <!-- ATM -->
-            <div class="conv">
-                <a href="{{ route('services.byType', 'atm') }}">
-                    <div class="convenience-item">
-                        <img src="{{ asset('website/atm.png') }}" alt="ATM">
-                    </div>
-                    <p>{{ $language === 'Odia' ? 'ଏଟିଏମ୍' : 'ATM' }}</p>
-                </a>
-            </div>
-
-            <!-- Route Map -->
-            <div class="conv">
-                <a href="https://www.google.co.in/maps/place/Shree+Jagannath+ji+Temple+,puri/@19.8051108,85.8158809,780m/data=!3m1!1e3!4m10!1m2!2m1!1spuri+jagannath+temple!3m6!1s0x3a19c50013561771:0xad4b4235186a4124!8m2!3d19.804741!4d85.81789!15sChVwdXJpIGphZ2FubmF0aCB0ZW1wbGVaFyIVcHVyaSBqYWdhbm5hdGggdGVtcGxlkgEMaGluZHVfdGVtcGxlmgEjQ2haRFNVaE5NRzluUzBWS04xcGZkWFpTTkRkeVNWZEJFQUWqAT4QATIfEAEiG3wu8pyG9H18GTedswS-EibRIw6yUk1mse1cVzIZEAIiFXB1cmkgamFnYW5uYXRoIHRlbXBsZeABAPoBBAgAED8!16s%2Fg%2F11y89cqz51?entry=ttu&g_ep=EgoyMDI1MDUxMy4xIKXMDSoASAFQAw%3D%3D"
-                    target="_blank">
-                    <div class="convenience-item">
-                        <img src="{{ asset('website/map.png') }}" alt="Route Map">
-                    </div>
-                    <p>{{ $language === 'Odia' ? 'ଯାତାୟାତ ମାର୍ଗ' : 'Route Map' }}</p>
-                </a>
-            </div>
-
-            <!-- Petrol Pump -->
-            <div class="conv">
-                <a href="{{ route('services.byType', 'petrol_pump') }}">
-                    <div class="convenience-item">
-                        <img src="{{ asset('website/petrolPump21.png') }}" alt="Petrol Pump">
-                    </div>
-                    <p>{{ $language === 'Odia' ? 'ପେଟ୍ରୋଲ ପମ୍ପ' : 'Petrol Pump' }}</p>
-                </a>
-            </div>
-
-            <!-- Railway Station -->
-            <div class="conv">
-                <a href="{{ route('busAndRailaway') }}" class="flex flex-col items-center text-center">
-                    <div class="convenience-item">
-                        <img src="{{ asset('website/busRaily.png') }}"
-                            alt="{{ $language === 'Odia' ? 'ରେଲୱେ ଷ୍ଟେସନ୍' : 'Bus Stand/Railway Station' }}">
-                    </div>
-                    <p class="mt-2 text-sm font-medium text-gray-800">
-                        {{ $language === 'Odia' ? 'ବସ ଷ୍ଟାଣ୍ଡ/ରେଲୱେ ଷ୍ଟେସନ୍' : 'Bus Stand/Railway Station' }}
-                    </p>
-                </a>
-            </div>
-
-            <!-- Charging Station -->
-            <div class="conv">
-                <a href="{{ route('services.byType', 'charging_station') }}">
-                    <div class="convenience-item">
-                        <img src="{{ asset('website/charghingstation89.png') }}" alt="Charging Station">
-                    </div>
-                    <p class="mt-2 text-sm font-medium text-gray-800">{!! $language === 'Odia' ? 'ଚାର୍ଜିଂ <br> ଷ୍ଟେସନ୍' : 'Charging <br> Station' !!}</p>
-                </a>
-            </div>
-
-        </div>
-
-    </section>
-
-    {{-- <section class="bg-100 p-10  bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-100">
-        <div class="max-w-6xl mx-auto">
-            <!-- Header -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
-                <div class="image-panji flex items-center gap-2">
-                    <p class="text-2xl text-[#db4d30] flex items-center font-sans">
-                        Panji Calendar
-                    </p>
-                    <img src="{{ asset('website/right.png') }}" alt="Shree Jagannatha Dham" class="w-28 h-5">
-                </div>
-                <!-- Desktop-only: Events Header stays here on larger screens -->
-                <div class="image-event flex items-center gap-2 hidden md:flex">
-                    <p class="text-2xl text-[#db4d30] flex items-center font-sans">
-                        Events
-                    </p>
-                    <img src="{{ asset('website/right.png') }}" alt="Shree Jagannatha Dham" class="w-28 h-5">
-                </div>
-
-            </div>
-
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <!-- Calendar Section -->
-                <div class="bg-white p-6 rounded-xl border border-yellow-300">
-                    <h3 class="text-md font-semibold text-red-500 mb-2">Select date</h3>
-                    <div id="calendar"></div>
-
-                    <!-- Today Occasion Header -->
-                    <div class="flex justify-center items-center gap-5 mt-12">
-                        <img src="{{ asset('website/left.png') }}" alt="Shree Jagannatha Dham" class="w-25 h-4">
-                        <h2 class="text-md text-[#db4d30] font-bold font-sans tracking-wide uppercase">Today Occasion</h2>
-                        <img src="{{ asset('website/right.png') }}" alt="Shree Jagannatha Dham" class="w-25 h-4">
-                    </div>
-
-                    <!-- Today Occasion List -->
-                    <div class="mt-6 space-y-4 font-[Inter,sans-serif] text-sm md:text-base" id="panjiContent">
-                        @if ($todayPanji)
-                            <div class="flex items-start gap-3">
-                                <i class="fas fa-calendar-day text-green-600 mt-1 w-5 h-5"></i>
-                                <p class="text-gray-800">{{ $todayPanji->event_name ?? 'No Event' }}</p>
-                            </div>
-
-                            <div class="flex items-start gap-3">
-                                <i class="fas fa-star text-purple-600 mt-1 w-5 h-5"></i>
-                                <p class="text-gray-800">Tithi: <span
-                                        class="font-medium">{{ $todayPanji->tithi ?? '-' }}</span></p>
-                            </div>
-
-                            <div class="flex items-start gap-3">
-                                <i class="fas fa-smile text-yellow-500 mt-1 w-5 h-5"></i>
-                                <p class="text-gray-800">Yoga: <span
-                                        class="font-medium">{{ $todayPanji->yoga ?? '-' }}</span></p>
-                            </div>
-
-                            <div class="flex items-start gap-3">
-                                <i class="fas fa-adjust text-blue-600 mt-1 w-5 h-5"></i>
-                                <p class="text-gray-800">Paksha: <span
-                                        class="font-medium">{{ $todayPanji->pakshya ?? '-' }}</span></p>
-                            </div>
-
-                            <div class="flex items-start gap-3">
-                                <i class="fas fa-clock text-red-400 mt-1 w-5 h-5"></i>
-                                <p class="text-gray-800">Sunrise: <span
-                                        class="font-medium">{{ $todayPanji->sun_rise ?? '-' }}</span></p>
-                            </div>
-
-                            <div class="flex items-start gap-3">
-                                <i class="fas fa-moon text-indigo-600 mt-1 w-5 h-5"></i>
-                                <p class="text-gray-800">Sunset: <span
-                                        class="font-medium">{{ $todayPanji->sun_set ?? '-' }}</span></p>
-                            </div>
-
-                            @if ($todayPanji->description)
-                                <hr class="border-dashed border-gray-300 my-4">
-                                <div class="flex items-start gap-3">
-                                    <i class="fas fa-info-circle text-gray-600 mt-1 w-5 h-5"></i>
-                                    <p class="text-gray-800">{{ $todayPanji->description }}</p>
-                                </div>
-                            @endif
-                        @else
-                            <p class="text-center text-gray-500">No Panji Details Available for Today.</p>
-                        @endif
-                    </div>
-
-                </div>
-                <!-- Events Section -->
-                <div class="bg-white p-6 rounded-xl border border-gray-300">
-                    <div class="flex items-center gap-2 mb-4 md:hidden">
-                        <p class="text-xl font-semibold text-[#db4d30] font-sans">
-                            Events
-                        </p>
-                        <img src="{{ asset('website/right.png') }}" alt="Shree Jagannatha Dham" class="w-28 h-5">
-                    </div>
-                    <div id="events">
-                        <img src="{{ asset('website/astami.png') }}">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="bg-100 p-2 relative bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-100">
-        <div class="max-w-6xl mx-auto text-center relative">
-            <!-- Tabs -->
-            <div class="absolute top-14 right-0 flex space-x-3 p-3 rounded-lg">
-                <button class="tab-buttons active-tabs" onclick="showContent('worldwide', this)">Worldwide</button>
-                <button class="tab-buttons" onclick="showContent('india', this)">India</button>
-                <button class="tab-buttons" onclick="showContent('odisha', this)">Odisha</button>
-            </div>
-
-            <!-- Title -->
-            <div class="flex justify-center items-center gap-5 mt-12">
-                <img src="{{ asset('website/left.png') }}" alt="Shree Jagannatha Dham" class="w-36 h-5">
-                <h2 class="text-2xl text-[#db4d30] flex items-center font-sans">Jagannatha Temples Worldwide</h2>
-                <img src="{{ asset('website/right.png') }}" alt="Shree Jagannatha Dham" class="w-36 h-5">
-            </div>
-
-            <!-- Image -->
-            <div class="dynamic-image mt-10 flex justify-center">
-                <img id="dynamicImage" src="{{ asset('website/18.png') }}" alt="Jagannatha Temples Worldwide"
-                    class="w-[600px] h-[800px] object-contain rounded-xl shadow-md" />
-            </div>
-
-        </div>
-    </section>
-
-    <div class="timeline-footer">
-            © {{ date('Y') }} Temple Management System. All rights reserved. <a style="color: red" href="http://temple.mandirparikrama.com/puri-website/privacy-policy">privacy policy</a>
-    </div> --}}
-
-    {{-- </section> --}}
-
-    @include('partials.website-footer')
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const languageChecks = document.querySelectorAll('.language-check');
+
+        languageChecks.forEach(function (checkbox) {
+            checkbox.addEventListener('change', function () {
+                if (!this.checked) {
+                    this.checked = true;
+                    return;
+                }
+
+                languageChecks.forEach(function (other) {
+                    if (other !== checkbox) {
+                        other.checked = false;
+                    }
+                });
+
+                const url = new URL(window.location.href);
+                url.searchParams.set('language', this.value);
+                window.location.href = url.toString();
+            });
+        });
+    });
+</script>
 
 @endsection
