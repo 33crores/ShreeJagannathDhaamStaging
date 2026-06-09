@@ -537,67 +537,55 @@
 </head>
 
 <body>
-
 @php
     $language = $language ?? request('language', session('app_language', 'English'));
     $language = $language === 'Odia' ? 'Odia' : 'English';
 
-    $uploadBaseUrl = 'https://shreejagannathdham.com';
+    /*
+        Correct parking image folder:
+        public/assets/uploads/parking_photo
 
-    $parkingImageUrl = function ($photo) use ($uploadBaseUrl) {
-        $fallback = asset('website/parking.jpeg');
+        Browser URL:
+        /assets/uploads/parking_photo/image-name.jpg
+    */
 
+    $newPhotoFolder = 'assets/uploads/parking_photo';
+    $fallbackImage = asset('website/parking.jpeg');
+
+    $parkingImageUrl = function ($photo) use ($newPhotoFolder, $fallbackImage) {
         $photo = trim((string) $photo);
 
         if ($photo === '') {
-            return $fallback;
+            return $fallbackImage;
         }
 
+        $photo = trim($photo, " \t\n\r\0\x0B\"'");
         $photo = str_replace(['\\/', '\\'], '/', $photo);
-        $photo = ltrim($photo, '/');
+
+        /*
+            DB may contain:
+            assets/uploads/parking_photo/abc.jpg
+            uploads/parking_photo/abc.jpg
+            parking_photo/abc.jpg
+            abc.jpg
+            full URL
+
+            Final output:
+            /assets/uploads/parking_photo/abc.jpg
+        */
 
         if (preg_match('/^https?:\/\//i', $photo)) {
-            $urlPath = parse_url($photo, PHP_URL_PATH);
-
-            if ($urlPath && strpos($urlPath, '/assets/uploads/') === 0) {
-                return $uploadBaseUrl . $urlPath;
-            }
-
-            if ($urlPath && strpos($urlPath, '/uploads/') === 0) {
-                return $uploadBaseUrl . '/assets' . $urlPath;
-            }
-
-            return $photo;
+            $path = parse_url($photo, PHP_URL_PATH);
+            $filename = basename($path);
+        } else {
+            $filename = basename($photo);
         }
 
-        if (strpos($photo, 'assets/uploads/') === 0) {
-            return $uploadBaseUrl . '/' . $photo;
+        if (!$filename || $filename === '.' || $filename === '/') {
+            return $fallbackImage;
         }
 
-        if (strpos($photo, 'uploads/') === 0) {
-            return $uploadBaseUrl . '/assets/' . $photo;
-        }
-
-        if (
-            strpos($photo, 'parking_photo/') === 0 ||
-            strpos($photo, 'parking_photos/') === 0
-        ) {
-            return $uploadBaseUrl . '/assets/uploads/' . $photo;
-        }
-
-        if (
-            strpos($photo, 'website/') === 0 ||
-            strpos($photo, 'front-assets/') === 0 ||
-            strpos($photo, 'storage/') === 0
-        ) {
-            return asset($photo);
-        }
-
-        if (strpos($photo, '/') === false) {
-            return $uploadBaseUrl . '/assets/uploads/parking_photo/' . $photo;
-        }
-
-        return $fallback;
+        return asset($newPhotoFolder . '/' . $filename);
     };
 
     $getVehicleTypes = function ($vehicleTypeValue) {
@@ -619,8 +607,6 @@
 
         return array_map('trim', explode(',', $vehicleTypeValue));
     };
-
-    $fallbackImage = asset('website/parking.jpeg');
 @endphp
 
 <div class="parking-page">
