@@ -228,4 +228,5 @@ class QuickServiceController extends Controller
 
         return view('website.sea-beach-list', compact('seabeach', 'language'));
     }
+    
 }
