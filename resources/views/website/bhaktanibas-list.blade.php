@@ -80,15 +80,15 @@
             font-size: 44px;
             line-height: 1.12;
             font-weight: 900;
-            max-width: 680px;
+            max-width: 720px;
         }
 
         .bhakta-hero p {
             margin: 14px 0 0;
             font-size: 17px;
             line-height: 1.6;
-            max-width: 620px;
-            color: rgba(255, 255, 255, 0.88);
+            max-width: 680px;
+            color: rgba(255, 255, 255, 0.90);
         }
 
         .page-container {
@@ -108,7 +108,7 @@
         }
 
         .summary-card {
-            background: rgba(255, 255, 255, 0.88);
+            background: rgba(255, 255, 255, 0.90);
             border: 1px solid rgba(255, 255, 255, 0.65);
             border-radius: 18px;
             padding: 16px;
@@ -193,7 +193,7 @@
             left: 14px;
             padding: 8px 12px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.90);
+            background: rgba(255, 255, 255, 0.92);
             color: #db4d30;
             font-size: 12px;
             font-weight: 800;
@@ -477,11 +477,18 @@
 
 <body>
 
-@include('partials.header-puri-dham')
-
 @php
     $language = $language ?? session('app_language', 'English');
     $language = $language === 'Odia' ? 'Odia' : 'English';
+
+    /*
+        IMPORTANT:
+        Your uploaded accommodation images are available on:
+        https://shreejagannathdham.com/assets/uploads/accomodation_photos/...
+
+        So this page always converts DB paths into that URL.
+    */
+    $uploadBaseUrl = 'https://shreejagannathdham.com';
 
     $getAccommodationPhotos = function ($photoValue) {
         if (is_array($photoValue)) {
@@ -503,7 +510,7 @@
         return [$photoValue];
     };
 
-    $accommodationImageUrl = function ($photo) {
+    $accommodationImageUrl = function ($photo) use ($uploadBaseUrl) {
         $fallback = asset('website/bhkt.jpg');
 
         $photo = trim((string) $photo);
@@ -512,36 +519,50 @@
             return $fallback;
         }
 
-        $photo = str_replace('\\', '/', $photo);
+        $photo = str_replace(['\\/', '\\'], '/', $photo);
         $photo = ltrim($photo, '/');
 
         if (preg_match('/^https?:\/\//i', $photo)) {
+            $urlPath = parse_url($photo, PHP_URL_PATH);
+
+            if ($urlPath && strpos($urlPath, '/assets/uploads/') === 0) {
+                return $uploadBaseUrl . $urlPath;
+            }
+
+            if ($urlPath && strpos($urlPath, '/uploads/') === 0) {
+                return $uploadBaseUrl . '/assets' . $urlPath;
+            }
+
             return $photo;
         }
 
-        if (str_starts_with($photo, 'assets/uploads/')) {
-            return asset($photo);
+        if (strpos($photo, 'assets/uploads/') === 0) {
+            return $uploadBaseUrl . '/' . $photo;
         }
 
-        if (str_starts_with($photo, 'uploads/')) {
-            return asset('assets/' . $photo);
+        if (strpos($photo, 'uploads/') === 0) {
+            return $uploadBaseUrl . '/assets/' . $photo;
         }
 
         if (
-            str_starts_with($photo, 'accomodation_photos/') ||
-            str_starts_with($photo, 'accomodation_photo/') ||
-            str_starts_with($photo, 'accommodation_photos/') ||
-            str_starts_with($photo, 'accommodation_photo/')
+            strpos($photo, 'accomodation_photos/') === 0 ||
+            strpos($photo, 'accomodation_photo/') === 0 ||
+            strpos($photo, 'accommodation_photos/') === 0 ||
+            strpos($photo, 'accommodation_photo/') === 0
         ) {
-            return asset('assets/uploads/' . $photo);
+            return $uploadBaseUrl . '/assets/uploads/' . $photo;
         }
 
-        if (str_starts_with($photo, 'website/') || str_starts_with($photo, 'front-assets/') || str_starts_with($photo, 'storage/')) {
+        if (
+            strpos($photo, 'website/') === 0 ||
+            strpos($photo, 'front-assets/') === 0 ||
+            strpos($photo, 'storage/') === 0
+        ) {
             return asset($photo);
         }
 
-        if (!str_contains($photo, '/')) {
-            return asset('assets/uploads/accomodation_photos/' . $photo);
+        if (strpos($photo, '/') === false) {
+            return $uploadBaseUrl . '/assets/uploads/accomodation_photos/' . $photo;
         }
 
         return $fallback;
@@ -628,7 +649,10 @@
                         ? ucwords(str_replace('_', ' ', $item->accomodation_type))
                         : 'Bhakta Niwas';
 
-                    $foodText = $item->food_type ?: ($language === 'Odia' ? 'ଜଳଖିଆ / ମଧ୍ୟାହ୍ନ ଭୋଜନ / ରାତ୍ରି ଭୋଜନ' : 'Breakfast / Lunch / Dinner');
+                    $foodText = $item->food_type
+                        ?: ($language === 'Odia'
+                            ? 'ଜଳଖିଆ / ମଧ୍ୟାହ୍ନ ଭୋଜନ / ରାତ୍ରି ଭୋଜନ'
+                            : 'Breakfast / Lunch / Dinner');
                 @endphp
 
                 <article class="bhakta-card">
@@ -753,8 +777,6 @@
         </div>
     </main>
 </div>
-
-@include('partials.website-footer')
 
 <script>
     function updateMainImage(src, index) {
