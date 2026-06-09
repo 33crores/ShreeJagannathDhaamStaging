@@ -919,6 +919,17 @@
             'alt' => 'Police Station',
             'type' => 'fa',
         ],
+
+        [
+    'url' => route('services.byType', 'hospital'),
+    'title1' => $language === 'Odia' ? 'ହସ୍ପିଟାଲ୍' : 'Hospital',
+    'title2' => $language === 'Odia' ? 'ସୁବିଧା' : 'Facility',
+    'desc' => $language === 'Odia' ? 'ନିକଟସ୍ଥ ହସ୍ପିଟାଲ୍ ଖୋଜନ୍ତୁ' : 'Find nearby hospital facilities',
+    'icon' => 'fa-solid fa-hospital',
+    'alt' => 'Hospital',
+    'type' => 'fa',
+],
+        
         ];
     @endphp
 
