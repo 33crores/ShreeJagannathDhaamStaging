@@ -6,9 +6,6 @@
     <title>{{ ($language ?? 'English') === 'Odia' ? 'ଭକ୍ତ ନିବାସ' : 'Bhakta Niwas' }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="{{ asset('front-assets/frontend/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('front-assets/frontend/css/footer.css') }}">
-    <link rel="stylesheet" href="{{ asset('front-assets/frontend/css/dham-header.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -482,13 +479,17 @@
     $language = $language === 'Odia' ? 'Odia' : 'English';
 
     /*
-        IMPORTANT:
-        Your uploaded accommodation images are available on:
-        https://shreejagannathdham.com/assets/uploads/accomodation_photos/...
+        Your actual image folder:
+        public/assets/uploads/accomodation_photos
 
-        So this page always converts DB paths into that URL.
+        DB can contain:
+        - ["assets\/uploads\/accomodation_photos\/file.jpg"]
+        - assets/uploads/accomodation_photos/file.jpg
+        - file.jpg
+        - old full URL
     */
-    $uploadBaseUrl = 'https://shreejagannathdham.com';
+
+    $fallbackImage = asset('website/bhkt.jpg');
 
     $getAccommodationPhotos = function ($photoValue) {
         if (is_array($photoValue)) {
@@ -510,65 +511,29 @@
         return [$photoValue];
     };
 
-    $accommodationImageUrl = function ($photo) use ($uploadBaseUrl) {
-        $fallback = asset('website/bhkt.jpg');
-
+    $accommodationImageUrl = function ($photo) use ($fallbackImage) {
         $photo = trim((string) $photo);
 
         if ($photo === '') {
-            return $fallback;
+            return $fallbackImage;
         }
 
+        $photo = trim($photo, " \t\n\r\0\x0B\"'");
         $photo = str_replace(['\\/', '\\'], '/', $photo);
-        $photo = ltrim($photo, '/');
 
         if (preg_match('/^https?:\/\//i', $photo)) {
-            $urlPath = parse_url($photo, PHP_URL_PATH);
-
-            if ($urlPath && strpos($urlPath, '/assets/uploads/') === 0) {
-                return $uploadBaseUrl . $urlPath;
-            }
-
-            if ($urlPath && strpos($urlPath, '/uploads/') === 0) {
-                return $uploadBaseUrl . '/assets' . $urlPath;
-            }
-
-            return $photo;
+            $path = parse_url($photo, PHP_URL_PATH);
+            $filename = basename($path);
+        } else {
+            $filename = basename($photo);
         }
 
-        if (strpos($photo, 'assets/uploads/') === 0) {
-            return $uploadBaseUrl . '/' . $photo;
+        if (!$filename || $filename === '.' || $filename === '/') {
+            return $fallbackImage;
         }
 
-        if (strpos($photo, 'uploads/') === 0) {
-            return $uploadBaseUrl . '/assets/' . $photo;
-        }
-
-        if (
-            strpos($photo, 'accomodation_photos/') === 0 ||
-            strpos($photo, 'accomodation_photo/') === 0 ||
-            strpos($photo, 'accommodation_photos/') === 0 ||
-            strpos($photo, 'accommodation_photo/') === 0
-        ) {
-            return $uploadBaseUrl . '/assets/uploads/' . $photo;
-        }
-
-        if (
-            strpos($photo, 'website/') === 0 ||
-            strpos($photo, 'front-assets/') === 0 ||
-            strpos($photo, 'storage/') === 0
-        ) {
-            return asset($photo);
-        }
-
-        if (strpos($photo, '/') === false) {
-            return $uploadBaseUrl . '/assets/uploads/accomodation_photos/' . $photo;
-        }
-
-        return $fallback;
+        return asset('assets/uploads/accomodation_photos/' . $filename);
     };
-
-    $fallbackImage = asset('website/bhkt.jpg');
 @endphp
 
 <div class="bhakta-page">
@@ -633,6 +598,7 @@
             @forelse ($bhaktaNibas as $item)
                 @php
                     $photoArray = $getAccommodationPhotos($item->photo ?? null);
+
                     $firstPhoto = $photoArray[0] ?? null;
                     $firstPhotoUrl = $firstPhoto ? $accommodationImageUrl($firstPhoto) : $fallbackImage;
 
@@ -645,12 +611,13 @@
 
                     $address = count($addressParts) ? implode(', ', $addressParts) : 'N/A';
 
-                    $typeText = $item->accomodation_type
+                    $typeText = !empty($item->accomodation_type)
                         ? ucwords(str_replace('_', ' ', $item->accomodation_type))
                         : 'Bhakta Niwas';
 
-                    $foodText = $item->food_type
-                        ?: ($language === 'Odia'
+                    $foodText = !empty($item->food_type)
+                        ? $item->food_type
+                        : ($language === 'Odia'
                             ? 'ଜଳଖିଆ / ମଧ୍ୟାହ୍ନ ଭୋଜନ / ରାତ୍ରି ଭୋଜନ'
                             : 'Breakfast / Lunch / Dinner');
                 @endphp
@@ -661,7 +628,7 @@
                             id="mainImage-{{ $loop->index }}"
                             class="main-display-image"
                             src="{{ $firstPhotoUrl }}"
-                            alt="{{ $item->name }}"
+                            alt="{{ $item->name ?? 'Bhakta Niwas' }}"
                             onerror="this.onerror=null; this.src='{{ $fallbackImage }}'; this.classList.add('fallback-img');"
                         >
 
@@ -673,7 +640,7 @@
 
                     @if(count($photoArray) > 0)
                         <div class="thumbnail-section">
-                            @foreach ($photoArray as $index => $photo)
+                            @foreach ($photoArray as $photoIndex => $photo)
                                 @php
                                     $thumbUrl = $accommodationImageUrl($photo);
                                 @endphp
@@ -681,9 +648,9 @@
                                 <img
                                     src="{{ $thumbUrl }}"
                                     class="thumbnail"
-                                    onclick="updateMainImage({{ json_encode($thumbUrl) }}, {{ $loop->parent->index }})"
-                                    alt="Thumbnail {{ $index + 1 }}"
-                                    onerror="this.onerror=null; this.src='{{ $fallbackImage }}'; this.classList.add('fallback-img');"
+                                    onclick="updateMainImage(@json($thumbUrl), {{ $loop->parent->index }})"
+                                    alt="Thumbnail {{ $photoIndex + 1 }}"
+                                    onerror="this.onerror=null; this.style.display='none';"
                                 >
                             @endforeach
                         </div>
@@ -691,7 +658,7 @@
 
                     <div class="card-body-custom">
                         <div class="card-title-row">
-                            <h5>{{ $item->name }}</h5>
+                            <h5>{{ $item->name ?? 'Bhakta Niwas' }}</h5>
                             <span class="type-pill">{{ $typeText }}</span>
                         </div>
 
@@ -742,7 +709,7 @@
 
                         <div class="action-row">
                             @if(!empty($item->google_map_link))
-                                <a href="{{ $item->google_map_link }}" target="_blank" class="action-btn btn-map">
+                                <a href="{{ $item->google_map_link }}" target="_blank" rel="noopener noreferrer" class="action-btn btn-map">
                                     <i class="fa-solid fa-location-arrow"></i>
                                     {{ $language === 'Odia' ? 'ଦିଗ ନିର୍ଦ୍ଦେଶ' : 'Directions' }}
                                 </a>
@@ -754,7 +721,7 @@
                             @endif
 
                             @if(!empty($item->contact_no))
-                                <a href="tel:{{ $item->contact_no }}" class="action-btn btn-call">
+                                <a href="tel:{{ preg_replace('/\s+/', '', $item->contact_no) }}" class="action-btn btn-call">
                                     <i class="fa-solid fa-phone"></i>
                                     {{ $language === 'Odia' ? 'କଲ କରନ୍ତୁ' : 'Call to Book' }}
                                 </a>
@@ -790,5 +757,4 @@
 </script>
 
 </body>
-
 </html>
