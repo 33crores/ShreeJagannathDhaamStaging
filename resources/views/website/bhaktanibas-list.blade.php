@@ -15,7 +15,10 @@
 
         body {
             margin: 0;
-            background: linear-gradient(180deg, #fff8f3 0%, #ffffff 48%, #fff7f1 100%);
+            background:
+                radial-gradient(circle at 8% 8%, rgba(255, 122, 26, 0.16), transparent 28%),
+                radial-gradient(circle at 92% 10%, rgba(52, 21, 81, 0.12), transparent 30%),
+                linear-gradient(180deg, #fff8f3 0%, #ffffff 48%, #fff7f1 100%);
             font-family: Arial, sans-serif;
             color: #222;
         }
@@ -23,41 +26,131 @@
         .bhakta-page {
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative;
         }
 
+        .bhakta-page::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(52, 21, 81, 0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(52, 21, 81, 0.035) 1px, transparent 1px);
+            background-size: 34px 34px;
+            opacity: 0.55;
+        }
+
+        /* Attractive header without background image */
         .bhakta-hero {
             position: relative;
             width: 100%;
-            min-height: 330px;
+            min-height: 350px;
             overflow: hidden;
             display: flex;
             align-items: center;
-        }
-
-        .bhakta-hero-bg {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scale(1.04);
-        }
-
-        .bhakta-hero-overlay {
-            position: absolute;
-            inset: 0;
             background:
-                radial-gradient(circle at 85% 15%, rgba(255, 196, 87, 0.34), transparent 32%),
-                linear-gradient(90deg, rgba(52, 21, 81, 0.86), rgba(219, 77, 48, 0.70));
+                radial-gradient(circle at 82% 18%, rgba(255, 196, 87, 0.42), transparent 25%),
+                radial-gradient(circle at 18% 78%, rgba(255, 122, 26, 0.35), transparent 28%),
+                linear-gradient(135deg, #341551 0%, #70204a 45%, #db4d30 78%, #ff7a1a 100%);
+        }
+
+        .bhakta-hero::before {
+            content: "";
+            position: absolute;
+            width: 520px;
+            height: 520px;
+            right: -190px;
+            top: -220px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.13);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .bhakta-hero::after {
+            content: "";
+            position: absolute;
+            width: 360px;
+            height: 360px;
+            left: -140px;
+            bottom: -170px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+        }
+
+        .hero-pattern {
+            position: absolute;
+            inset: 0;
+            opacity: 0.20;
+            background-image:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.18) 25%, transparent 25%),
+                linear-gradient(225deg, rgba(255, 255, 255, 0.16) 25%, transparent 25%),
+                linear-gradient(45deg, rgba(255, 255, 255, 0.10) 25%, transparent 25%),
+                linear-gradient(315deg, rgba(255, 255, 255, 0.10) 25%, transparent 25%);
+            background-position: 18px 0, 18px 0, 0 0, 0 0;
+            background-size: 36px 36px;
+        }
+
+        .hero-glow {
+            position: absolute;
+            right: 9%;
+            bottom: 28px;
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            filter: blur(5px);
+        }
+
+        .hero-floating-card {
+            position: absolute;
+            right: 8%;
+            top: 92px;
+            width: 255px;
+            padding: 18px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            color: #ffffff;
+            z-index: 2;
+        }
+
+        .hero-floating-card .icon-box {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.20);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            margin-bottom: 13px;
+        }
+
+        .hero-floating-card h4 {
+            margin: 0 0 7px;
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .hero-floating-card p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.45;
+            color: rgba(255, 255, 255, 0.88);
         }
 
         .bhakta-hero-content {
             position: relative;
-            z-index: 2;
+            z-index: 3;
             width: 100%;
             max-width: 1180px;
             margin: 0 auto;
-            padding: 50px 22px;
+            padding: 58px 22px;
             color: #ffffff;
         }
 
@@ -68,37 +161,69 @@
             padding: 9px 14px;
             border-radius: 999px;
             background: rgba(255, 255, 255, 0.16);
-            border: 1px solid rgba(255, 255, 255, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             font-size: 13px;
             font-weight: 800;
             margin-bottom: 16px;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10);
         }
 
         .bhakta-hero h1 {
             margin: 0;
-            font-size: 44px;
-            line-height: 1.12;
+            font-size: 48px;
+            line-height: 1.1;
             font-weight: 900;
-            max-width: 720px;
+            max-width: 700px;
+            letter-spacing: -0.8px;
         }
 
         .bhakta-hero p {
-            margin: 14px 0 0;
+            margin: 15px 0 0;
             font-size: 17px;
             line-height: 1.6;
             max-width: 680px;
-            color: rgba(255, 255, 255, 0.90);
+            color: rgba(255, 255, 255, 0.92);
+        }
+
+        .hero-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 26px;
+        }
+
+        .hero-stat {
+            min-width: 145px;
+            padding: 13px 15px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .hero-stat strong {
+            display: block;
+            font-size: 20px;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .hero-stat span {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.86);
+            font-weight: 700;
         }
 
         .page-container {
             width: 100%;
             max-width: 1180px;
-            margin: 32px auto 0;
+            margin: -28px auto 0;
             padding: 0 18px 55px;
             position: relative;
-            z-index: 3;
+            z-index: 4;
         }
 
         .bhakta-grid {
@@ -361,15 +486,19 @@
             .bhakta-grid {
                 grid-template-columns: 1fr;
             }
+
+            .hero-floating-card {
+                display: none;
+            }
         }
 
         @media (max-width: 575px) {
             .bhakta-hero {
-                min-height: 270px;
+                min-height: 330px;
             }
 
             .bhakta-hero-content {
-                padding: 34px 16px;
+                padding: 42px 16px 58px;
             }
 
             .hero-badge {
@@ -378,15 +507,31 @@
             }
 
             .bhakta-hero h1 {
-                font-size: 30px;
+                font-size: 32px;
             }
 
             .bhakta-hero p {
                 font-size: 14px;
+                line-height: 1.5;
+            }
+
+            .hero-stats {
+                gap: 8px;
+                margin-top: 20px;
+            }
+
+            .hero-stat {
+                min-width: calc(50% - 4px);
+                padding: 11px 12px;
+                border-radius: 15px;
+            }
+
+            .hero-stat strong {
+                font-size: 18px;
             }
 
             .page-container {
-                margin-top: 22px;
+                margin-top: -30px;
                 padding: 0 12px 42px;
             }
 
@@ -426,18 +571,6 @@
 @php
     $language = $language ?? session('app_language', 'English');
     $language = $language === 'Odia' ? 'Odia' : 'English';
-
-    /*
-        Image folder:
-        public/assets/uploads/accomodation_photos
-
-        DB can contain:
-        - ["assets\/uploads\/accomodation_photos\/file.jpg"]
-        - assets/uploads/accomodation_photos/file.jpg
-        - accomodation_photos/file.jpg
-        - file.jpg
-        - old full URL
-    */
 
     $fallbackImage = asset('website/bhkt.jpg');
 
@@ -505,8 +638,22 @@
 <div class="bhakta-page">
 
     <section class="bhakta-hero">
-        <img class="bhakta-hero-bg" src="{{ asset('website/bhkt.jpg') }}" alt="Bhakta Niwas Background">
-        <div class="bhakta-hero-overlay"></div>
+        <div class="hero-pattern"></div>
+        <div class="hero-glow"></div>
+
+        <div class="hero-floating-card">
+            <div class="icon-box">
+                <i class="fa-solid fa-house-chimney-user"></i>
+            </div>
+
+            <h4>{{ $language === 'Odia' ? 'ଶାନ୍ତିପୂର୍ଣ୍ଣ ରହଣି' : 'Peaceful Stay' }}</h4>
+
+            <p>
+                {{ $language === 'Odia'
+                    ? 'ମନ୍ଦିର ପାଖରେ ତୀର୍ଥଯାତ୍ରୀଙ୍କ ପାଇଁ ସୁବିଧାଜନକ ରହିବା ବ୍ୟବସ୍ଥା।'
+                    : 'Comfortable stay options near the temple with contact and direction details.' }}
+            </p>
+        </div>
 
         <div class="bhakta-hero-content">
             <div class="hero-badge">
@@ -523,6 +670,23 @@
                     ? 'ତୀର୍ଥଯାତ୍ରୀମାନଙ୍କ ପାଇଁ ମନ୍ଦିର ପାଖରେ ଶାନ୍ତିପୂର୍ଣ୍ଣ ଓ ସୁବିଧାଜନକ ରହିବା ସ୍ଥାନ।'
                     : 'Experience peaceful and convenient stay options near Shree Jagannatha Dham.' }}
             </p>
+
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <strong><i class="fa-solid fa-bed"></i></strong>
+                    <span>{{ $language === 'Odia' ? 'ରହିବା ସୁବିଧା' : 'Stay Facility' }}</span>
+                </div>
+
+                <div class="hero-stat">
+                    <strong><i class="fa-solid fa-location-dot"></i></strong>
+                    <span>{{ $language === 'Odia' ? 'ଦିଗ ନିର୍ଦ୍ଦେଶ' : 'Map Direction' }}</span>
+                </div>
+
+                <div class="hero-stat">
+                    <strong><i class="fa-solid fa-phone"></i></strong>
+                    <span>{{ $language === 'Odia' ? 'ବୁକିଂ ସହାୟତା' : 'Booking Help' }}</span>
+                </div>
+            </div>
         </div>
     </section>
 
