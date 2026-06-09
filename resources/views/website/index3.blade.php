@@ -738,14 +738,15 @@
             'type' => 'image',
         ],
         [
-            'url' => route('services.byType', 'ratha_yatra_mela'),
-            'title1' => $language === 'Odia' ? 'ରୁଟ' : 'Route',
-            'title2' => $language === 'Odia' ? 'ମାନଚିତ୍ର' : 'Map',
-            'desc' => $language === 'Odia' ? 'ରୁଟ ଦିଗ ଦେଖନ୍ତୁ' : 'View route direction',
-            'icon' => asset('website/map.png'),
-            'alt' => 'Route Map',
-            'type' => 'image',
-        ],
+        'url' => 'https://www.google.com/maps/dir/?api=1&destination=Shree%20Jagannath%20Temple%2C%20Puri%2C%20Odisha%2C%20India&travelmode=driving',
+        'title1' => $language === 'Odia' ? 'ରୁଟ' : 'Route',
+        'title2' => $language === 'Odia' ? 'ମାନଚିତ୍ର' : 'Map',
+        'desc' => $language === 'Odia' ? 'ଶ୍ରୀମନ୍ଦିରକୁ ରୁଟ ଦେଖନ୍ତୁ' : 'Route to Shree Jagannath Temple',
+        'icon' => asset('website/map.png'),
+        'alt' => 'Route Map',
+        'type' => 'image',
+        'external' => true,
+    ],
         [
             'url' => route('services.byType', 'lost_and_found_booth'),
             'title1' => $language === 'Odia' ? 'ହଜିଥିବା' : 'Lost &',
@@ -828,7 +829,8 @@
 
         @foreach ($cards as $card)
             <div class="conv">
-                <a href="{{ $card['url'] }}?{{ $langQuery }}">
+               <a href="{{ !empty($card['external']) ? $card['url'] : $card['url'] . '?' . $langQuery }}"
+            @if(!empty($card['external'])) target="_blank" rel="noopener noreferrer" @endif>
                     <div class="convenience-card-top">
                         <div class="convenience-text">
                             <h3>
