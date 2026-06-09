@@ -12,24 +12,23 @@ class Parking extends Model
     protected $table = 'temple__parking_details';
 
     protected $fillable = [
-       'temple_id',
-       'language',
-       'vehicle_type',
-       'pass_type',
-       'parking_name',
-       'parking_availability',
-       'map_url',
-       'parking_photo',
-       'parking_address',
-       'area_type',
-       'parking_management',
-       'landmark',
-       'pincode',
-       'city_village',
-       'district',
-       'state',
-       'country',
-       'status'
+        'temple_id',
+        'language',
+        'vehicle_type',
+        'pass_type',
+        'parking_name',
+        'parking_availability',
+        'map_url',
+        'parking_photo',
+        'parking_address',
+        'area_type',
+        'parking_management',
+        'landmark',
+        'pincode',
+        'city_village',
+        'district',
+        'state',
+        'country',
+        'status',
     ];
-
 }

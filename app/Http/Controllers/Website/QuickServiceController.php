@@ -76,6 +76,7 @@ class QuickServiceController extends Controller
 
         $parking = Parking::where('status', 'active')
             ->where('language', $language)
+            ->latest('id')
             ->get();
 
         return view('website.parking-list', compact('parking', 'language'));

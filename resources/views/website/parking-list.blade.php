@@ -486,13 +486,6 @@
     $language = $language ?? request('language', session('app_language', 'English'));
     $language = $language === 'Odia' ? 'Odia' : 'English';
 
-    /*
-        Parking image folder:
-        public/assets/uploads/parking_photo
-
-        Browser URL:
-        /assets/uploads/parking_photo/image-name.jpg
-    */
     $newPhotoFolder = 'assets/uploads/parking_photo';
     $fallbackImage = asset('website/parking.jpeg');
 
@@ -522,7 +515,7 @@
         return asset($newPhotoFolder . '/' . $filename);
     };
 
-    $getVehicleTypes = function ($vehicleTypeValue) {
+    $parseVehicleTypes = function ($vehicleTypeValue) {
         if (is_array($vehicleTypeValue)) {
             return array_values(array_filter($vehicleTypeValue));
         }
@@ -535,29 +528,74 @@
 
         $decoded = json_decode($vehicleTypeValue, true);
 
-        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-            return array_values(array_filter($decoded));
+        if (json_last_error() === JSON_ERROR_NONE) {
+            if (is_array($decoded)) {
+                return array_values(array_filter($decoded));
+            }
+
+            if (is_string($decoded) && trim($decoded) !== '') {
+                return [trim($decoded)];
+            }
         }
 
-        return array_values(array_filter(array_map('trim', explode(',', $vehicleTypeValue))));
+        $vehicleTypeValue = str_replace(['\\/', '\\'], '/', $vehicleTypeValue);
+        $vehicleTypeValue = str_replace(['[', ']', '"', "'"], '', $vehicleTypeValue);
+
+        return array_values(array_filter(array_map('trim', preg_split('/[,|;]+/', $vehicleTypeValue))));
     };
 
-    $normalizeVehicleSlug = function ($value) {
+    $vehicleKey = function ($value) {
         $value = strtolower(trim((string) $value));
         $value = str_replace(['_', '-', '/', '\\'], ' ', $value);
         $value = preg_replace('/\s+/', ' ', $value);
 
-        $aliases = [
-            'two wheeler' => ['two wheeler', 'two wheelers', '2 wheeler', '2 wheelers', 'bike', 'bikes', 'motorcycle', 'motorcycles', 'scooter', 'scooters'],
-            'three wheeler' => ['three wheeler', 'three wheelers', '3 wheeler', '3 wheelers', 'auto', 'autos', 'auto rickshaw', 'autorickshaw'],
-            'four wheeler' => ['four wheeler', 'four wheelers', '4 wheeler', '4 wheelers', 'car', 'cars', 'jeep', 'suv'],
-            'electric vehicle' => ['electric vehicle', 'electric vehicles', 'ev', 'e vehicle', 'e vehicles', 'charging', 'electric'],
-        ];
+        if ($value === '') {
+            return null;
+        }
 
-        foreach ($aliases as $slug => $items) {
-            if (in_array($value, $items, true)) {
-                return $slug;
-            }
+        if (
+            str_contains($value, 'all') ||
+            str_contains($value, 'both') ||
+            str_contains($value, 'ସମସ୍ତ')
+        ) {
+            return 'all';
+        }
+
+        if (
+            str_contains($value, 'two') ||
+            str_contains($value, '2') ||
+            str_contains($value, 'bike') ||
+            str_contains($value, 'motor') ||
+            str_contains($value, 'scooter')
+        ) {
+            return 'two_wheeler';
+        }
+
+        if (
+            str_contains($value, 'three') ||
+            str_contains($value, '3') ||
+            str_contains($value, 'auto')
+        ) {
+            return 'three_wheeler';
+        }
+
+        if (
+            str_contains($value, 'four') ||
+            str_contains($value, '4') ||
+            str_contains($value, 'car') ||
+            str_contains($value, 'jeep') ||
+            str_contains($value, 'suv')
+        ) {
+            return 'four_wheeler';
+        }
+
+        if (
+            str_contains($value, 'electric') ||
+            $value === 'ev' ||
+            str_contains($value, 'e vehicle') ||
+            str_contains($value, 'charging')
+        ) {
+            return 'electric_vehicle';
         }
 
         return $value;
@@ -592,22 +630,22 @@
 
         <div class="tab-section">
             <div class="parking-tabs">
-                <button type="button" class="parking-tab active" data-type="two wheeler">
+                <button type="button" class="parking-tab active" data-type="two_wheeler">
                     <i class="fa-solid fa-motorcycle"></i>
                     {{ $language === 'Odia' ? 'ଦୁଇ ଚକିଆ' : 'Two Wheeler' }}
                 </button>
 
-                <button type="button" class="parking-tab" data-type="three wheeler">
+                <button type="button" class="parking-tab" data-type="three_wheeler">
                     <i class="fa-solid fa-car-side"></i>
                     {{ $language === 'Odia' ? 'ତିନି ଚକିଆ' : 'Three Wheeler' }}
                 </button>
 
-                <button type="button" class="parking-tab" data-type="four wheeler">
+                <button type="button" class="parking-tab" data-type="four_wheeler">
                     <i class="fa-solid fa-car"></i>
                     {{ $language === 'Odia' ? 'ଚାରି ଚକିଆ' : 'Four Wheeler' }}
                 </button>
 
-                <button type="button" class="parking-tab" data-type="electric vehicle">
+                <button type="button" class="parking-tab" data-type="electric_vehicle">
                     <i class="fa-solid fa-charging-station"></i>
                     {{ $language === 'Odia' ? 'ଇଲେକ୍ଟ୍ରିକ ଯାନ' : 'Electric Vehicle' }}
                 </button>
@@ -617,11 +655,11 @@
         <div class="parking-grid" id="parkingGrid">
             @forelse ($parking as $item)
                 @php
-                    $vehicleTypes = $getVehicleTypes($item->vehicle_type ?? null);
+                    $vehicleTypes = $parseVehicleTypes($item->vehicle_type ?? null);
                     $vehicleTypesText = implode(', ', $vehicleTypes);
 
-                    $vehicleSlugs = collect($vehicleTypes)
-                        ->map(fn($type) => $normalizeVehicleSlug($type))
+                    $vehicleKeys = collect($vehicleTypes)
+                        ->map(fn($type) => $vehicleKey($type))
                         ->filter()
                         ->unique()
                         ->values()
@@ -630,6 +668,7 @@
                     $parkingPhoto = $parkingImageUrl($item->parking_photo ?? null);
 
                     $addressParts = array_filter([
+                        $item->parking_address ?? null,
                         $item->landmark ?? null,
                         $item->city_village ?? null,
                         $item->district ?? null,
@@ -651,8 +690,7 @@
 
                 <article
                     class="parking-card"
-                    data-vehicle-slugs="{{ e($vehicleSlugs) }}"
-                    data-vehicle-types="{{ e(strtolower($vehicleTypesText)) }}"
+                    data-vehicle-keys="{{ e($vehicleKeys) }}"
                 >
                     <div class="parking-image-wrap">
                         <img
@@ -746,49 +784,22 @@
         const cards = document.querySelectorAll('.parking-card');
         const noResultBox = document.getElementById('noResultBox');
 
-        function normalizeType(value) {
-            value = String(value || '')
-                .toLowerCase()
-                .replace(/_/g, ' ')
-                .replace(/-/g, ' ')
-                .replace(/\//g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim();
-
-            const aliases = {
-                'two wheeler': ['two wheeler', 'two wheelers', '2 wheeler', '2 wheelers', 'bike', 'bikes', 'motorcycle', 'motorcycles', 'scooter', 'scooters'],
-                'three wheeler': ['three wheeler', 'three wheelers', '3 wheeler', '3 wheelers', 'auto', 'autos', 'auto rickshaw', 'autorickshaw'],
-                'four wheeler': ['four wheeler', 'four wheelers', '4 wheeler', '4 wheelers', 'car', 'cars', 'jeep', 'suv'],
-                'electric vehicle': ['electric vehicle', 'electric vehicles', 'ev', 'e vehicle', 'e vehicles', 'charging', 'electric']
-            };
-
-            for (const slug in aliases) {
-                if (aliases[slug].includes(value)) {
-                    return slug;
-                }
-            }
-
-            return value;
-        }
-
-        function showTab(type) {
-            const selectedType = normalizeType(type);
+        function showTab(selectedKey) {
             let visibleCount = 0;
 
             tabs.forEach(function (tab) {
-                tab.classList.toggle('active', normalizeType(tab.dataset.type) === selectedType);
+                tab.classList.toggle('active', tab.dataset.type === selectedKey);
             });
 
             cards.forEach(function (card) {
-                const slugText = String(card.dataset.vehicleSlugs || '').toLowerCase();
-                const slugs = slugText.split('|').map(normalizeType).filter(Boolean);
+                const keys = String(card.dataset.vehicleKeys || '')
+                    .split('|')
+                    .map(function (item) {
+                        return item.trim();
+                    })
+                    .filter(Boolean);
 
-                const rawTypes = String(card.dataset.vehicleTypes || '').toLowerCase();
-                const rawTypeList = rawTypes.split(',').map(normalizeType).filter(Boolean);
-
-                const finalTypes = [...new Set([...slugs, ...rawTypeList])];
-
-                const shouldShow = finalTypes.length === 0 || finalTypes.includes(selectedType);
+                const shouldShow = keys.length === 0 || keys.includes('all') || keys.includes(selectedKey);
 
                 card.classList.toggle('show', shouldShow);
 
@@ -808,7 +819,11 @@
             });
         });
 
-        showTab('two wheeler');
+        const defaultTab = document.querySelector('.parking-tab.active') || tabs[0];
+
+        if (defaultTab) {
+            showTab(defaultTab.dataset.type);
+        }
     });
 </script>
 

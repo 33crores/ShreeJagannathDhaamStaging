@@ -19,9 +19,10 @@
             font-family: Arial, sans-serif;
             color: #222;
             background:
-                radial-gradient(circle at top left, rgba(255, 122, 26, 0.12), transparent 30%),
-                radial-gradient(circle at top right, rgba(52, 21, 81, 0.08), transparent 32%),
-                linear-gradient(180deg, #fff8f3 0%, #ffffff 48%, #fff7f1 100%);
+                radial-gradient(circle at 12% 8%, rgba(255, 122, 26, 0.16), transparent 28%),
+                radial-gradient(circle at 88% 10%, rgba(52, 21, 81, 0.12), transparent 30%),
+                radial-gradient(circle at 50% 95%, rgba(219, 77, 48, 0.10), transparent 34%),
+                linear-gradient(180deg, #fff8f3 0%, #ffffff 46%, #fff4ec 100%);
         }
 
         .service-page {
@@ -31,14 +32,46 @@
         }
 
         .page-heading-section {
+            position: relative;
             width: 100%;
-            padding: 38px 16px 30px;
+            padding: 44px 16px 42px;
             background:
-                radial-gradient(circle at 85% 15%, rgba(255, 196, 87, 0.30), transparent 32%),
-                linear-gradient(135deg, #341551 0%, #7a2354 45%, #db4d30 78%, #ff7a1a 100%);
+                radial-gradient(circle at 18% 20%, rgba(255, 213, 109, 0.34), transparent 28%),
+                radial-gradient(circle at 85% 18%, rgba(255, 122, 26, 0.30), transparent 26%),
+                linear-gradient(135deg, #341551 0%, #64205c 42%, #db4d30 76%, #ff7a1a 100%);
             color: #ffffff;
             text-align: center;
-            box-shadow: 0 14px 34px rgba(52, 21, 81, 0.18);
+            overflow: hidden;
+            box-shadow: 0 16px 36px rgba(52, 21, 81, 0.20);
+        }
+
+        .page-heading-section::before {
+            content: "";
+            position: absolute;
+            width: 210px;
+            height: 210px;
+            left: -70px;
+            top: -80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .page-heading-section::after {
+            content: "";
+            position: absolute;
+            width: 170px;
+            height: 170px;
+            right: -54px;
+            bottom: -70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .heading-inner {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
         .page-heading-badge {
@@ -48,80 +81,38 @@
             padding: 9px 15px;
             border-radius: 999px;
             background: rgba(255, 255, 255, 0.16);
-            border: 1px solid rgba(255, 255, 255, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.24);
             font-size: 13px;
             font-weight: 800;
             margin-bottom: 14px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .page-heading-section h1 {
             margin: 0;
-            font-size: 38px;
-            line-height: 1.15;
+            font-size: 42px;
+            line-height: 1.14;
             font-weight: 900;
-            letter-spacing: -0.6px;
+            letter-spacing: -0.7px;
+            text-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
         }
 
         .page-heading-section p {
             margin: 12px auto 0;
             max-width: 720px;
             font-size: 16px;
-            line-height: 1.55;
-            color: rgba(255, 255, 255, 0.90);
+            line-height: 1.58;
+            color: rgba(255, 255, 255, 0.92);
         }
 
         .service-wrapper {
             width: 100%;
             max-width: 1180px;
-            margin: 26px auto 0;
+            margin: 30px auto 0;
             padding: 0 18px;
             position: relative;
             z-index: 3;
-        }
-
-        .summary-strip {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
-            margin-bottom: 26px;
-        }
-
-        .summary-card {
-            background: rgba(255, 255, 255, 0.94);
-            border: 1px solid rgba(219, 77, 48, 0.08);
-            border-radius: 18px;
-            padding: 16px;
-            box-shadow: 0 14px 32px rgba(52, 21, 81, 0.10);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .summary-icon {
-            width: 44px;
-            height: 44px;
-            min-width: 44px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #ff7a1a, #db4d30);
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 18px rgba(219, 77, 48, 0.24);
-        }
-
-        .summary-card strong {
-            display: block;
-            color: #341551;
-            font-size: 15px;
-            line-height: 1.2;
-        }
-
-        .summary-card span {
-            display: block;
-            color: #777777;
-            font-size: 12px;
-            margin-top: 3px;
         }
 
         .service-grid {
@@ -332,15 +323,11 @@
             .service-grid {
                 grid-template-columns: 1fr;
             }
-
-            .summary-strip {
-                grid-template-columns: 1fr;
-            }
         }
 
         @media (max-width: 575px) {
             .page-heading-section {
-                padding: 30px 14px 24px;
+                padding: 34px 14px 30px;
             }
 
             .page-heading-badge {
@@ -358,13 +345,8 @@
             }
 
             .service-wrapper {
-                margin-top: 20px;
+                margin-top: 22px;
                 padding: 0 12px;
-            }
-
-            .summary-card {
-                border-radius: 16px;
-                padding: 13px;
             }
 
             .service-card-new {
@@ -434,7 +416,7 @@
         : $rawTitle;
 
     /*
-        Correct screenshot-wise folder:
+        Correct folder:
         public/uploads/public_services
 
         Browser URL:
@@ -503,18 +485,6 @@
         $photo = trim($photo, " \t\n\r\0\x0B\"'");
         $photo = str_replace(['\\/', '\\'], '/', $photo);
 
-        /*
-            DB may contain any old path:
-            assets/uploads/public_services/abc.jpg
-            public/uploads/public_services/abc.jpg
-            uploads/public_services/abc.jpg
-            public_services/abc.jpg
-            abc.jpg
-            full URL
-
-            Final output:
-            /uploads/public_services/abc.jpg
-        */
         if (preg_match('/^https?:\/\//i', $photo)) {
             $path = parse_url($photo, PHP_URL_PATH);
             $filename = basename($path);
@@ -528,67 +498,30 @@
             return $fallbackImage;
         }
 
-        $relativePath = $publicServicePhotoFolder . '/' . $filename;
-        $serverPath = public_path($relativePath);
-
-        if (file_exists($serverPath)) {
-            return $encodeAssetUrl($relativePath);
-        }
-
-        return $fallbackImage;
+        return $encodeAssetUrl($publicServicePhotoFolder . '/' . $filename);
     };
 @endphp
 
 <div class="service-page">
 
     <section class="page-heading-section">
-        <div class="page-heading-badge">
-            <i class="fa-solid fa-location-dot"></i>
-            {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ' : 'Shree Jagannatha Dham' }}
+        <div class="heading-inner">
+            <div class="page-heading-badge">
+                <i class="fa-solid fa-location-dot"></i>
+                {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ' : 'Shree Jagannatha Dham' }}
+            </div>
+
+            <h1>{{ $localizedTitle }}</h1>
+
+            <p>
+                {{ $language === 'Odia'
+                    ? 'ଏଠାରେ ଉପଲବ୍ଧ ସମସ୍ତ ସେବା, ସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
+                    : 'Explore available facilities, locations and directions near Shree Jagannatha Dham.' }}
+            </p>
         </div>
-
-        <h1>{{ $localizedTitle }}</h1>
-
-        <p>
-            {{ $language === 'Odia'
-                ? 'ଏଠାରେ ଉପଲବ୍ଧ ସମସ୍ତ ସେବା, ସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
-                : 'Explore available facilities, locations and directions near Shree Jagannatha Dham.' }}
-        </p>
     </section>
 
     <main class="service-wrapper">
-
-        <div class="summary-strip">
-            <div class="summary-card">
-                <div class="summary-icon">
-                    <i class="fa-solid fa-map-location-dot"></i>
-                </div>
-                <div>
-                    <strong>{{ $language === 'Odia' ? 'ନିକଟସ୍ଥ ସେବା' : 'Nearby Services' }}</strong>
-                    <span>{{ $language === 'Odia' ? 'ସହଜରେ ଖୋଜନ୍ତୁ' : 'Find facilities easily' }}</span>
-                </div>
-            </div>
-
-            <div class="summary-card">
-                <div class="summary-icon">
-                    <i class="fa-solid fa-circle-info"></i>
-                </div>
-                <div>
-                    <strong>{{ $language === 'Odia' ? 'ସେବା ବିବରଣୀ' : 'Service Details' }}</strong>
-                    <span>{{ $language === 'Odia' ? 'ନାମ ଓ ଠିକଣା' : 'Name and address' }}</span>
-                </div>
-            </div>
-
-            <div class="summary-card">
-                <div class="summary-icon">
-                    <i class="fa-solid fa-location-arrow"></i>
-                </div>
-                <div>
-                    <strong>{{ $language === 'Odia' ? 'ଦିଗ ନିର୍ଦ୍ଦେଶ' : 'Directions' }}</strong>
-                    <span>{{ $language === 'Odia' ? 'ମ୍ୟାପ ଦ୍ୱାରା ପହଞ୍ଚନ୍ତୁ' : 'Reach through map' }}</span>
-                </div>
-            </div>
-        </div>
 
         <div class="service-grid">
             @forelse ($services as $service)
