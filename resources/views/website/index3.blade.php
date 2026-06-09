@@ -887,42 +887,7 @@
                 'type' => 'fa',
             ],
 
-              [
-            'url' => $serviceUrl('atm'),
-            'title1' => $language === 'Odia' ? 'ଏଟିଏମ୍' : 'ATM',
-            'title2' => $language === 'Odia' ? 'ସୁବିଧା' : 'Facility',
-            'desc' => $language === 'Odia' ? 'ନିକଟସ୍ଥ ଏଟିଏମ୍ ଖୋଜନ୍ତୁ' : 'Find nearby ATM points',
-            'icon' => 'fa-solid fa-building-columns',
-            'alt' => 'ATM',
-            'type' => 'fa',
-        ],
-        [
-            'url' => $serviceUrl('petrol_pump'),
-            'title1' => $language === 'Odia' ? 'ପେଟ୍ରୋଲ' : 'Petrol',
-            'title2' => $language === 'Odia' ? 'ପମ୍ପ' : 'Pump',
-            'desc' => $language === 'Odia' ? 'ନିକଟସ୍ଥ ଇନ୍ଧନ ସୁବିଧା' : 'Nearby fuel stations',
-            'icon' => 'fa-solid fa-gas-pump',
-            'alt' => 'Petrol Pump',
-            'type' => 'fa',
-        ],
-        [
-            'url' => $serviceUrl('bus_stand'),
-            'title1' => $language === 'Odia' ? 'ବସ୍' : 'Bus',
-            'title2' => $language === 'Odia' ? 'ଷ୍ଟାଣ୍ଡ' : 'Stand',
-            'desc' => $language === 'Odia' ? 'ବସ୍ ଷ୍ଟାଣ୍ଡ ଓ ରୁଟ ସୂଚନା' : 'Bus stand and route info',
-            'icon' => 'fa-solid fa-bus',
-            'alt' => 'Bus Stand',
-            'type' => 'fa',
-        ],
-        [
-            'url' => $serviceUrl('railway_station'),
-            'title1' => $language === 'Odia' ? 'ରେଳୱେ' : 'Railway',
-            'title2' => $language === 'Odia' ? 'ଷ୍ଟେସନ୍' : 'Station',
-            'desc' => $language === 'Odia' ? 'ରେଳ ଷ୍ଟେସନ୍ ଦିଗ ନିର୍ଦ୍ଦେଶ' : 'Railway station directions',
-            'icon' => 'fa-solid fa-train-subway',
-            'alt' => 'Railway Station',
-            'type' => 'fa',
-        ],
+          
       
 
                 [
