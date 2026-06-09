@@ -32,7 +32,7 @@
 
         .page-heading-section {
             width: 100%;
-            padding: 36px 16px 28px;
+            padding: 38px 16px 30px;
             background:
                 radial-gradient(circle at 85% 15%, rgba(255, 196, 87, 0.30), transparent 32%),
                 linear-gradient(135deg, #341551 0%, #7a2354 45%, #db4d30 78%, #ff7a1a 100%);
@@ -434,19 +434,15 @@
         : $rawTitle;
 
     /*
-        Final image folder:
+        Correct service image folder:
         public/assets/uploads/public_services
 
-        Browser image URL:
+        Browser URL:
         /assets/uploads/public_services/image-name.jpg
     */
 
     $publicServicePhotoFolder = 'assets/uploads/public_services';
 
-    /*
-        Removed old parking.jpeg fallback.
-        This blank SVG will show only when image is missing.
-    */
     $fallbackImage = 'data:image/svg+xml;charset=UTF-8,' . rawurlencode('
         <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450">
             <rect width="100%" height="100%" fill="#fff3e8"/>
@@ -456,6 +452,13 @@
             </text>
         </svg>
     ');
+
+    $encodeAssetUrl = function ($path) {
+        $parts = explode('/', $path);
+        $encodedParts = array_map('rawurlencode', $parts);
+
+        return url(implode('/', $encodedParts));
+    };
 
     $getServicePhotos = function ($photoValue) {
         if (is_array($photoValue)) {
@@ -470,14 +473,28 @@
 
         $decoded = json_decode($photoValue, true);
 
-        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-            return array_values(array_filter($decoded));
+        if (json_last_error() === JSON_ERROR_NONE) {
+            if (is_array($decoded)) {
+                return array_values(array_filter($decoded));
+            }
+
+            if (is_string($decoded) && trim($decoded) !== '') {
+                return [trim($decoded)];
+            }
+        }
+
+        $photoValue = str_replace(['\\/', '\\'], '/', $photoValue);
+
+        preg_match_all('/[^,"\[\]]+\.(jpg|jpeg|png|webp|gif)/i', $photoValue, $matches);
+
+        if (!empty($matches[0])) {
+            return array_values(array_filter(array_map('trim', $matches[0])));
         }
 
         return [$photoValue];
     };
 
-    $serviceImageUrl = function ($photo) use ($publicServicePhotoFolder, $fallbackImage) {
+    $serviceImageUrl = function ($photo) use ($publicServicePhotoFolder, $fallbackImage, $encodeAssetUrl) {
         $photo = trim((string) $photo);
 
         if ($photo === '') {
@@ -487,21 +504,6 @@
         $photo = trim($photo, " \t\n\r\0\x0B\"'");
         $photo = str_replace(['\\/', '\\'], '/', $photo);
 
-        /*
-            Whatever old path exists in DB, take only filename.
-
-            Old DB examples:
-            assets/uploads/parking_photo/abc.jpg
-            assets/uploads/public_services/abc.jpg
-            uploads/public_services/abc.jpg
-            public_services/abc.jpg
-            abc.jpg
-            https://domain.com/assets/uploads/parking_photo/abc.jpg
-
-            Final output:
-            /assets/uploads/public_services/abc.jpg
-        */
-
         if (preg_match('/^https?:\/\//i', $photo)) {
             $path = parse_url($photo, PHP_URL_PATH);
             $filename = basename($path);
@@ -509,11 +511,20 @@
             $filename = basename($photo);
         }
 
-        if (!$filename || $filename === '.' || $filename === '/') {
+        $filename = trim(rawurldecode($filename), " \t\n\r\0\x0B\"'");
+
+        if ($filename === '' || $filename === '.' || $filename === '/') {
             return $fallbackImage;
         }
 
-        return asset($publicServicePhotoFolder . '/' . $filename);
+        $relativePath = $publicServicePhotoFolder . '/' . $filename;
+        $serverPath = public_path($relativePath);
+
+        if (file_exists($serverPath)) {
+            return $encodeAssetUrl($relativePath);
+        }
+
+        return $fallbackImage;
     };
 @endphp
 
