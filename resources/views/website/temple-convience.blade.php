@@ -434,14 +434,13 @@
         : $rawTitle;
 
     /*
-        Correct service image folder:
-        public/assets/uploads/public_services
+        Correct screenshot-wise folder:
+        public/uploads/public_services
 
         Browser URL:
-        /assets/uploads/public_services/image-name.jpg
+        /uploads/public_services/image-name.jpg
     */
-
-    $publicServicePhotoFolder = 'assets/uploads/public_services';
+    $publicServicePhotoFolder = 'uploads/public_services';
 
     $fallbackImage = 'data:image/svg+xml;charset=UTF-8,' . rawurlencode('
         <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450">
@@ -504,6 +503,18 @@
         $photo = trim($photo, " \t\n\r\0\x0B\"'");
         $photo = str_replace(['\\/', '\\'], '/', $photo);
 
+        /*
+            DB may contain any old path:
+            assets/uploads/public_services/abc.jpg
+            public/uploads/public_services/abc.jpg
+            uploads/public_services/abc.jpg
+            public_services/abc.jpg
+            abc.jpg
+            full URL
+
+            Final output:
+            /uploads/public_services/abc.jpg
+        */
         if (preg_match('/^https?:\/\//i', $photo)) {
             $path = parse_url($photo, PHP_URL_PATH);
             $filename = basename($path);
