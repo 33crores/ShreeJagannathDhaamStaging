@@ -601,6 +601,7 @@
     $normalizedTitle = strtolower(str_replace('_', ' ', $service_type));
     $isFreeFoodPage = $normalizedTitle === 'free food';
     $isChargingStationPage = $normalizedTitle === 'charging station';
+    $isPoliceOutpostPage = $normalizedTitle === 'police outpost';
 
     $odiaTitles = [
         'drinking water' => 'ବିଶୁଦ୍ଧ ପାନୀୟ ଜଳ',
@@ -621,6 +622,7 @@
         'railway station' => 'ରେଲୱେ ଷ୍ଟେସନ୍',
         'hospital' => 'ହସ୍ପିଟାଲ୍',
         'police station' => 'ପୋଲିସ୍ ଷ୍ଟେସନ୍',
+        'police outpost' => 'ପୋଲିସ୍ ଆଉଟପୋଷ୍ଟ',
 
     ];
 
@@ -644,6 +646,7 @@
 
     $serviceTypeIconMap = [
         'charging station' => 'fa-solid fa-car-bolt',
+        'police outpost' => 'fa-solid fa-shield-halved',
         'free food' => 'fa-solid fa-bowl-rice',
     ];
 
@@ -760,7 +763,7 @@
     <section class="page-heading-section">
         <div class="heading-inner">
             <div class="page-heading-badge">
-                <i class="{{ $isFreeFoodPage ? 'fa-solid fa-bowl-food' : ($isChargingStationPage ? 'fa-solid fa-car-bolt' : 'fa-solid fa-location-dot') }}"></i>
+                <i class="{{ $isFreeFoodPage ? 'fa-solid fa-bowl-food' : ($isChargingStationPage ? 'fa-solid fa-car-bolt' : ($isPoliceOutpostPage ? 'fa-solid fa-shield-halved' : 'fa-solid fa-location-dot')) }}"></i>
                 {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ' : 'Shree Jagannatha Dham' }}
             </div>
 
@@ -775,6 +778,10 @@
                     {{ $language === 'Odia'
                         ? 'ଚାର୍ଜିଂ ସ୍ଟେସନ୍ ଅବସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
                         : 'Find charging station locations and directions near Shree Jagannatha Dham.' }}
+                @elseif($isPoliceOutpostPage)
+                    {{ $language === 'Odia'
+                        ? 'ପୋଲିସ୍ ଆଉଟପୋଷ୍ଟ ଅବସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
+                        : 'Find police outpost locations and directions near Shree Jagannatha Dham.' }}
                 @else
                     {{ $language === 'Odia'
                         ? 'ଏଠାରେ ଉପଲବ୍ଧ ସମସ୍ତ ସେବା, ସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'

@@ -896,6 +896,15 @@
                 'type' => 'fa',
             ],
             [
+                'url' => $serviceUrl('police_outpost'),
+                'title1' => $language === 'Odia' ? 'ପୋଲିସ୍' : 'Police',
+                'title2' => $language === 'Odia' ? 'ଆଉଟପୋଷ୍ଟ' : 'Outpost',
+                'desc' => $language === 'Odia' ? 'ପୋଲିସ୍ ଆଉଟପୋଷ୍ଟ ସ୍ଥଳ ତଥ୍ୟ' : 'Police outpost locations',
+                'icon' => 'fa-solid fa-shield-halved',
+                'alt' => 'Police Outpost',
+                'type' => 'fa',
+            ],
+            [
                 'url' => route('services.byType', 'hospital'),
                 'title1' => $language === 'Odia' ? 'ହସ୍ପିଟାଲ୍' : 'Hospital',
                 'title2' => $language === 'Odia' ? 'ସୁବିଧା' : 'Facility',
