@@ -41,25 +41,22 @@
                                 <div class="form-group">
                                     <label for="service_type">Service Type</label>
                                     <select class="form-control" id="service_type" name="service_type" required>
-                                        <option value="locker">Locker</option>
-                                        <option value="shoe_stand">Shoe Stand</option>
-                                        <option value="drinking_water">Drinking Water</option>
-                                        <option value="toilet">Toilet</option>
-                                        <option value="free_food">Free Food</option>
-                                        <option value="ratha_yatra_mela">Ratha Yatra Mela</option>
-                                        <option value="beach">Beach</option>
-                                        <option value="life_guard_booth">Life Guard Booth</option>
-                                        <option value="charging_station">Charging Station</option>
-                                        <option value="petrol_pump">Petrol Pump</option>
-                                        <option value="atm">ATM</option>
-                                        <option value="lost_and_found_booth">Lost and Found Booth</option>
+                                        <option value="">Select Service Type</option>
+
+                                        @foreach ($serviceTypes as $value => $label)
+                                            <option value="{{ $value }}"
+                                                {{ old('service_type') == $value ? 'selected' : '' }}>
+                                                {{ $label }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="service_name">Service Name</label>
-                                    <input type="text" class="form-control" id="service_name" name="service_name" required>
+                                    <input type="text" class="form-control" id="service_name" name="service_name"
+                                        required>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -83,19 +80,19 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="contact_no">Contact No</label>
-                                    <input type="text" class="form-control" id="contact_no" name="contact_no" >
+                                    <input type="text" class="form-control" id="contact_no" name="contact_no">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="whatsapp_no">WhatsApp No</label>
-                                    <input type="text" class="form-control" id="whatsapp_no" name="whatsapp_no" >
+                                    <input type="text" class="form-control" id="whatsapp_no" name="whatsapp_no">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="email">Email</label>
-                                    <input type="email" class="form-control" id="email" name="email" >
+                                    <input type="email" class="form-control" id="email" name="email">
                                 </div>
                             </div>
                             <div class="col-md-4">

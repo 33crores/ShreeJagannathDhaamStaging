@@ -52,7 +52,7 @@
                                 @foreach ($services as $index => $service)
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                        <td>{{ $service->service_type }}</td>
+                                        <td>{{ $serviceTypes[$service->service_type] ?? ucwords(str_replace('_', ' ', $service->service_type)) }}</td>
                                         <td>{{ $service->service_name }}</td>
                                         <td>
                                             <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
@@ -160,54 +160,32 @@
                                                             <div class="col-md-4">
                                                                 <div class="form-group">
                                                                     <label for="language">Language</label>
-                                                                    <select class="form-control" id="language" name="language" required>
-                                                                        <option value="English" {{ $service->language == 'English' ? 'selected' : '' }}>English</option>
-                                                                        <option value="Odia" {{ $service->language == 'Odia' ? 'selected' : '' }}>Odia</option>
+                                                                    <select class="form-control" id="language"
+                                                                        name="language" required>
+                                                                        <option value="English"
+                                                                            {{ $service->language == 'English' ? 'selected' : '' }}>
+                                                                            English</option>
+                                                                        <option value="Odia"
+                                                                            {{ $service->language == 'Odia' ? 'selected' : '' }}>
+                                                                            Odia</option>
                                                                     </select>
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-4">
                                                                 <div class="form-group">
-                                                                    <label for="service_type">Service Type</label>
-                                                                    <select class="form-control" id="service_type"
+                                                                    <label for="service_type{{ $service->id }}">Service
+                                                                        Type</label>
+                                                                    <select class="form-control"
+                                                                        id="service_type{{ $service->id }}"
                                                                         name="service_type" required>
-                                                                        <option value="locker"
-                                                                            {{ $service->service_type == 'locker' ? 'selected' : '' }}>
-                                                                            Locker</option>
+                                                                        <option value="">Select Service Type</option>
 
-                                                                            <option value="toilet"
-                                                                            {{ $service->service_type == 'toilet' ? 'selected' : '' }}>
-                                                                            Toilet</option>
-                                                                        <option value="shoe_stand"
-                                                                            {{ $service->service_type == 'shoe_stand' ? 'selected' : '' }}>
-                                                                            Shoe Stand</option>
-                                                                        <option value="drinking_water"
-                                                                            {{ $service->service_type == 'drinking_water' ? 'selected' : '' }}>
-                                                                            Drinking Water</option>
-                                                                        <option value="free_food"
-                                                                            {{ $service->service_type == 'free_food' ? 'selected' : '' }}>
-                                                                            Free Food</option>
-                                                                        <option value="ratha_yatra_mela"
-                                                                            {{ $service->service_type == 'ratha_yatra_mela' ? 'selected' : '' }}>
-                                                                            Ratha Yatra Mela</option>
-                                                                        <option value="beach"
-                                                                            {{ $service->service_type == 'beach' ? 'selected' : '' }}>
-                                                                            Beach</option>
-                                                                        <option value="life_guard_booth"
-                                                                            {{ $service->service_type == 'life_guard_booth' ? 'selected' : '' }}>
-                                                                            Life Guard Booth</option>
-                                                                        <option value="charging_station"
-                                                                            {{ $service->service_type == 'charging_station' ? 'selected' : '' }}>
-                                                                            Charging Station</option>
-                                                                        <option value="petrol_pump"
-                                                                            {{ $service->service_type == 'petrol_pump' ? 'selected' : '' }}>
-                                                                            Petrol Pump</option>
-                                                                        <option value="atm"
-                                                                            {{ $service->service_type == 'atm' ? 'selected' : '' }}>
-                                                                            ATM</option>
-                                                                        <option value="lost_and_found_booth"
-                                                                            {{ $service->service_type == 'lost_and_found_booth' ? 'selected' : '' }}>
-                                                                            Lost and Found Booth</option>
+                                                                        @foreach ($serviceTypes as $value => $label)
+                                                                            <option value="{{ $value }}"
+                                                                                {{ $service->service_type == $value ? 'selected' : '' }}>
+                                                                                {{ $label }}
+                                                                            </option>
+                                                                        @endforeach
                                                                     </select>
                                                                 </div>
                                                             </div>
@@ -256,7 +234,7 @@
                                                                     <label for="contact_no">Contact No</label>
                                                                     <input type="text" class="form-control"
                                                                         id="contact_no" name="contact_no"
-                                                                        value="{{ $service->contact_no }}" >
+                                                                        value="{{ $service->contact_no }}">
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-4">
@@ -264,7 +242,7 @@
                                                                     <label for="whatsapp_no">WhatsApp No</label>
                                                                     <input type="text" class="form-control"
                                                                         id="whatsapp_no" name="whatsapp_no"
-                                                                        value="{{ $service->whatsapp_no }}" >
+                                                                        value="{{ $service->whatsapp_no }}">
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-4">
@@ -272,7 +250,7 @@
                                                                     <label for="email">Email</label>
                                                                     <input type="email" class="form-control"
                                                                         id="email" name="email"
-                                                                        value="{{ $service->email }}" >
+                                                                        value="{{ $service->email }}">
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-4">
