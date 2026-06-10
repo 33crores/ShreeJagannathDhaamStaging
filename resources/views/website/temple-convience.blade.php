@@ -462,15 +462,23 @@
         }
 
         /* Drinking Water Theme */
+        /* Drinking Water Theme - Same Police Color Pattern */
         .water-card {
             background:
-                radial-gradient(circle at top right, rgba(14, 165, 233, 0.16), transparent 36%),
-                linear-gradient(180deg, #ffffff 0%, #effaff 100%);
-            border: 1px solid rgba(14, 165, 233, 0.20);
+                radial-gradient(circle at top right, rgba(219, 77, 48, 0.10), transparent 36%),
+                radial-gradient(circle at bottom left, rgba(52, 21, 81, 0.08), transparent 34%),
+                linear-gradient(180deg, #ffffff 0%, #fff8f3 100%);
+            border: 1px solid rgba(52, 21, 81, 0.12);
+            box-shadow: 0 12px 30px rgba(52, 21, 81, 0.11);
+        }
+
+        .water-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 18px 38px rgba(52, 21, 81, 0.18);
         }
 
         .water-card::before {
-            background: rgba(14, 165, 233, 0.14);
+            background: rgba(219, 77, 48, 0.10);
         }
 
         .water-card::after {
@@ -481,22 +489,41 @@
             left: -38px;
             bottom: -42px;
             border-radius: 50%;
-            background: rgba(52, 21, 81, 0.06);
+            background: rgba(52, 21, 81, 0.08);
         }
 
         .water-card .small-service-icon {
-            background: linear-gradient(135deg, #0284c7, #0ea5e9, #38bdf8);
-            box-shadow: 0 10px 18px rgba(14, 165, 233, 0.28);
+            background: linear-gradient(135deg, #341551, #64205c, #db4d30);
+            box-shadow: 0 12px 22px rgba(52, 21, 81, 0.24);
         }
 
-        .water-card .small-service-btn {
-            background: linear-gradient(135deg, #075985, #0284c7, #0ea5e9);
-            box-shadow: 0 10px 18px rgba(14, 165, 233, 0.24);
+        .water-card .small-service-icon i {
+            color: #ffffff;
+        }
+
+        .water-card .small-service-title {
+            color: #341551;
+        }
+
+        .water-card .small-service-badge {
+            background: rgba(21, 128, 61, 0.10);
+            color: #15803d;
         }
 
         .water-card .small-service-info-row i {
-            background: #e0f2fe;
-            color: #0284c7;
+            background: #fff0e8;
+            color: #db4d30;
+        }
+
+        .water-card .small-service-btn {
+            background: linear-gradient(135deg, #341551, #db4d30, #ff7a1a);
+            box-shadow: 0 10px 18px rgba(52, 21, 81, 0.20);
+        }
+
+        .water-card .small-service-btn:hover {
+            color: #ffffff;
+            text-decoration: none;
+            transform: translateY(-2px);
         }
 
         /* Police Logo Small Card Design */
@@ -689,6 +716,7 @@
         }
 
         @media (max-width: 1199px) {
+
             .small-card-grid,
             .police-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -815,61 +843,58 @@
 
 <body>
 
-@php
-    $language = $language ?? request('language', session('app_language', 'English'));
-    $language = $language === 'Odia' ? 'Odia' : 'English';
+    @php
+        $language = $language ?? request('language', session('app_language', 'English'));
+        $language = $language === 'Odia' ? 'Odia' : 'English';
 
-    $rawTitle = ucfirst(str_replace('_', ' ', $service_type));
-    $normalizedTitle = strtolower(str_replace('_', ' ', $service_type));
+        $rawTitle = ucfirst(str_replace('_', ' ', $service_type));
+        $normalizedTitle = strtolower(str_replace('_', ' ', $service_type));
 
-    $isFreeFoodPage = $normalizedTitle === 'free food';
-    $isDrinkingWaterPage = $normalizedTitle === 'drinking water';
-    $isChargingStationPage = $normalizedTitle === 'charging station';
-    $isPoliceStationPage = $normalizedTitle === 'police station';
-    $isPoliceOutpostPage = $normalizedTitle === 'police outpost';
-    $isPolicePage = $isPoliceStationPage || $isPoliceOutpostPage;
-    $isSmallIconCardPage = $isFreeFoodPage || $isDrinkingWaterPage;
+        $isFreeFoodPage = $normalizedTitle === 'free food';
+        $isDrinkingWaterPage = $normalizedTitle === 'drinking water';
+        $isChargingStationPage = $normalizedTitle === 'charging station';
+        $isPoliceStationPage = $normalizedTitle === 'police station';
+        $isPoliceOutpostPage = $normalizedTitle === 'police outpost';
+        $isPolicePage = $isPoliceStationPage || $isPoliceOutpostPage;
+        $isSmallIconCardPage = $isFreeFoodPage || $isDrinkingWaterPage;
 
-    $odiaTitles = [
-        'drinking water' => 'ବିଶୁଦ୍ଧ ପାନୀୟ ଜଳ',
-        'emergency' => 'ଜରୁରୀ ସେବା',
-        'specially abled person' => 'ବିଶେଷ କ୍ଷମତା ବ୍ୟକ୍ତି',
-        'abled person' => 'ଦିବ୍ୟାଙ୍ଗ ସହାୟତା',
-        'ratha yatra mela' => 'ରଥ ଯାତ୍ରା ରୁଟ ମାନଚିତ୍ର',
-        'route map' => 'ମାର୍ଗ ମାନଚିତ୍ର',
-        'lost and found booth' => 'ହଜିବା ଓ ଖୋଜିବା କେନ୍ଦ୍ର',
-        'toilet' => 'ଶୌଚାଳୟ',
-        'beach' => 'ବେଳାଭୂମି',
-        'life guard booth' => 'ଲାଇଫ ଗାର୍ଡ ସେବା',
-        'charging station' => 'ଚାର୍ଜିଂ ଷ୍ଟେସନ୍',
-        'petrol pump' => 'ପେଟ୍ରୋଲ ପମ୍ପ',
-        'atm' => 'ଏଟିଏମ୍',
-        'free food' => 'ମାଗଣା ଖାଦ୍ୟ',
-        'bus stand' => 'ବସ୍ ଷ୍ଟାଣ୍ଡ',
-        'railway station' => 'ରେଲୱେ ଷ୍ଟେସନ୍',
-        'hospital' => 'ହସ୍ପିଟାଲ୍',
-        'police station' => 'ପୋଲିସ୍ ଷ୍ଟେସନ୍',
-        'police outpost' => 'ପୋଲିସ୍ ଆଉଟପୋଷ୍ଟ',
-    ];
+        $odiaTitles = [
+            'drinking water' => 'ବିଶୁଦ୍ଧ ପାନୀୟ ଜଳ',
+            'emergency' => 'ଜରୁରୀ ସେବା',
+            'specially abled person' => 'ବିଶେଷ କ୍ଷମତା ବ୍ୟକ୍ତି',
+            'abled person' => 'ଦିବ୍ୟାଙ୍ଗ ସହାୟତା',
+            'ratha yatra mela' => 'ରଥ ଯାତ୍ରା ରୁଟ ମାନଚିତ୍ର',
+            'route map' => 'ମାର୍ଗ ମାନଚିତ୍ର',
+            'lost and found booth' => 'ହଜିବା ଓ ଖୋଜିବା କେନ୍ଦ୍ର',
+            'toilet' => 'ଶୌଚାଳୟ',
+            'beach' => 'ବେଳାଭୂମି',
+            'life guard booth' => 'ଲାଇଫ ଗାର୍ଡ ସେବା',
+            'charging station' => 'ଚାର୍ଜିଂ ଷ୍ଟେସନ୍',
+            'petrol pump' => 'ପେଟ୍ରୋଲ ପମ୍ପ',
+            'atm' => 'ଏଟିଏମ୍',
+            'free food' => 'ମାଗଣା ଖାଦ୍ୟ',
+            'bus stand' => 'ବସ୍ ଷ୍ଟାଣ୍ଡ',
+            'railway station' => 'ରେଲୱେ ଷ୍ଟେସନ୍',
+            'hospital' => 'ହସ୍ପିଟାଲ୍',
+            'police station' => 'ପୋଲିସ୍ ଷ୍ଟେସନ୍',
+            'police outpost' => 'ପୋଲିସ୍ ଆଉଟପୋଷ୍ଟ',
+        ];
 
-    $localizedTitle = $language === 'Odia'
-        ? ($odiaTitles[$normalizedTitle] ?? $rawTitle)
-        : $rawTitle;
+        $localizedTitle = $language === 'Odia' ? $odiaTitles[$normalizedTitle] ?? $rawTitle : $rawTitle;
 
-    $publicServicePhotoFolders = [
-        'assets/uploads/public_services',
-        'uploads/public_services',
-    ];
+        $publicServicePhotoFolders = ['assets/uploads/public_services', 'uploads/public_services'];
 
-    $serviceTypeIconMap = [
-        'charging station' => 'fa-solid fa-car-bolt',
-        'police station' => 'fa-solid fa-building-shield',
-        'police outpost' => 'fa-solid fa-shield-halved',
-        'free food' => 'fa-solid fa-bowl-rice',
-        'drinking water' => 'fa-solid fa-droplet',
-    ];
+        $serviceTypeIconMap = [
+            'charging station' => 'fa-solid fa-car-bolt',
+            'police station' => 'fa-solid fa-building-shield',
+            'police outpost' => 'fa-solid fa-shield-halved',
+            'free food' => 'fa-solid fa-bowl-rice',
+            'drinking water' => 'fa-solid fa-droplet',
+        ];
 
-    $fallbackImage = 'data:image/svg+xml;charset=UTF-8,' . rawurlencode('
+        $fallbackImage =
+            'data:image/svg+xml;charset=UTF-8,' .
+            rawurlencode('
         <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450">
             <rect width="100%" height="100%" fill="#fff3e8"/>
             <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
@@ -879,302 +904,205 @@
         </svg>
     ');
 
-    $encodeAssetUrl = function ($path) {
-        $path = ltrim(str_replace('\\', '/', $path), '/');
-        $parts = explode('/', $path);
-        $encodedParts = array_map('rawurlencode', $parts);
+        $encodeAssetUrl = function ($path) {
+            $path = ltrim(str_replace('\\', '/', $path), '/');
+            $parts = explode('/', $path);
+            $encodedParts = array_map('rawurlencode', $parts);
 
-        return url(implode('/', $encodedParts));
-    };
+            return url(implode('/', $encodedParts));
+        };
 
-    $getServicePhotos = function ($photoValue) {
-        if (is_array($photoValue)) {
-            return array_values(array_filter($photoValue));
-        }
-
-        $photoValue = trim((string) $photoValue);
-
-        if ($photoValue === '' || $photoValue === '[]' || strtolower($photoValue) === 'null') {
-            return [];
-        }
-
-        $decoded = json_decode($photoValue, true);
-
-        if (json_last_error() === JSON_ERROR_NONE) {
-            if (is_array($decoded)) {
-                return array_values(array_filter($decoded));
+        $getServicePhotos = function ($photoValue) {
+            if (is_array($photoValue)) {
+                return array_values(array_filter($photoValue));
             }
 
-            if (is_string($decoded) && trim($decoded) !== '') {
-                return [trim($decoded)];
+            $photoValue = trim((string) $photoValue);
+
+            if ($photoValue === '' || $photoValue === '[]' || strtolower($photoValue) === 'null') {
+                return [];
             }
-        }
 
-        $photoValue = str_replace(['\\/', '\\'], '/', $photoValue);
+            $decoded = json_decode($photoValue, true);
 
-        preg_match_all('/[^,"\[\]]+\.(jpg|jpeg|png|webp|gif|svg)/i', $photoValue, $matches);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                if (is_array($decoded)) {
+                    return array_values(array_filter($decoded));
+                }
 
-        if (!empty($matches[0])) {
-            return array_values(array_filter(array_map('trim', $matches[0])));
-        }
+                if (is_string($decoded) && trim($decoded) !== '') {
+                    return [trim($decoded)];
+                }
+            }
 
-        return [$photoValue];
-    };
+            $photoValue = str_replace(['\\/', '\\'], '/', $photoValue);
 
-    $serviceImageData = function ($photo) use ($publicServicePhotoFolders, $fallbackImage, $encodeAssetUrl) {
-        $photo = trim((string) $photo);
+            preg_match_all('/[^,"\[\]]+\.(jpg|jpeg|png|webp|gif|svg)/i', $photoValue, $matches);
 
-        if ($photo === '') {
+            if (!empty($matches[0])) {
+                return array_values(array_filter(array_map('trim', $matches[0])));
+            }
+
+            return [$photoValue];
+        };
+
+        $serviceImageData = function ($photo) use ($publicServicePhotoFolders, $fallbackImage, $encodeAssetUrl) {
+            $photo = trim((string) $photo);
+
+            if ($photo === '') {
+                return [
+                    'url' => $fallbackImage,
+                    'found' => false,
+                ];
+            }
+
+            $photo = trim($photo, " \t\n\r\0\x0B\"'");
+            $photo = str_replace(['\\/', '\\'], '/', $photo);
+
+            $isRemoteUrl = preg_match('/^https?:\/\//i', $photo);
+
+            if ($isRemoteUrl) {
+                $photoPath = parse_url($photo, PHP_URL_PATH);
+                $relativePathFromDb = ltrim((string) $photoPath, '/');
+            } else {
+                $relativePathFromDb = ltrim($photo, '/');
+            }
+
+            $relativePathFromDb = str_replace('\\', '/', $relativePathFromDb);
+            $relativePathFromDb = rawurldecode($relativePathFromDb);
+            $relativePathFromDb = trim($relativePathFromDb, " \t\n\r\0\x0B\"'");
+
+            $filename = basename($relativePathFromDb);
+            $filename = trim($filename, " \t\n\r\0\x0B\"'");
+
+            $candidatePaths = [];
+
+            if ($relativePathFromDb !== '' && preg_match('/\.(jpg|jpeg|png|webp|gif|svg)$/i', $relativePathFromDb)) {
+                $candidatePaths[] = $relativePathFromDb;
+            }
+
+            if ($filename !== '' && $filename !== '.' && $filename !== '/') {
+                foreach ($publicServicePhotoFolders as $folder) {
+                    $candidatePaths[] = $folder . '/' . $filename;
+                }
+            }
+
+            $candidatePaths = array_values(array_unique(array_filter($candidatePaths)));
+
+            foreach ($candidatePaths as $candidatePath) {
+                $candidatePath = ltrim(str_replace('\\', '/', $candidatePath), '/');
+
+                if (file_exists(public_path($candidatePath))) {
+                    return [
+                        'url' => $encodeAssetUrl($candidatePath),
+                        'found' => true,
+                    ];
+                }
+            }
+
+            if ($isRemoteUrl) {
+                return [
+                    'url' => $photo,
+                    'found' => true,
+                ];
+            }
+
             return [
                 'url' => $fallbackImage,
                 'found' => false,
             ];
-        }
+        };
+    @endphp
 
-        $photo = trim($photo, " \t\n\r\0\x0B\"'");
-        $photo = str_replace(['\\/', '\\'], '/', $photo);
+    <div class="service-page">
 
-        $isRemoteUrl = preg_match('/^https?:\/\//i', $photo);
+        <section class="page-heading-section">
+            <div class="heading-inner">
+                <div class="page-heading-badge">
+                    <i
+                        class="{{ $isFreeFoodPage ? 'fa-solid fa-bowl-food' : ($isDrinkingWaterPage ? 'fa-solid fa-droplet' : ($isChargingStationPage ? 'fa-solid fa-car-bolt' : ($isPoliceStationPage ? 'fa-solid fa-building-shield' : ($isPoliceOutpostPage ? 'fa-solid fa-shield-halved' : 'fa-solid fa-location-dot')))) }}"></i>
+                    {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ' : 'Shree Jagannatha Dham' }}
+                </div>
 
-        if ($isRemoteUrl) {
-            $photoPath = parse_url($photo, PHP_URL_PATH);
-            $relativePathFromDb = ltrim((string) $photoPath, '/');
-        } else {
-            $relativePathFromDb = ltrim($photo, '/');
-        }
+                <h1>{{ $localizedTitle }}</h1>
 
-        $relativePathFromDb = str_replace('\\', '/', $relativePathFromDb);
-        $relativePathFromDb = rawurldecode($relativePathFromDb);
-        $relativePathFromDb = trim($relativePathFromDb, " \t\n\r\0\x0B\"'");
-
-        $filename = basename($relativePathFromDb);
-        $filename = trim($filename, " \t\n\r\0\x0B\"'");
-
-        $candidatePaths = [];
-
-        if ($relativePathFromDb !== '' && preg_match('/\.(jpg|jpeg|png|webp|gif|svg)$/i', $relativePathFromDb)) {
-            $candidatePaths[] = $relativePathFromDb;
-        }
-
-        if ($filename !== '' && $filename !== '.' && $filename !== '/') {
-            foreach ($publicServicePhotoFolders as $folder) {
-                $candidatePaths[] = $folder . '/' . $filename;
-            }
-        }
-
-        $candidatePaths = array_values(array_unique(array_filter($candidatePaths)));
-
-        foreach ($candidatePaths as $candidatePath) {
-            $candidatePath = ltrim(str_replace('\\', '/', $candidatePath), '/');
-
-            if (file_exists(public_path($candidatePath))) {
-                return [
-                    'url' => $encodeAssetUrl($candidatePath),
-                    'found' => true,
-                ];
-            }
-        }
-
-        if ($isRemoteUrl) {
-            return [
-                'url' => $photo,
-                'found' => true,
-            ];
-        }
-
-        return [
-            'url' => $fallbackImage,
-            'found' => false,
-        ];
-    };
-@endphp
-
-<div class="service-page">
-
-    <section class="page-heading-section">
-        <div class="heading-inner">
-            <div class="page-heading-badge">
-                <i class="{{ $isFreeFoodPage ? 'fa-solid fa-bowl-food' : ($isDrinkingWaterPage ? 'fa-solid fa-droplet' : ($isChargingStationPage ? 'fa-solid fa-car-bolt' : ($isPoliceStationPage ? 'fa-solid fa-building-shield' : ($isPoliceOutpostPage ? 'fa-solid fa-shield-halved' : 'fa-solid fa-location-dot')))) }}"></i>
-                {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ' : 'Shree Jagannatha Dham' }}
+                <p>
+                    @if ($isFreeFoodPage)
+                        {{ $language === 'Odia'
+                            ? 'ମାଗଣା ଖାଦ୍ୟ ସେବା, ସ୍ଥାନ, ସମୟ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
+                            : 'Find free food service points, timings, locations and directions near Shree Jagannatha Dham.' }}
+                    @elseif($isDrinkingWaterPage)
+                        {{ $language === 'Odia'
+                            ? 'ବିଶୁଦ୍ଧ ପାନୀୟ ଜଳ ସ୍ଥାନ, ସମୟ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
+                            : 'Find drinking water points, timings, locations and directions near Shree Jagannatha Dham.' }}
+                    @elseif($isChargingStationPage)
+                        {{ $language === 'Odia'
+                            ? 'ଚାର୍ଜିଂ ସ୍ଟେସନ୍ ଅବସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
+                            : 'Find charging station locations and directions near Shree Jagannatha Dham.' }}
+                    @elseif($isPoliceStationPage)
+                        {{ $language === 'Odia'
+                            ? 'ପୋଲିସ୍ ଷ୍ଟେସନ୍ ଅବସ୍ଥାନ, ଯୋଗାଯୋଗ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
+                            : 'Find police station locations, contact details and directions near Shree Jagannatha Dham.' }}
+                    @elseif($isPoliceOutpostPage)
+                        {{ $language === 'Odia'
+                            ? 'ପୋଲିସ୍ ଆଉଟପୋଷ୍ଟ ଅବସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
+                            : 'Find police outpost locations and directions near Shree Jagannatha Dham.' }}
+                    @else
+                        {{ $language === 'Odia'
+                            ? 'ଏଠାରେ ଉପଲବ୍ଧ ସମସ୍ତ ସେବା, ସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
+                            : 'Explore available facilities, locations and directions near Shree Jagannatha Dham.' }}
+                    @endif
+                </p>
             </div>
+        </section>
 
-            <h1>{{ $localizedTitle }}</h1>
+        <main class="service-wrapper">
 
-            <p>
-                @if($isFreeFoodPage)
-                    {{ $language === 'Odia'
-                        ? 'ମାଗଣା ଖାଦ୍ୟ ସେବା, ସ୍ଥାନ, ସମୟ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
-                        : 'Find free food service points, timings, locations and directions near Shree Jagannatha Dham.' }}
-                @elseif($isDrinkingWaterPage)
-                    {{ $language === 'Odia'
-                        ? 'ବିଶୁଦ୍ଧ ପାନୀୟ ଜଳ ସ୍ଥାନ, ସମୟ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
-                        : 'Find drinking water points, timings, locations and directions near Shree Jagannatha Dham.' }}
-                @elseif($isChargingStationPage)
-                    {{ $language === 'Odia'
-                        ? 'ଚାର୍ଜିଂ ସ୍ଟେସନ୍ ଅବସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
-                        : 'Find charging station locations and directions near Shree Jagannatha Dham.' }}
-                @elseif($isPoliceStationPage)
-                    {{ $language === 'Odia'
-                        ? 'ପୋଲିସ୍ ଷ୍ଟେସନ୍ ଅବସ୍ଥାନ, ଯୋଗାଯୋଗ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
-                        : 'Find police station locations, contact details and directions near Shree Jagannatha Dham.' }}
-                @elseif($isPoliceOutpostPage)
-                    {{ $language === 'Odia'
-                        ? 'ପୋଲିସ୍ ଆଉଟପୋଷ୍ଟ ଅବସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
-                        : 'Find police outpost locations and directions near Shree Jagannatha Dham.' }}
-                @else
-                    {{ $language === 'Odia'
-                        ? 'ଏଠାରେ ଉପଲବ୍ଧ ସମସ୍ତ ସେବା, ସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
-                        : 'Explore available facilities, locations and directions near Shree Jagannatha Dham.' }}
-                @endif
-            </p>
-        </div>
-    </section>
+            @if ($isSmallIconCardPage)
+                <div class="small-card-grid">
+                    @forelse ($services as $service)
+                        @php
+                            $addressParts = array_filter([
+                                $service->landmark ?? null,
+                                $service->city_village ?? null,
+                                $service->district ?? null,
+                                $service->state ?? null,
+                            ]);
 
-    <main class="service-wrapper">
+                            $address = count($addressParts) ? implode(', ', $addressParts) : 'N/A';
 
-        @if($isSmallIconCardPage)
-            <div class="small-card-grid">
-                @forelse ($services as $service)
-                    @php
-                        $addressParts = array_filter([
-                            $service->landmark ?? null,
-                            $service->city_village ?? null,
-                            $service->district ?? null,
-                            $service->state ?? null,
-                        ]);
+                            $mapUrl =
+                                $service->google_map_link ?? ($service->map_url ?? ($service->google_map_url ?? null));
 
-                        $address = count($addressParts) ? implode(', ', $addressParts) : 'N/A';
+                            $cardClass = $isDrinkingWaterPage ? 'water-card' : 'free-food-card';
+                            $cardIcon = $isDrinkingWaterPage ? 'fa-solid fa-glass-water' : 'fa-solid fa-bowl-rice';
+                            $badgeText = $isDrinkingWaterPage
+                                ? ($language === 'Odia'
+                                    ? 'ପାନୀୟ ଜଳ'
+                                    : 'Water')
+                                : ($language === 'Odia'
+                                    ? 'ମାଗଣା'
+                                    : 'Free');
+                        @endphp
 
-                        $mapUrl = $service->google_map_link
-                            ?? $service->map_url
-                            ?? $service->google_map_url
-                            ?? null;
-
-                        $cardClass = $isDrinkingWaterPage ? 'water-card' : 'free-food-card';
-                        $cardIcon = $isDrinkingWaterPage ? 'fa-solid fa-droplet' : 'fa-solid fa-bowl-rice';
-                        $badgeText = $isDrinkingWaterPage
-                            ? ($language === 'Odia' ? 'ପାନୀୟ ଜଳ' : 'Water')
-                            : ($language === 'Odia' ? 'ମାଗଣା' : 'Free');
-                    @endphp
-
-                    <article class="small-service-card {{ $cardClass }}">
-                        <div class="small-service-icon">
-                            <i class="{{ $cardIcon }}"></i>
-                        </div>
-
-                        <div class="small-service-mobile-content">
-                            <div class="small-service-top">
-                                <h5 class="small-service-title">{{ $service->service_name ?? $localizedTitle }}</h5>
-
-                                <span class="small-service-badge">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                    {{ $badgeText }}
-                                </span>
+                        <article class="small-service-card {{ $cardClass }}">
+                            <div class="small-service-icon">
+                                <i class="{{ $cardIcon }}"></i>
                             </div>
 
-                            <div class="small-service-info">
-                                <div class="small-service-info-row">
-                                    <i class="fa-solid fa-location-dot"></i>
-                                    <div>
-                                        <strong>{{ $language === 'Odia' ? 'ଠିକଣା' : 'Address' }}</strong>
-                                        {{ $address }}
-                                    </div>
+                            <div class="small-service-mobile-content">
+                                <div class="small-service-top">
+                                    <h5 class="small-service-title">{{ $service->service_name ?? $localizedTitle }}
+                                    </h5>
+
+                                    <span class="small-service-badge">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        {{ $badgeText }}
+                                    </span>
                                 </div>
 
-                                @if(!empty($service->opening_time) || !empty($service->closing_time))
+                                <div class="small-service-info">
                                     <div class="small-service-info-row">
-                                        <i class="fa-solid fa-clock"></i>
-                                        <div>
-                                            <strong>{{ $language === 'Odia' ? 'ସମୟ' : 'Timing' }}</strong>
-                                            {{ $service->opening_time ?? 'N/A' }} - {{ $service->closing_time ?? 'N/A' }}
-                                        </div>
-                                    </div>
-                                @endif
-
-                                @if(!empty($service->contact_no))
-                                    <div class="small-service-info-row">
-                                        <i class="fa-solid fa-phone"></i>
-                                        <div>
-                                            <strong>{{ $language === 'Odia' ? 'ଯୋଗାଯୋଗ' : 'Contact' }}</strong>
-                                            {{ $service->contact_no }}
-                                        </div>
-                                    </div>
-                                @endif
-                            </div>
-
-                            @if(!empty($mapUrl))
-                                <a href="{{ $mapUrl }}" class="small-service-btn" target="_blank" rel="noopener noreferrer">
-                                    <i class="fa-solid fa-location-arrow"></i>
-                                    {{ $language === 'Odia' ? 'ଦିଗ ନିର୍ଦ୍ଦେଶ' : 'Directions' }}
-                                </a>
-                            @else
-                                <a href="javascript:void(0)" class="small-service-btn disabled">
-                                    <i class="fa-solid fa-location-arrow"></i>
-                                    {{ $language === 'Odia' ? 'ଲିଙ୍କ ନାହିଁ' : 'No Direction Link' }}
-                                </a>
-                            @endif
-                        </div>
-                    </article>
-                @empty
-                    <div class="empty-box">
-                        <i class="fa-solid fa-circle-exclamation"></i>
-                        <h3>{{ $language === 'Odia' ? 'କୌଣସି ସେବା ମିଳିଲା ନାହିଁ' : 'No Services Found' }}</h3>
-                        <p>{{ $language === 'Odia' ? 'ଦୟାକରି ପରେ ପୁଣି ଯାଞ୍ଚ କରନ୍ତୁ।' : 'Please check again later.' }}</p>
-                    </div>
-                @endforelse
-            </div>
-        @else
-            <div class="{{ $isPolicePage ? 'police-grid' : 'service-grid' }}">
-                @forelse ($services as $service)
-                    @php
-                        $photos = $getServicePhotos($service->photo ?? null);
-                        $firstPhoto = $photos[0] ?? null;
-                        $imageData = $firstPhoto ? $serviceImageData($firstPhoto) : ['url' => $fallbackImage, 'found' => false];
-
-                        $servicePhoto = $imageData['url'];
-                        $hasValidImage = $imageData['found'];
-
-                        $addressParts = array_filter([
-                            $service->landmark ?? null,
-                            $service->city_village ?? null,
-                            $service->district ?? null,
-                            $service->state ?? null,
-                        ]);
-
-                        $address = count($addressParts) ? implode(', ', $addressParts) : 'N/A';
-
-                        $serviceTypeKey = strtolower(str_replace('_', ' ', $service->service_type ?? $service_type));
-                        $serviceTypeText = ucwords($serviceTypeKey);
-                        $serviceTypeIcon = $serviceTypeIconMap[$serviceTypeKey] ?? 'fa-solid fa-building-circle-check';
-
-                        $isChargingStation = $serviceTypeKey === 'charging station';
-                        $isPoliceService = in_array($serviceTypeKey, ['police station', 'police outpost']);
-                        $showPoliceLogoCard = $isPoliceService && !$hasValidImage;
-
-                        $mapUrl = $service->google_map_link
-                            ?? $service->map_url
-                            ?? $service->google_map_url
-                            ?? null;
-                    @endphp
-
-                    @if($showPoliceLogoCard)
-                        <article class="police-logo-card">
-                            <div class="police-icon-wrap">
-                                <div class="police-icon">
-                                    <i class="{{ $serviceTypeIcon }}"></i>
-                                </div>
-
-                                <span class="police-status">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                    {{ $language === 'Odia' ? 'ଉପଲବ୍ଧ' : 'Available' }}
-                                </span>
-                            </div>
-
-                            <div class="police-mobile-content">
-                                <h5 class="police-title">{{ $service->service_name ?? $localizedTitle }}</h5>
-
-                                <div class="police-info">
-                                    <div class="police-info-row">
                                         <i class="fa-solid fa-location-dot"></i>
                                         <div>
                                             <strong>{{ $language === 'Odia' ? 'ଠିକଣା' : 'Address' }}</strong>
@@ -1182,8 +1110,19 @@
                                         </div>
                                     </div>
 
-                                    @if(!empty($service->contact_no))
-                                        <div class="police-info-row">
+                                    @if (!empty($service->opening_time) || !empty($service->closing_time))
+                                        <div class="small-service-info-row">
+                                            <i class="fa-solid fa-clock"></i>
+                                            <div>
+                                                <strong>{{ $language === 'Odia' ? 'ସମୟ' : 'Timing' }}</strong>
+                                                {{ $service->opening_time ?? 'N/A' }} -
+                                                {{ $service->closing_time ?? 'N/A' }}
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    @if (!empty($service->contact_no))
+                                        <div class="small-service-info-row">
                                             <i class="fa-solid fa-phone"></i>
                                             <div>
                                                 <strong>{{ $language === 'Odia' ? 'ଯୋଗାଯୋଗ' : 'Contact' }}</strong>
@@ -1193,103 +1132,201 @@
                                     @endif
                                 </div>
 
-                                @if(!empty($mapUrl))
-                                    <a href="{{ $mapUrl }}" class="police-btn" target="_blank" rel="noopener noreferrer">
+                                @if (!empty($mapUrl))
+                                    <a href="{{ $mapUrl }}" class="small-service-btn" target="_blank"
+                                        rel="noopener noreferrer">
                                         <i class="fa-solid fa-location-arrow"></i>
                                         {{ $language === 'Odia' ? 'ଦିଗ ନିର୍ଦ୍ଦେଶ' : 'Directions' }}
                                     </a>
                                 @else
-                                    <a href="javascript:void(0)" class="police-btn disabled">
+                                    <a href="javascript:void(0)" class="small-service-btn disabled">
                                         <i class="fa-solid fa-location-arrow"></i>
                                         {{ $language === 'Odia' ? 'ଲିଙ୍କ ନାହିଁ' : 'No Direction Link' }}
                                     </a>
                                 @endif
                             </div>
                         </article>
-                    @else
-                        <article class="service-card-new{{ $isChargingStation ? ' charging-station' : '' }}">
-                            <div class="service-image-wrap">
-                                <img
-                                    src="{{ $servicePhoto }}"
-                                    alt="{{ $service->service_name ?? $localizedTitle }}"
-                                    class="service-image"
-                                    onerror="this.onerror=null; this.src='{{ $fallbackImage }}'; this.classList.add('fallback-img');"
-                                >
+                    @empty
+                        <div class="empty-box">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <h3>{{ $language === 'Odia' ? 'କୌଣସି ସେବା ମିଳିଲା ନାହିଁ' : 'No Services Found' }}</h3>
+                            <p>{{ $language === 'Odia' ? 'ଦୟାକରି ପରେ ପୁଣି ଯାଞ୍ଚ କରନ୍ତୁ।' : 'Please check again later.' }}
+                            </p>
+                        </div>
+                    @endforelse
+                </div>
+            @else
+                <div class="{{ $isPolicePage ? 'police-grid' : 'service-grid' }}">
+                    @forelse ($services as $service)
+                        @php
+                            $photos = $getServicePhotos($service->photo ?? null);
+                            $firstPhoto = $photos[0] ?? null;
+                            $imageData = $firstPhoto
+                                ? $serviceImageData($firstPhoto)
+                                : ['url' => $fallbackImage, 'found' => false];
 
-                                <div class="service-tag">
-                                    <i class="{{ $serviceTypeIcon }}"></i>
-                                    {{ $serviceTypeText }}
-                                </div>
+                            $servicePhoto = $imageData['url'];
+                            $hasValidImage = $imageData['found'];
 
-                                <div class="available-tag">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                    {{ $language === 'Odia' ? 'ଉପଲବ୍ଧ' : 'Available' }}
-                                </div>
-                            </div>
+                            $addressParts = array_filter([
+                                $service->landmark ?? null,
+                                $service->city_village ?? null,
+                                $service->district ?? null,
+                                $service->state ?? null,
+                            ]);
 
-                            <div class="service-content">
-                                <div class="service-title-row">
-                                    <h5>{{ $service->service_name ?? $localizedTitle }}</h5>
-                                    <span class="type-pill">{{ $serviceTypeText }}</span>
-                                </div>
+                            $address = count($addressParts) ? implode(', ', $addressParts) : 'N/A';
 
-                                <div class="info-list">
-                                    <div class="info-row">
-                                        <i class="fa-solid fa-location-dot"></i>
-                                        <div>
-                                            <strong>{{ $language === 'Odia' ? 'ଠିକଣା' : 'Address' }}</strong>
-                                            {{ $address }}
-                                        </div>
+                            $serviceTypeKey = strtolower(
+                                str_replace('_', ' ', $service->service_type ?? $service_type),
+                            );
+                            $serviceTypeText = ucwords($serviceTypeKey);
+                            $serviceTypeIcon =
+                                $serviceTypeIconMap[$serviceTypeKey] ?? 'fa-solid fa-building-circle-check';
+
+                            $isChargingStation = $serviceTypeKey === 'charging station';
+                            $isPoliceService = in_array($serviceTypeKey, ['police station', 'police outpost']);
+                            $showPoliceLogoCard = $isPoliceService && !$hasValidImage;
+
+                            $mapUrl =
+                                $service->google_map_link ?? ($service->map_url ?? ($service->google_map_url ?? null));
+                        @endphp
+
+                        @if ($showPoliceLogoCard)
+                            <article class="police-logo-card">
+                                <div class="police-icon-wrap">
+                                    <div class="police-icon">
+                                        <i class="{{ $serviceTypeIcon }}"></i>
                                     </div>
 
-                                    @if(!empty($service->opening_time) || !empty($service->closing_time))
-                                        <div class="info-row">
-                                            <i class="fa-solid fa-clock"></i>
-                                            <div>
-                                                <strong>{{ $language === 'Odia' ? 'ସମୟ' : 'Timing' }}</strong>
-                                                {{ $service->opening_time ?? 'N/A' }} - {{ $service->closing_time ?? 'N/A' }}
-                                            </div>
-                                        </div>
-                                    @endif
-
-                                    @if(!empty($service->contact_no))
-                                        <div class="info-row">
-                                            <i class="fa-solid fa-phone"></i>
-                                            <div>
-                                                <strong>{{ $language === 'Odia' ? 'ଯୋଗାଯୋଗ' : 'Contact' }}</strong>
-                                                {{ $service->contact_no }}
-                                            </div>
-                                        </div>
-                                    @endif
+                                    <span class="police-status">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        {{ $language === 'Odia' ? 'ଉପଲବ୍ଧ' : 'Available' }}
+                                    </span>
                                 </div>
 
-                                <div class="action-row">
-                                    @if(!empty($mapUrl))
-                                        <a href="{{ $mapUrl }}" class="action-btn" target="_blank" rel="noopener noreferrer">
+                                <div class="police-mobile-content">
+                                    <h5 class="police-title">{{ $service->service_name ?? $localizedTitle }}</h5>
+
+                                    <div class="police-info">
+                                        <div class="police-info-row">
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            <div>
+                                                <strong>{{ $language === 'Odia' ? 'ଠିକଣା' : 'Address' }}</strong>
+                                                {{ $address }}
+                                            </div>
+                                        </div>
+
+                                        @if (!empty($service->contact_no))
+                                            <div class="police-info-row">
+                                                <i class="fa-solid fa-phone"></i>
+                                                <div>
+                                                    <strong>{{ $language === 'Odia' ? 'ଯୋଗାଯୋଗ' : 'Contact' }}</strong>
+                                                    {{ $service->contact_no }}
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    @if (!empty($mapUrl))
+                                        <a href="{{ $mapUrl }}" class="police-btn" target="_blank"
+                                            rel="noopener noreferrer">
                                             <i class="fa-solid fa-location-arrow"></i>
                                             {{ $language === 'Odia' ? 'ଦିଗ ନିର୍ଦ୍ଦେଶ' : 'Directions' }}
                                         </a>
                                     @else
-                                        <a href="javascript:void(0)" class="action-btn disabled">
+                                        <a href="javascript:void(0)" class="police-btn disabled">
                                             <i class="fa-solid fa-location-arrow"></i>
                                             {{ $language === 'Odia' ? 'ଲିଙ୍କ ନାହିଁ' : 'No Direction Link' }}
                                         </a>
                                     @endif
                                 </div>
-                            </div>
-                        </article>
-                    @endif
-                @empty
-                    <div class="empty-box">
-                        <i class="fa-solid fa-circle-exclamation"></i>
-                        <h3>{{ $language === 'Odia' ? 'କୌଣସି ସେବା ମିଳିଲା ନାହିଁ' : 'No Services Found' }}</h3>
-                        <p>{{ $language === 'Odia' ? 'ଦୟାକରି ପରେ ପୁଣି ଯାଞ୍ଚ କରନ୍ତୁ।' : 'Please check again later.' }}</p>
-                    </div>
-                @endforelse
-            </div>
-        @endif
-    </main>
-</div>
+                            </article>
+                        @else
+                            <article class="service-card-new{{ $isChargingStation ? ' charging-station' : '' }}">
+                                <div class="service-image-wrap">
+                                    <img src="{{ $servicePhoto }}"
+                                        alt="{{ $service->service_name ?? $localizedTitle }}" class="service-image"
+                                        onerror="this.onerror=null; this.src='{{ $fallbackImage }}'; this.classList.add('fallback-img');">
+
+                                    <div class="service-tag">
+                                        <i class="{{ $serviceTypeIcon }}"></i>
+                                        {{ $serviceTypeText }}
+                                    </div>
+
+                                    <div class="available-tag">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        {{ $language === 'Odia' ? 'ଉପଲବ୍ଧ' : 'Available' }}
+                                    </div>
+                                </div>
+
+                                <div class="service-content">
+                                    <div class="service-title-row">
+                                        <h5>{{ $service->service_name ?? $localizedTitle }}</h5>
+                                        <span class="type-pill">{{ $serviceTypeText }}</span>
+                                    </div>
+
+                                    <div class="info-list">
+                                        <div class="info-row">
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            <div>
+                                                <strong>{{ $language === 'Odia' ? 'ଠିକଣା' : 'Address' }}</strong>
+                                                {{ $address }}
+                                            </div>
+                                        </div>
+
+                                        @if (!empty($service->opening_time) || !empty($service->closing_time))
+                                            <div class="info-row">
+                                                <i class="fa-solid fa-clock"></i>
+                                                <div>
+                                                    <strong>{{ $language === 'Odia' ? 'ସମୟ' : 'Timing' }}</strong>
+                                                    {{ $service->opening_time ?? 'N/A' }} -
+                                                    {{ $service->closing_time ?? 'N/A' }}
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        @if (!empty($service->contact_no))
+                                            <div class="info-row">
+                                                <i class="fa-solid fa-phone"></i>
+                                                <div>
+                                                    <strong>{{ $language === 'Odia' ? 'ଯୋଗାଯୋଗ' : 'Contact' }}</strong>
+                                                    {{ $service->contact_no }}
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <div class="action-row">
+                                        @if (!empty($mapUrl))
+                                            <a href="{{ $mapUrl }}" class="action-btn" target="_blank"
+                                                rel="noopener noreferrer">
+                                                <i class="fa-solid fa-location-arrow"></i>
+                                                {{ $language === 'Odia' ? 'ଦିଗ ନିର୍ଦ୍ଦେଶ' : 'Directions' }}
+                                            </a>
+                                        @else
+                                            <a href="javascript:void(0)" class="action-btn disabled">
+                                                <i class="fa-solid fa-location-arrow"></i>
+                                                {{ $language === 'Odia' ? 'ଲିଙ୍କ ନାହିଁ' : 'No Direction Link' }}
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </article>
+                        @endif
+                    @empty
+                        <div class="empty-box">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <h3>{{ $language === 'Odia' ? 'କୌଣସି ସେବା ମିଳିଲା ନାହିଁ' : 'No Services Found' }}</h3>
+                            <p>{{ $language === 'Odia' ? 'ଦୟାକରି ପରେ ପୁଣି ଯାଞ୍ଚ କରନ୍ତୁ।' : 'Please check again later.' }}
+                            </p>
+                        </div>
+                    @endforelse
+                </div>
+            @endif
+        </main>
+    </div>
 
 </body>
+
 </html>
