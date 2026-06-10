@@ -409,6 +409,10 @@
         'petrol pump' => 'ପେଟ୍ରୋଲ ପମ୍ପ',
         'atm' => 'ଏଟିଏମ୍',
         'free food' => 'ମାଗଣା ଖାଦ୍ୟ',
+        'bus stand' => 'ବସ୍ ଷ୍ଟାଣ୍ଡ',
+        'railway station' => 'ରେଲୱେ ଷ୍ଟେସନ୍',
+        'hospital' => 'ହସ୍ପିଟାଲ୍',
+        'police station' => 'ପୋଲିସ୍ ଷ୍ଟେସନ୍',
     ];
 
     $localizedTitle = $language === 'Odia'
@@ -416,13 +420,18 @@
         : $rawTitle;
 
     /*
-        Correct folder:
-        public/uploads/public_services
+        Supported old and new photo folders:
 
-        Browser URL:
-        /uploads/public_services/image-name.jpg
+        1. public/assets/uploads/public_services
+           Browser URL: /assets/uploads/public_services/image.jpg
+
+        2. public/uploads/public_services
+           Browser URL: /uploads/public_services/image.jpg
     */
-    $publicServicePhotoFolder = 'uploads/public_services';
+    $publicServicePhotoFolders = [
+        'assets/uploads/public_services',
+        'uploads/public_services',
+    ];
 
     $fallbackImage = 'data:image/svg+xml;charset=UTF-8,' . rawurlencode('
         <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450">
@@ -435,6 +444,7 @@
     ');
 
     $encodeAssetUrl = function ($path) {
+        $path = ltrim(str_replace('\\', '/', $path), '/');
         $parts = explode('/', $path);
         $encodedParts = array_map('rawurlencode', $parts);
 
@@ -466,7 +476,7 @@
 
         $photoValue = str_replace(['\\/', '\\'], '/', $photoValue);
 
-        preg_match_all('/[^,"\[\]]+\.(jpg|jpeg|png|webp|gif)/i', $photoValue, $matches);
+        preg_match_all('/[^,"\[\]]+\.(jpg|jpeg|png|webp|gif|svg)/i', $photoValue, $matches);
 
         if (!empty($matches[0])) {
             return array_values(array_filter(array_map('trim', $matches[0])));
@@ -475,7 +485,7 @@
         return [$photoValue];
     };
 
-    $serviceImageUrl = function ($photo) use ($publicServicePhotoFolder, $fallbackImage, $encodeAssetUrl) {
+    $serviceImageUrl = function ($photo) use ($publicServicePhotoFolders, $fallbackImage, $encodeAssetUrl) {
         $photo = trim((string) $photo);
 
         if ($photo === '') {
@@ -485,20 +495,63 @@
         $photo = trim($photo, " \t\n\r\0\x0B\"'");
         $photo = str_replace(['\\/', '\\'], '/', $photo);
 
-        if (preg_match('/^https?:\/\//i', $photo)) {
-            $path = parse_url($photo, PHP_URL_PATH);
-            $filename = basename($path);
+        $isRemoteUrl = preg_match('/^https?:\/\//i', $photo);
+
+        if ($isRemoteUrl) {
+            $photoPath = parse_url($photo, PHP_URL_PATH);
+            $relativePathFromDb = ltrim((string) $photoPath, '/');
         } else {
-            $filename = basename($photo);
+            $relativePathFromDb = ltrim($photo, '/');
         }
 
-        $filename = trim(rawurldecode($filename), " \t\n\r\0\x0B\"'");
+        $relativePathFromDb = str_replace('\\', '/', $relativePathFromDb);
+        $relativePathFromDb = rawurldecode($relativePathFromDb);
+        $relativePathFromDb = trim($relativePathFromDb, " \t\n\r\0\x0B\"'");
 
-        if ($filename === '' || $filename === '.' || $filename === '/') {
-            return $fallbackImage;
+        $filename = basename($relativePathFromDb);
+        $filename = trim($filename, " \t\n\r\0\x0B\"'");
+
+        $candidatePaths = [];
+
+        /*
+            First check the exact path saved in DB.
+            Example:
+            assets/uploads/public_services/file.jpg
+            uploads/public_services/file.jpg
+        */
+        if ($relativePathFromDb !== '' && preg_match('/\.(jpg|jpeg|png|webp|gif|svg)$/i', $relativePathFromDb)) {
+            $candidatePaths[] = $relativePathFromDb;
         }
 
-        return $encodeAssetUrl($publicServicePhotoFolder . '/' . $filename);
+        /*
+            Then check both possible folders by filename.
+            This fixes old and new upload path issue.
+        */
+        if ($filename !== '' && $filename !== '.' && $filename !== '/') {
+            foreach ($publicServicePhotoFolders as $folder) {
+                $candidatePaths[] = $folder . '/' . $filename;
+            }
+        }
+
+        $candidatePaths = array_values(array_unique(array_filter($candidatePaths)));
+
+        foreach ($candidatePaths as $candidatePath) {
+            $candidatePath = ltrim(str_replace('\\', '/', $candidatePath), '/');
+
+            if (file_exists(public_path($candidatePath))) {
+                return $encodeAssetUrl($candidatePath);
+            }
+        }
+
+        /*
+            If image is a full remote URL, return it.
+            Otherwise show fallback image.
+        */
+        if ($isRemoteUrl) {
+            return $photo;
+        }
+
+        return $fallbackImage;
     };
 @endphp
 
