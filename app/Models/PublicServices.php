@@ -30,6 +30,6 @@ class PublicServices extends Model
         'state',
         'country',
         'description',
-        'status',
+        'status'
     ];
 }
