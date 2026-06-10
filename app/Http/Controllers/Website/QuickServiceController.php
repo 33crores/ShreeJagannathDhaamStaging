@@ -143,17 +143,17 @@ class QuickServiceController extends Controller
     }
 
     public function showByServiceType(Request $request, $service_type)
-{
-    $language = $this->getLanguage($request);
+    {
+        $language = $this->getLanguage($request);
 
-    $services = PublicServices::where('service_type', $service_type)
-        ->where('status', 'active')
-        ->where('language', $language)
-        ->latest('id')
-        ->get();
+        $services = PublicServices::where('service_type', $service_type)
+            ->where('status', 'active')
+            ->where('language', $language)
+            ->latest('id')
+            ->get();
 
-    return view('website.temple-convience', compact('services', 'service_type', 'language'));
-}
+        return view('website.temple-convience', compact('services', 'service_type', 'language'));
+    }
 
     public function busAndRailaway(Request $request)
     {
@@ -231,5 +231,4 @@ class QuickServiceController extends Controller
         return view('website.sea-beach-list', compact('seabeach', 'language'));
     }
 
-     
 }

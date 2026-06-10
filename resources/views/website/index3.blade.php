@@ -887,9 +887,6 @@
                 'type' => 'fa',
             ],
 
-          
-      
-
                 [
             'url' => route('services.byType', 'hospital'),
             'title1' => $language === 'Odia' ? 'ହସ୍ପିଟାଲ୍' : 'Hospital',
