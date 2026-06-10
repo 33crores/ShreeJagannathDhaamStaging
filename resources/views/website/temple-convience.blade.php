@@ -462,7 +462,6 @@
         }
 
         /* Drinking Water Theme */
-        /* Drinking Water Theme - Same Police Color Pattern */
         .water-card {
             background:
                 radial-gradient(circle at top right, rgba(219, 77, 48, 0.10), transparent 36%),
@@ -520,20 +519,16 @@
             box-shadow: 0 10px 18px rgba(52, 21, 81, 0.20);
         }
 
-        .water-card .small-service-btn:hover {
-            color: #ffffff;
-            text-decoration: none;
-            transform: translateY(-2px);
-        }
-
-        /* Police Logo Small Card Design */
-        .police-grid {
+        /* Police Small Card Design */
+        .police-grid,
+        .hospital-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 16px;
         }
 
-        .police-logo-card {
+        .police-logo-card,
+        .hospital-logo-card {
             position: relative;
             min-height: 235px;
             background:
@@ -547,12 +542,14 @@
             transition: all 0.3s ease;
         }
 
-        .police-logo-card:hover {
+        .police-logo-card:hover,
+        .hospital-logo-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 18px 38px rgba(52, 21, 81, 0.18);
         }
 
-        .police-logo-card::before {
+        .police-logo-card::before,
+        .hospital-logo-card::before {
             content: "";
             position: absolute;
             width: 110px;
@@ -563,7 +560,8 @@
             background: rgba(219, 77, 48, 0.10);
         }
 
-        .police-logo-card::after {
+        .police-logo-card::after,
+        .hospital-logo-card::after {
             content: "";
             position: absolute;
             width: 90px;
@@ -574,7 +572,8 @@
             background: rgba(52, 21, 81, 0.08);
         }
 
-        .police-icon-wrap {
+        .police-icon-wrap,
+        .hospital-icon-wrap {
             position: relative;
             z-index: 2;
             display: flex;
@@ -584,7 +583,8 @@
             margin-bottom: 13px;
         }
 
-        .police-icon {
+        .police-icon,
+        .hospital-icon {
             width: 56px;
             height: 56px;
             min-width: 56px;
@@ -598,7 +598,12 @@
             box-shadow: 0 12px 22px rgba(52, 21, 81, 0.24);
         }
 
-        .police-status {
+        .hospital-icon {
+            background: linear-gradient(135deg, #341551, #db4d30, #ff7a1a);
+        }
+
+        .police-status,
+        .hospital-status {
             display: inline-flex;
             align-items: center;
             gap: 5px;
@@ -611,7 +616,13 @@
             white-space: nowrap;
         }
 
-        .police-title {
+        .hospital-status {
+            background: rgba(219, 77, 48, 0.10);
+            color: #db4d30;
+        }
+
+        .police-title,
+        .hospital-title {
             position: relative;
             z-index: 2;
             margin: 0 0 11px;
@@ -621,14 +632,16 @@
             font-weight: 900;
         }
 
-        .police-info {
+        .police-info,
+        .hospital-info {
             position: relative;
             z-index: 2;
             display: grid;
             gap: 9px;
         }
 
-        .police-info-row {
+        .police-info-row,
+        .hospital-info-row {
             display: flex;
             gap: 8px;
             color: #4b4b4b;
@@ -636,7 +649,8 @@
             line-height: 1.42;
         }
 
-        .police-info-row i {
+        .police-info-row i,
+        .hospital-info-row i {
             width: 25px;
             height: 25px;
             min-width: 25px;
@@ -649,14 +663,16 @@
             font-size: 11px;
         }
 
-        .police-info-row strong {
+        .police-info-row strong,
+        .hospital-info-row strong {
             display: block;
             color: #222222;
             font-size: 11px;
             margin-bottom: 1px;
         }
 
-        .police-btn {
+        .police-btn,
+        .hospital-btn {
             position: relative;
             z-index: 2;
             width: 100%;
@@ -677,13 +693,19 @@
             transition: all 0.25s ease;
         }
 
-        .police-btn:hover {
+        .hospital-btn {
+            background: linear-gradient(135deg, #341551, #db4d30, #ff7a1a);
+        }
+
+        .police-btn:hover,
+        .hospital-btn:hover {
             color: #ffffff;
             text-decoration: none;
             transform: translateY(-2px);
         }
 
-        .police-btn.disabled {
+        .police-btn.disabled,
+        .hospital-btn.disabled {
             opacity: 0.55;
             pointer-events: none;
         }
@@ -718,7 +740,8 @@
         @media (max-width: 1199px) {
 
             .small-card-grid,
-            .police-grid {
+            .police-grid,
+            .hospital-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
@@ -729,7 +752,8 @@
             }
 
             .small-card-grid,
-            .police-grid {
+            .police-grid,
+            .hospital-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
@@ -777,13 +801,15 @@
             }
 
             .small-card-grid,
-            .police-grid {
+            .police-grid,
+            .hospital-grid {
                 grid-template-columns: 1fr;
                 gap: 14px;
             }
 
             .small-service-card,
-            .police-logo-card {
+            .police-logo-card,
+            .hospital-logo-card {
                 display: flex;
                 gap: 13px;
                 align-items: flex-start;
@@ -792,7 +818,8 @@
             }
 
             .small-service-icon,
-            .police-icon {
+            .police-icon,
+            .hospital-icon {
                 width: 50px;
                 height: 50px;
                 min-width: 50px;
@@ -800,16 +827,19 @@
             }
 
             .small-service-mobile-content,
-            .police-mobile-content {
+            .police-mobile-content,
+            .hospital-mobile-content {
                 width: 100%;
             }
 
-            .police-icon-wrap {
+            .police-icon-wrap,
+            .hospital-icon-wrap {
                 margin-bottom: 0;
                 display: block;
             }
 
-            .police-status {
+            .police-status,
+            .hospital-status {
                 margin-top: 8px;
             }
         }
@@ -829,12 +859,14 @@
             }
 
             .small-service-card,
-            .police-logo-card {
+            .police-logo-card,
+            .hospital-logo-card {
                 padding: 13px;
             }
 
             .small-service-title,
-            .police-title {
+            .police-title,
+            .hospital-title {
                 font-size: 15px;
             }
         }
@@ -853,6 +885,7 @@
         $isFreeFoodPage = $normalizedTitle === 'free food';
         $isDrinkingWaterPage = $normalizedTitle === 'drinking water';
         $isChargingStationPage = $normalizedTitle === 'charging station';
+        $isHospitalPage = $normalizedTitle === 'hospital';
         $isPoliceStationPage = $normalizedTitle === 'police station';
         $isPoliceOutpostPage = $normalizedTitle === 'police outpost';
         $isPolicePage = $isPoliceStationPage || $isPoliceOutpostPage;
@@ -890,6 +923,7 @@
             'police outpost' => 'fa-solid fa-shield-halved',
             'free food' => 'fa-solid fa-bowl-rice',
             'drinking water' => 'fa-solid fa-droplet',
+            'hospital' => 'fa-solid fa-hospital',
         ];
 
         $fallbackImage =
@@ -1020,7 +1054,7 @@
             <div class="heading-inner">
                 <div class="page-heading-badge">
                     <i
-                        class="{{ $isFreeFoodPage ? 'fa-solid fa-bowl-food' : ($isDrinkingWaterPage ? 'fa-solid fa-droplet' : ($isChargingStationPage ? 'fa-solid fa-car-bolt' : ($isPoliceStationPage ? 'fa-solid fa-building-shield' : ($isPoliceOutpostPage ? 'fa-solid fa-shield-halved' : 'fa-solid fa-location-dot')))) }}"></i>
+                        class="{{ $isFreeFoodPage ? 'fa-solid fa-bowl-food' : ($isDrinkingWaterPage ? 'fa-solid fa-droplet' : ($isChargingStationPage ? 'fa-solid fa-car-bolt' : ($isHospitalPage ? 'fa-solid fa-hospital' : ($isPoliceStationPage ? 'fa-solid fa-building-shield' : ($isPoliceOutpostPage ? 'fa-solid fa-shield-halved' : 'fa-solid fa-location-dot'))))) }}"></i>
                     {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ' : 'Shree Jagannatha Dham' }}
                 </div>
 
@@ -1039,6 +1073,10 @@
                         {{ $language === 'Odia'
                             ? 'ଚାର୍ଜିଂ ସ୍ଟେସନ୍ ଅବସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
                             : 'Find charging station locations and directions near Shree Jagannatha Dham.' }}
+                    @elseif($isHospitalPage)
+                        {{ $language === 'Odia'
+                            ? 'ହସ୍ପିଟାଲ୍, ଆମ୍ବୁଲାନ୍ସ, ପ୍ରଥମିକ ଚିକିତ୍ସା ଓ ସ୍ୱାସ୍ଥ୍ୟ ସହାୟତା ସ୍ଥାନ ଦେଖନ୍ତୁ।'
+                            : 'Find hospital, ambulance, first aid and medical support points near Shree Jagannatha Dham.' }}
                     @elseif($isPoliceStationPage)
                         {{ $language === 'Odia'
                             ? 'ପୋଲିସ୍ ଷ୍ଟେସନ୍ ଅବସ୍ଥାନ, ଯୋଗାଯୋଗ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
@@ -1092,8 +1130,7 @@
 
                             <div class="small-service-mobile-content">
                                 <div class="small-service-top">
-                                    <h5 class="small-service-title">{{ $service->service_name ?? $localizedTitle }}
-                                    </h5>
+                                    <h5 class="small-service-title">{{ $service->service_name ?? $localizedTitle }}</h5>
 
                                     <span class="small-service-badge">
                                         <i class="fa-solid fa-circle-check"></i>
@@ -1150,13 +1187,12 @@
                         <div class="empty-box">
                             <i class="fa-solid fa-circle-exclamation"></i>
                             <h3>{{ $language === 'Odia' ? 'କୌଣସି ସେବା ମିଳିଲା ନାହିଁ' : 'No Services Found' }}</h3>
-                            <p>{{ $language === 'Odia' ? 'ଦୟାକରି ପରେ ପୁଣି ଯାଞ୍ଚ କରନ୍ତୁ।' : 'Please check again later.' }}
-                            </p>
+                            <p>{{ $language === 'Odia' ? 'ଦୟାକରି ପରେ ପୁଣି ଯାଞ୍ଚ କରନ୍ତୁ।' : 'Please check again later.' }}</p>
                         </div>
                     @endforelse
                 </div>
             @else
-                <div class="{{ $isPolicePage ? 'police-grid' : 'service-grid' }}">
+                <div class="{{ $isPolicePage ? 'police-grid' : ($isHospitalPage ? 'hospital-grid' : 'service-grid') }}">
                     @forelse ($services as $service)
                         @php
                             $photos = $getServicePhotos($service->photo ?? null);
@@ -1180,13 +1216,17 @@
                             $serviceTypeKey = strtolower(
                                 str_replace('_', ' ', $service->service_type ?? $service_type),
                             );
+
                             $serviceTypeText = ucwords($serviceTypeKey);
                             $serviceTypeIcon =
                                 $serviceTypeIconMap[$serviceTypeKey] ?? 'fa-solid fa-building-circle-check';
 
                             $isChargingStation = $serviceTypeKey === 'charging station';
                             $isPoliceService = in_array($serviceTypeKey, ['police station', 'police outpost']);
+                            $isHospitalService = $serviceTypeKey === 'hospital';
+
                             $showPoliceLogoCard = $isPoliceService && !$hasValidImage;
+                            $showHospitalLogoCard = $isHospitalService && !$hasValidImage;
 
                             $mapUrl =
                                 $service->google_map_link ?? ($service->map_url ?? ($service->google_map_url ?? null));
@@ -1242,6 +1282,66 @@
                                     @endif
                                 </div>
                             </article>
+                        @elseif ($showHospitalLogoCard)
+                            <article class="hospital-logo-card">
+                                <div class="hospital-icon-wrap">
+                                    <div class="hospital-icon">
+                                        <i class="fa-solid fa-hospital"></i>
+                                    </div>
+
+                                    <span class="hospital-status">
+                                        <i class="fa-solid fa-briefcase-medical"></i>
+                                        {{ $language === 'Odia' ? 'ସ୍ୱାସ୍ଥ୍ୟ ସେବା' : 'Medical' }}
+                                    </span>
+                                </div>
+
+                                <div class="hospital-mobile-content">
+                                    <h5 class="hospital-title">{{ $service->service_name ?? $localizedTitle }}</h5>
+
+                                    <div class="hospital-info">
+                                        <div class="hospital-info-row">
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            <div>
+                                                <strong>{{ $language === 'Odia' ? 'ଠିକଣା' : 'Address' }}</strong>
+                                                {{ $address }}
+                                            </div>
+                                        </div>
+
+                                        @if (!empty($service->description))
+                                            <div class="hospital-info-row">
+                                                <i class="fa-solid fa-notes-medical"></i>
+                                                <div>
+                                                    <strong>{{ $language === 'Odia' ? 'ସେବା' : 'Service' }}</strong>
+                                                    {{ $service->description }}
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        @if (!empty($service->contact_no))
+                                            <div class="hospital-info-row">
+                                                <i class="fa-solid fa-phone"></i>
+                                                <div>
+                                                    <strong>{{ $language === 'Odia' ? 'ଯୋଗାଯୋଗ' : 'Contact' }}</strong>
+                                                    {{ $service->contact_no }}
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    @if (!empty($mapUrl))
+                                        <a href="{{ $mapUrl }}" class="hospital-btn" target="_blank"
+                                            rel="noopener noreferrer">
+                                            <i class="fa-solid fa-location-arrow"></i>
+                                            {{ $language === 'Odia' ? 'ଦିଗ ନିର୍ଦ୍ଦେଶ' : 'Directions' }}
+                                        </a>
+                                    @else
+                                        <a href="javascript:void(0)" class="hospital-btn disabled">
+                                            <i class="fa-solid fa-location-arrow"></i>
+                                            {{ $language === 'Odia' ? 'ଲିଙ୍କ ନାହିଁ' : 'No Direction Link' }}
+                                        </a>
+                                    @endif
+                                </div>
+                            </article>
                         @else
                             <article class="service-card-new{{ $isChargingStation ? ' charging-station' : '' }}">
                                 <div class="service-image-wrap">
@@ -1274,6 +1374,16 @@
                                                 {{ $address }}
                                             </div>
                                         </div>
+
+                                        @if (!empty($service->description))
+                                            <div class="info-row">
+                                                <i class="fa-solid fa-circle-info"></i>
+                                                <div>
+                                                    <strong>{{ $language === 'Odia' ? 'ବିବରଣୀ' : 'Details' }}</strong>
+                                                    {{ $service->description }}
+                                                </div>
+                                            </div>
+                                        @endif
 
                                         @if (!empty($service->opening_time) || !empty($service->closing_time))
                                             <div class="info-row">
@@ -1318,8 +1428,7 @@
                         <div class="empty-box">
                             <i class="fa-solid fa-circle-exclamation"></i>
                             <h3>{{ $language === 'Odia' ? 'କୌଣସି ସେବା ମିଳିଲା ନାହିଁ' : 'No Services Found' }}</h3>
-                            <p>{{ $language === 'Odia' ? 'ଦୟାକରି ପରେ ପୁଣି ଯାଞ୍ଚ କରନ୍ତୁ।' : 'Please check again later.' }}
-                            </p>
+                            <p>{{ $language === 'Odia' ? 'ଦୟାକରି ପରେ ପୁଣି ଯାଞ୍ଚ କରନ୍ତୁ।' : 'Please check again later.' }}</p>
                         </div>
                     @endforelse
                 </div>
