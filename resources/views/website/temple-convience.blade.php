@@ -301,16 +301,17 @@
             background: #fff7f2;
         }
 
-        /* Free Food Small Card Design */
-        .free-food-grid {
+        /* Common Small Card Layout */
+        .small-card-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 16px;
         }
 
-        .free-food-card {
+        .small-service-card {
             position: relative;
-            background: linear-gradient(180deg, #ffffff 0%, #fff8f1 100%);
+            min-height: 230px;
+            background: linear-gradient(180deg, #ffffff 0%, #fff8f3 100%);
             border-radius: 18px;
             padding: 16px;
             border: 1px solid rgba(255, 122, 26, 0.18);
@@ -319,12 +320,12 @@
             transition: all 0.3s ease;
         }
 
-        .free-food-card:hover {
+        .small-service-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 18px 36px rgba(52, 21, 81, 0.16);
         }
 
-        .free-food-card::before {
+        .small-service-card::before {
             content: "";
             position: absolute;
             width: 95px;
@@ -335,23 +336,21 @@
             background: rgba(255, 122, 26, 0.12);
         }
 
-        .free-food-icon {
+        .small-service-icon {
             width: 54px;
             height: 54px;
             border-radius: 18px;
-            background: linear-gradient(135deg, #ff7a1a, #db4d30);
             color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 23px;
-            box-shadow: 0 10px 18px rgba(219, 77, 48, 0.24);
             margin-bottom: 12px;
             position: relative;
             z-index: 2;
         }
 
-        .free-food-top {
+        .small-service-top {
             display: flex;
             justify-content: space-between;
             gap: 10px;
@@ -359,7 +358,7 @@
             margin-bottom: 10px;
         }
 
-        .free-food-title {
+        .small-service-title {
             margin: 0;
             color: #341551;
             font-size: 16px;
@@ -369,7 +368,7 @@
             z-index: 2;
         }
 
-        .free-food-badge {
+        .small-service-badge {
             display: inline-flex;
             align-items: center;
             gap: 5px;
@@ -384,7 +383,7 @@
             z-index: 2;
         }
 
-        .free-food-info {
+        .small-service-info {
             display: grid;
             gap: 8px;
             margin-top: 12px;
@@ -392,7 +391,7 @@
             z-index: 2;
         }
 
-        .free-food-info-row {
+        .small-service-info-row {
             display: flex;
             align-items: flex-start;
             gap: 8px;
@@ -401,7 +400,7 @@
             line-height: 1.4;
         }
 
-        .free-food-info-row i {
+        .small-service-info-row i {
             width: 24px;
             height: 24px;
             min-width: 24px;
@@ -414,14 +413,14 @@
             font-size: 11px;
         }
 
-        .free-food-info-row strong {
+        .small-service-info-row strong {
             display: block;
             color: #222222;
             font-size: 11px;
             margin-bottom: 1px;
         }
 
-        .free-food-btn {
+        .small-service-btn {
             width: 100%;
             margin-top: 14px;
             min-height: 38px;
@@ -435,22 +434,69 @@
             align-items: center;
             justify-content: center;
             gap: 7px;
-            background: linear-gradient(135deg, #341551, #db4d30);
-            box-shadow: 0 10px 18px rgba(219, 77, 48, 0.22);
             transition: all 0.25s ease;
             position: relative;
             z-index: 2;
         }
 
-        .free-food-btn:hover {
+        .small-service-btn:hover {
             color: #ffffff;
             text-decoration: none;
             transform: translateY(-2px);
         }
 
-        .free-food-btn.disabled {
+        .small-service-btn.disabled {
             opacity: 0.55;
             pointer-events: none;
+        }
+
+        /* Free Food Theme */
+        .free-food-card .small-service-icon {
+            background: linear-gradient(135deg, #ff7a1a, #db4d30);
+            box-shadow: 0 10px 18px rgba(219, 77, 48, 0.24);
+        }
+
+        .free-food-card .small-service-btn {
+            background: linear-gradient(135deg, #341551, #db4d30);
+            box-shadow: 0 10px 18px rgba(219, 77, 48, 0.22);
+        }
+
+        /* Drinking Water Theme */
+        .water-card {
+            background:
+                radial-gradient(circle at top right, rgba(14, 165, 233, 0.16), transparent 36%),
+                linear-gradient(180deg, #ffffff 0%, #effaff 100%);
+            border: 1px solid rgba(14, 165, 233, 0.20);
+        }
+
+        .water-card::before {
+            background: rgba(14, 165, 233, 0.14);
+        }
+
+        .water-card::after {
+            content: "";
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            left: -38px;
+            bottom: -42px;
+            border-radius: 50%;
+            background: rgba(52, 21, 81, 0.06);
+        }
+
+        .water-card .small-service-icon {
+            background: linear-gradient(135deg, #0284c7, #0ea5e9, #38bdf8);
+            box-shadow: 0 10px 18px rgba(14, 165, 233, 0.28);
+        }
+
+        .water-card .small-service-btn {
+            background: linear-gradient(135deg, #075985, #0284c7, #0ea5e9);
+            box-shadow: 0 10px 18px rgba(14, 165, 233, 0.24);
+        }
+
+        .water-card .small-service-info-row i {
+            background: #e0f2fe;
+            color: #0284c7;
         }
 
         /* Police Logo Small Card Design */
@@ -643,7 +689,7 @@
         }
 
         @media (max-width: 1199px) {
-            .free-food-grid,
+            .small-card-grid,
             .police-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
@@ -654,7 +700,7 @@
                 grid-template-columns: 1fr;
             }
 
-            .free-food-grid,
+            .small-card-grid,
             .police-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -702,13 +748,13 @@
                 font-size: 19px;
             }
 
-            .free-food-grid,
+            .small-card-grid,
             .police-grid {
                 grid-template-columns: 1fr;
                 gap: 14px;
             }
 
-            .free-food-card,
+            .small-service-card,
             .police-logo-card {
                 display: flex;
                 gap: 13px;
@@ -717,7 +763,7 @@
                 min-height: auto;
             }
 
-            .free-food-icon,
+            .small-service-icon,
             .police-icon {
                 width: 50px;
                 height: 50px;
@@ -725,7 +771,7 @@
                 margin-bottom: 0;
             }
 
-            .free-food-mobile-content,
+            .small-service-mobile-content,
             .police-mobile-content {
                 width: 100%;
             }
@@ -754,12 +800,12 @@
                 padding: 15px;
             }
 
-            .free-food-card,
+            .small-service-card,
             .police-logo-card {
                 padding: 13px;
             }
 
-            .free-food-title,
+            .small-service-title,
             .police-title {
                 font-size: 15px;
             }
@@ -777,10 +823,12 @@
     $normalizedTitle = strtolower(str_replace('_', ' ', $service_type));
 
     $isFreeFoodPage = $normalizedTitle === 'free food';
+    $isDrinkingWaterPage = $normalizedTitle === 'drinking water';
     $isChargingStationPage = $normalizedTitle === 'charging station';
     $isPoliceStationPage = $normalizedTitle === 'police station';
     $isPoliceOutpostPage = $normalizedTitle === 'police outpost';
     $isPolicePage = $isPoliceStationPage || $isPoliceOutpostPage;
+    $isSmallIconCardPage = $isFreeFoodPage || $isDrinkingWaterPage;
 
     $odiaTitles = [
         'drinking water' => 'ବିଶୁଦ୍ଧ ପାନୀୟ ଜଳ',
@@ -818,6 +866,7 @@
         'police station' => 'fa-solid fa-building-shield',
         'police outpost' => 'fa-solid fa-shield-halved',
         'free food' => 'fa-solid fa-bowl-rice',
+        'drinking water' => 'fa-solid fa-droplet',
     ];
 
     $fallbackImage = 'data:image/svg+xml;charset=UTF-8,' . rawurlencode('
@@ -945,7 +994,7 @@
     <section class="page-heading-section">
         <div class="heading-inner">
             <div class="page-heading-badge">
-                <i class="{{ $isFreeFoodPage ? 'fa-solid fa-bowl-food' : ($isChargingStationPage ? 'fa-solid fa-car-bolt' : ($isPoliceStationPage ? 'fa-solid fa-building-shield' : ($isPoliceOutpostPage ? 'fa-solid fa-shield-halved' : 'fa-solid fa-location-dot'))) }}"></i>
+                <i class="{{ $isFreeFoodPage ? 'fa-solid fa-bowl-food' : ($isDrinkingWaterPage ? 'fa-solid fa-droplet' : ($isChargingStationPage ? 'fa-solid fa-car-bolt' : ($isPoliceStationPage ? 'fa-solid fa-building-shield' : ($isPoliceOutpostPage ? 'fa-solid fa-shield-halved' : 'fa-solid fa-location-dot')))) }}"></i>
                 {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ' : 'Shree Jagannatha Dham' }}
             </div>
 
@@ -956,6 +1005,10 @@
                     {{ $language === 'Odia'
                         ? 'ମାଗଣା ଖାଦ୍ୟ ସେବା, ସ୍ଥାନ, ସମୟ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
                         : 'Find free food service points, timings, locations and directions near Shree Jagannatha Dham.' }}
+                @elseif($isDrinkingWaterPage)
+                    {{ $language === 'Odia'
+                        ? 'ବିଶୁଦ୍ଧ ପାନୀୟ ଜଳ ସ୍ଥାନ, ସମୟ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
+                        : 'Find drinking water points, timings, locations and directions near Shree Jagannatha Dham.' }}
                 @elseif($isChargingStationPage)
                     {{ $language === 'Odia'
                         ? 'ଚାର୍ଜିଂ ସ୍ଟେସନ୍ ଅବସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
@@ -979,8 +1032,8 @@
 
     <main class="service-wrapper">
 
-        @if($isFreeFoodPage)
-            <div class="free-food-grid">
+        @if($isSmallIconCardPage)
+            <div class="small-card-grid">
                 @forelse ($services as $service)
                     @php
                         $addressParts = array_filter([
@@ -996,25 +1049,31 @@
                             ?? $service->map_url
                             ?? $service->google_map_url
                             ?? null;
+
+                        $cardClass = $isDrinkingWaterPage ? 'water-card' : 'free-food-card';
+                        $cardIcon = $isDrinkingWaterPage ? 'fa-solid fa-droplet' : 'fa-solid fa-bowl-rice';
+                        $badgeText = $isDrinkingWaterPage
+                            ? ($language === 'Odia' ? 'ପାନୀୟ ଜଳ' : 'Water')
+                            : ($language === 'Odia' ? 'ମାଗଣା' : 'Free');
                     @endphp
 
-                    <article class="free-food-card">
-                        <div class="free-food-icon">
-                            <i class="fa-solid fa-bowl-rice"></i>
+                    <article class="small-service-card {{ $cardClass }}">
+                        <div class="small-service-icon">
+                            <i class="{{ $cardIcon }}"></i>
                         </div>
 
-                        <div class="free-food-mobile-content">
-                            <div class="free-food-top">
-                                <h5 class="free-food-title">{{ $service->service_name ?? $localizedTitle }}</h5>
+                        <div class="small-service-mobile-content">
+                            <div class="small-service-top">
+                                <h5 class="small-service-title">{{ $service->service_name ?? $localizedTitle }}</h5>
 
-                                <span class="free-food-badge">
+                                <span class="small-service-badge">
                                     <i class="fa-solid fa-circle-check"></i>
-                                    {{ $language === 'Odia' ? 'ଉପଲବ୍ଧ' : 'Free' }}
+                                    {{ $badgeText }}
                                 </span>
                             </div>
 
-                            <div class="free-food-info">
-                                <div class="free-food-info-row">
+                            <div class="small-service-info">
+                                <div class="small-service-info-row">
                                     <i class="fa-solid fa-location-dot"></i>
                                     <div>
                                         <strong>{{ $language === 'Odia' ? 'ଠିକଣା' : 'Address' }}</strong>
@@ -1023,7 +1082,7 @@
                                 </div>
 
                                 @if(!empty($service->opening_time) || !empty($service->closing_time))
-                                    <div class="free-food-info-row">
+                                    <div class="small-service-info-row">
                                         <i class="fa-solid fa-clock"></i>
                                         <div>
                                             <strong>{{ $language === 'Odia' ? 'ସମୟ' : 'Timing' }}</strong>
@@ -1033,7 +1092,7 @@
                                 @endif
 
                                 @if(!empty($service->contact_no))
-                                    <div class="free-food-info-row">
+                                    <div class="small-service-info-row">
                                         <i class="fa-solid fa-phone"></i>
                                         <div>
                                             <strong>{{ $language === 'Odia' ? 'ଯୋଗାଯୋଗ' : 'Contact' }}</strong>
@@ -1044,12 +1103,12 @@
                             </div>
 
                             @if(!empty($mapUrl))
-                                <a href="{{ $mapUrl }}" class="free-food-btn" target="_blank" rel="noopener noreferrer">
+                                <a href="{{ $mapUrl }}" class="small-service-btn" target="_blank" rel="noopener noreferrer">
                                     <i class="fa-solid fa-location-arrow"></i>
                                     {{ $language === 'Odia' ? 'ଦିଗ ନିର୍ଦ୍ଦେଶ' : 'Directions' }}
                                 </a>
                             @else
-                                <a href="javascript:void(0)" class="free-food-btn disabled">
+                                <a href="javascript:void(0)" class="small-service-btn disabled">
                                     <i class="fa-solid fa-location-arrow"></i>
                                     {{ $language === 'Odia' ? 'ଲିଙ୍କ ନାହିଁ' : 'No Direction Link' }}
                                 </a>
