@@ -292,6 +292,158 @@
             background: #fff7f2;
         }
 
+        /* Free Food Small Card Design */
+        .free-food-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .free-food-card {
+            position: relative;
+            background: linear-gradient(180deg, #ffffff 0%, #fff8f1 100%);
+            border-radius: 18px;
+            padding: 16px;
+            border: 1px solid rgba(255, 122, 26, 0.18);
+            box-shadow: 0 12px 28px rgba(52, 21, 81, 0.10);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .free-food-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 18px 36px rgba(52, 21, 81, 0.16);
+        }
+
+        .free-food-card::before {
+            content: "";
+            position: absolute;
+            width: 95px;
+            height: 95px;
+            right: -36px;
+            top: -38px;
+            border-radius: 50%;
+            background: rgba(255, 122, 26, 0.12);
+        }
+
+        .free-food-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #ff7a1a, #db4d30);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+            box-shadow: 0 10px 18px rgba(219, 77, 48, 0.24);
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .free-food-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .free-food-title {
+            margin: 0;
+            color: #341551;
+            font-size: 16px;
+            line-height: 1.35;
+            font-weight: 900;
+            position: relative;
+            z-index: 2;
+        }
+
+        .free-food-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 8px;
+            border-radius: 999px;
+            background: rgba(21, 128, 61, 0.10);
+            color: #15803d;
+            font-size: 10px;
+            font-weight: 900;
+            white-space: nowrap;
+            position: relative;
+            z-index: 2;
+        }
+
+        .free-food-info {
+            display: grid;
+            gap: 8px;
+            margin-top: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .free-food-info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            color: #4b4b4b;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .free-food-info-row i {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            border-radius: 50%;
+            background: #fff0e5;
+            color: #db4d30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+        }
+
+        .free-food-info-row strong {
+            display: block;
+            color: #222222;
+            font-size: 11px;
+            margin-bottom: 1px;
+        }
+
+        .free-food-btn {
+            width: 100%;
+            margin-top: 14px;
+            min-height: 38px;
+            border-radius: 12px;
+            padding: 9px 12px;
+            text-decoration: none;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 900;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            background: linear-gradient(135deg, #341551, #db4d30);
+            box-shadow: 0 10px 18px rgba(219, 77, 48, 0.22);
+            transition: all 0.25s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .free-food-btn:hover {
+            color: #ffffff;
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+
+        .free-food-btn.disabled {
+            opacity: 0.55;
+            pointer-events: none;
+        }
+
         .empty-box {
             grid-column: 1 / -1;
             background: #ffffff;
@@ -319,9 +471,19 @@
             margin: 0;
         }
 
+        @media (max-width: 1199px) {
+            .free-food-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
         @media (max-width: 991px) {
             .service-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .free-food-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -366,6 +528,29 @@
             .service-title-row h5 {
                 font-size: 19px;
             }
+
+            .free-food-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .free-food-card {
+                display: flex;
+                gap: 13px;
+                align-items: flex-start;
+                padding: 14px;
+            }
+
+            .free-food-icon {
+                width: 50px;
+                height: 50px;
+                min-width: 50px;
+                margin-bottom: 0;
+            }
+
+            .free-food-mobile-content {
+                width: 100%;
+            }
         }
 
         @media (max-width: 360px) {
@@ -381,6 +566,14 @@
             .service-content {
                 padding: 15px;
             }
+
+            .free-food-card {
+                padding: 13px;
+            }
+
+            .free-food-title {
+                font-size: 15px;
+            }
         }
     </style>
 </head>
@@ -393,6 +586,7 @@
 
     $rawTitle = ucfirst(str_replace('_', ' ', $service_type));
     $normalizedTitle = strtolower(str_replace('_', ' ', $service_type));
+    $isFreeFoodPage = $normalizedTitle === 'free food';
 
     $odiaTitles = [
         'drinking water' => 'ବିଶୁଦ୍ଧ ପାନୀୟ ଜଳ',
@@ -437,7 +631,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="800" height="450">
             <rect width="100%" height="100%" fill="#fff3e8"/>
             <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
-                  font-family="Arial" font-size="28" fill="#db4d30">
+                font-family="Arial" font-size="28" fill="#db4d30">
                 Service Image
             </text>
         </svg>
@@ -513,20 +707,10 @@
 
         $candidatePaths = [];
 
-        /*
-            First check the exact path saved in DB.
-            Example:
-            assets/uploads/public_services/file.jpg
-            uploads/public_services/file.jpg
-        */
         if ($relativePathFromDb !== '' && preg_match('/\.(jpg|jpeg|png|webp|gif|svg)$/i', $relativePathFromDb)) {
             $candidatePaths[] = $relativePathFromDb;
         }
 
-        /*
-            Then check both possible folders by filename.
-            This fixes old and new upload path issue.
-        */
         if ($filename !== '' && $filename !== '.' && $filename !== '/') {
             foreach ($publicServicePhotoFolders as $folder) {
                 $candidatePaths[] = $folder . '/' . $filename;
@@ -543,10 +727,6 @@
             }
         }
 
-        /*
-            If image is a full remote URL, return it.
-            Otherwise show fallback image.
-        */
         if ($isRemoteUrl) {
             return $photo;
         }
@@ -560,125 +740,218 @@
     <section class="page-heading-section">
         <div class="heading-inner">
             <div class="page-heading-badge">
-                <i class="fa-solid fa-location-dot"></i>
+                <i class="{{ $isFreeFoodPage ? 'fa-solid fa-bowl-food' : 'fa-solid fa-location-dot' }}"></i>
                 {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ' : 'Shree Jagannatha Dham' }}
             </div>
 
             <h1>{{ $localizedTitle }}</h1>
 
             <p>
-                {{ $language === 'Odia'
-                    ? 'ଏଠାରେ ଉପଲବ୍ଧ ସମସ୍ତ ସେବା, ସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
-                    : 'Explore available facilities, locations and directions near Shree Jagannatha Dham.' }}
+                @if($isFreeFoodPage)
+                    {{ $language === 'Odia'
+                        ? 'ମାଗଣା ଖାଦ୍ୟ ସେବା, ସ୍ଥାନ, ସମୟ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
+                        : 'Find free food service points, timings, locations and directions near Shree Jagannatha Dham.' }}
+                @else
+                    {{ $language === 'Odia'
+                        ? 'ଏଠାରେ ଉପଲବ୍ଧ ସମସ୍ତ ସେବା, ସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
+                        : 'Explore available facilities, locations and directions near Shree Jagannatha Dham.' }}
+                @endif
             </p>
         </div>
     </section>
 
     <main class="service-wrapper">
 
-        <div class="service-grid">
-            @forelse ($services as $service)
-                @php
-                    $photos = $getServicePhotos($service->photo ?? null);
-                    $firstPhoto = $photos[0] ?? null;
-                    $servicePhoto = $firstPhoto ? $serviceImageUrl($firstPhoto) : $fallbackImage;
+        @if($isFreeFoodPage)
+            <div class="free-food-grid">
+                @forelse ($services as $service)
+                    @php
+                        $addressParts = array_filter([
+                            $service->landmark ?? null,
+                            $service->city_village ?? null,
+                            $service->district ?? null,
+                            $service->state ?? null,
+                        ]);
 
-                    $addressParts = array_filter([
-                        $service->landmark ?? null,
-                        $service->city_village ?? null,
-                        $service->district ?? null,
-                        $service->state ?? null,
-                    ]);
+                        $address = count($addressParts) ? implode(', ', $addressParts) : 'N/A';
 
-                    $address = count($addressParts) ? implode(', ', $addressParts) : 'N/A';
+                        $mapUrl = $service->google_map_link
+                            ?? $service->map_url
+                            ?? $service->google_map_url
+                            ?? null;
+                    @endphp
 
-                    $serviceTypeText = ucwords(str_replace('_', ' ', $service->service_type ?? $service_type));
-
-                    $mapUrl = $service->google_map_link
-                        ?? $service->map_url
-                        ?? $service->google_map_url
-                        ?? null;
-                @endphp
-
-                <article class="service-card-new">
-                    <div class="service-image-wrap">
-                        <img
-                            src="{{ $servicePhoto }}"
-                            alt="{{ $service->service_name ?? $localizedTitle }}"
-                            class="service-image"
-                            onerror="this.onerror=null; this.src='{{ $fallbackImage }}'; this.classList.add('fallback-img');"
-                        >
-
-                        <div class="service-tag">
-                            <i class="fa-solid fa-building-circle-check"></i>
-                            {{ $serviceTypeText }}
+                    <article class="free-food-card">
+                        <div class="free-food-icon">
+                            <i class="fa-solid fa-bowl-rice"></i>
                         </div>
 
-                        <div class="available-tag">
-                            <i class="fa-solid fa-circle-check"></i>
-                            {{ $language === 'Odia' ? 'ଉପଲବ୍ଧ' : 'Available' }}
-                        </div>
-                    </div>
+                        <div class="free-food-mobile-content">
+                            <div class="free-food-top">
+                                <h5 class="free-food-title">{{ $service->service_name ?? $localizedTitle }}</h5>
 
-                    <div class="service-content">
-                        <div class="service-title-row">
-                            <h5>{{ $service->service_name ?? $localizedTitle }}</h5>
-                            <span class="type-pill">{{ $serviceTypeText }}</span>
-                        </div>
-
-                        <div class="info-list">
-                            <div class="info-row">
-                                <i class="fa-solid fa-location-dot"></i>
-                                <div>
-                                    <strong>{{ $language === 'Odia' ? 'ଠିକଣା' : 'Address' }}</strong>
-                                    {{ $address }}
-                                </div>
+                                <span class="free-food-badge">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    {{ $language === 'Odia' ? 'ଉପଲବ୍ଧ' : 'Free' }}
+                                </span>
                             </div>
 
-                            @if(!empty($service->opening_time) || !empty($service->closing_time))
-                                <div class="info-row">
-                                    <i class="fa-solid fa-clock"></i>
+                            <div class="free-food-info">
+                                <div class="free-food-info-row">
+                                    <i class="fa-solid fa-location-dot"></i>
                                     <div>
-                                        <strong>{{ $language === 'Odia' ? 'ସମୟ' : 'Timing' }}</strong>
-                                        {{ $service->opening_time ?? 'N/A' }} - {{ $service->closing_time ?? 'N/A' }}
+                                        <strong>{{ $language === 'Odia' ? 'ଠିକଣା' : 'Address' }}</strong>
+                                        {{ $address }}
                                     </div>
                                 </div>
-                            @endif
 
-                            @if(!empty($service->contact_no))
-                                <div class="info-row">
-                                    <i class="fa-solid fa-phone"></i>
-                                    <div>
-                                        <strong>{{ $language === 'Odia' ? 'ଯୋଗାଯୋଗ' : 'Contact' }}</strong>
-                                        {{ $service->contact_no }}
+                                @if(!empty($service->opening_time) || !empty($service->closing_time))
+                                    <div class="free-food-info-row">
+                                        <i class="fa-solid fa-clock"></i>
+                                        <div>
+                                            <strong>{{ $language === 'Odia' ? 'ସମୟ' : 'Timing' }}</strong>
+                                            {{ $service->opening_time ?? 'N/A' }} - {{ $service->closing_time ?? 'N/A' }}
+                                        </div>
                                     </div>
-                                </div>
-                            @endif
-                        </div>
+                                @endif
 
-                        <div class="action-row">
+                                @if(!empty($service->contact_no))
+                                    <div class="free-food-info-row">
+                                        <i class="fa-solid fa-phone"></i>
+                                        <div>
+                                            <strong>{{ $language === 'Odia' ? 'ଯୋଗାଯୋଗ' : 'Contact' }}</strong>
+                                            {{ $service->contact_no }}
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+
                             @if(!empty($mapUrl))
-                                <a href="{{ $mapUrl }}" class="action-btn" target="_blank" rel="noopener noreferrer">
+                                <a href="{{ $mapUrl }}" class="free-food-btn" target="_blank" rel="noopener noreferrer">
                                     <i class="fa-solid fa-location-arrow"></i>
                                     {{ $language === 'Odia' ? 'ଦିଗ ନିର୍ଦ୍ଦେଶ' : 'Directions' }}
                                 </a>
                             @else
-                                <a href="javascript:void(0)" class="action-btn disabled">
+                                <a href="javascript:void(0)" class="free-food-btn disabled">
                                     <i class="fa-solid fa-location-arrow"></i>
                                     {{ $language === 'Odia' ? 'ଲିଙ୍କ ନାହିଁ' : 'No Direction Link' }}
                                 </a>
                             @endif
                         </div>
+                    </article>
+                @empty
+                    <div class="empty-box">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <h3>{{ $language === 'Odia' ? 'କୌଣସି ସେବା ମିଳିଲା ନାହିଁ' : 'No Services Found' }}</h3>
+                        <p>{{ $language === 'Odia' ? 'ଦୟାକରି ପରେ ପୁଣି ଯାଞ୍ଚ କରନ୍ତୁ।' : 'Please check again later.' }}</p>
                     </div>
-                </article>
-            @empty
-                <div class="empty-box">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                    <h3>{{ $language === 'Odia' ? 'କୌଣସି ସେବା ମିଳିଲା ନାହିଁ' : 'No Services Found' }}</h3>
-                    <p>{{ $language === 'Odia' ? 'ଦୟାକରି ପରେ ପୁଣି ଯାଞ୍ଚ କରନ୍ତୁ।' : 'Please check again later.' }}</p>
-                </div>
-            @endforelse
-        </div>
+                @endforelse
+            </div>
+        @else
+            <div class="service-grid">
+                @forelse ($services as $service)
+                    @php
+                        $photos = $getServicePhotos($service->photo ?? null);
+                        $firstPhoto = $photos[0] ?? null;
+                        $servicePhoto = $firstPhoto ? $serviceImageUrl($firstPhoto) : $fallbackImage;
+
+                        $addressParts = array_filter([
+                            $service->landmark ?? null,
+                            $service->city_village ?? null,
+                            $service->district ?? null,
+                            $service->state ?? null,
+                        ]);
+
+                        $address = count($addressParts) ? implode(', ', $addressParts) : 'N/A';
+
+                        $serviceTypeText = ucwords(str_replace('_', ' ', $service->service_type ?? $service_type));
+
+                        $mapUrl = $service->google_map_link
+                            ?? $service->map_url
+                            ?? $service->google_map_url
+                            ?? null;
+                    @endphp
+
+                    <article class="service-card-new">
+                        <div class="service-image-wrap">
+                            <img
+                                src="{{ $servicePhoto }}"
+                                alt="{{ $service->service_name ?? $localizedTitle }}"
+                                class="service-image"
+                                onerror="this.onerror=null; this.src='{{ $fallbackImage }}'; this.classList.add('fallback-img');"
+                            >
+
+                            <div class="service-tag">
+                                <i class="fa-solid fa-building-circle-check"></i>
+                                {{ $serviceTypeText }}
+                            </div>
+
+                            <div class="available-tag">
+                                <i class="fa-solid fa-circle-check"></i>
+                                {{ $language === 'Odia' ? 'ଉପଲବ୍ଧ' : 'Available' }}
+                            </div>
+                        </div>
+
+                        <div class="service-content">
+                            <div class="service-title-row">
+                                <h5>{{ $service->service_name ?? $localizedTitle }}</h5>
+                                <span class="type-pill">{{ $serviceTypeText }}</span>
+                            </div>
+
+                            <div class="info-list">
+                                <div class="info-row">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <div>
+                                        <strong>{{ $language === 'Odia' ? 'ଠିକଣା' : 'Address' }}</strong>
+                                        {{ $address }}
+                                    </div>
+                                </div>
+
+                                @if(!empty($service->opening_time) || !empty($service->closing_time))
+                                    <div class="info-row">
+                                        <i class="fa-solid fa-clock"></i>
+                                        <div>
+                                            <strong>{{ $language === 'Odia' ? 'ସମୟ' : 'Timing' }}</strong>
+                                            {{ $service->opening_time ?? 'N/A' }} - {{ $service->closing_time ?? 'N/A' }}
+                                        </div>
+                                    </div>
+                                @endif
+
+                                @if(!empty($service->contact_no))
+                                    <div class="info-row">
+                                        <i class="fa-solid fa-phone"></i>
+                                        <div>
+                                            <strong>{{ $language === 'Odia' ? 'ଯୋଗାଯୋଗ' : 'Contact' }}</strong>
+                                            {{ $service->contact_no }}
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="action-row">
+                                @if(!empty($mapUrl))
+                                    <a href="{{ $mapUrl }}" class="action-btn" target="_blank" rel="noopener noreferrer">
+                                        <i class="fa-solid fa-location-arrow"></i>
+                                        {{ $language === 'Odia' ? 'ଦିଗ ନିର୍ଦ୍ଦେଶ' : 'Directions' }}
+                                    </a>
+                                @else
+                                    <a href="javascript:void(0)" class="action-btn disabled">
+                                        <i class="fa-solid fa-location-arrow"></i>
+                                        {{ $language === 'Odia' ? 'ଲିଙ୍କ ନାହିଁ' : 'No Direction Link' }}
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    </article>
+                @empty
+                    <div class="empty-box">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <h3>{{ $language === 'Odia' ? 'କୌଣସି ସେବା ମିଳିଲା ନାହିଁ' : 'No Services Found' }}</h3>
+                        <p>{{ $language === 'Odia' ? 'ଦୟାକରି ପରେ ପୁଣି ଯାଞ୍ଚ କରନ୍ତୁ।' : 'Please check again later.' }}</p>
+                    </div>
+                @endforelse
+            </div>
+        @endif
     </main>
 </div>
 
