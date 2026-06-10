@@ -860,6 +860,15 @@
                 'type' => 'fa',
             ],
             [
+                'url' => $serviceUrl('charging_station'),
+                'title1' => $language === 'Odia' ? 'ଚାର୍ଜିଂ' : 'Charging',
+                'title2' => $language === 'Odia' ? 'ଷ୍ଟେସନ୍' : 'Station',
+                'desc' => $language === 'Odia' ? 'ନିକଟସ୍ଥ ଚାର୍ଜିଂ ସ୍ଟେସନ୍ ଖୋଜନ୍ତୁ' : 'Find nearby charging stations',
+                'icon' => 'fa-solid fa-charging-station',
+                'alt' => 'Charging Station',
+                'type' => 'fa',
+            ],
+            [
                 'url' => $serviceUrl('bus_stand'),
                 'title1' => $language === 'Odia' ? 'ବସ୍' : 'Bus',
                 'title2' => $language === 'Odia' ? 'ଷ୍ଟାଣ୍ଡ' : 'Stand',
@@ -886,16 +895,17 @@
                 'alt' => 'Police Station',
                 'type' => 'fa',
             ],
+            [
+                'url' => route('services.byType', 'hospital'),
+                'title1' => $language === 'Odia' ? 'ହସ୍ପିଟାଲ୍' : 'Hospital',
+                'title2' => $language === 'Odia' ? 'ସୁବିଧା' : 'Facility',
+                'desc' => $language === 'Odia' ? 'ନିକଟସ୍ଥ ହସ୍ପିଟାଲ୍ ଖୋଜନ୍ତୁ' : 'Find nearby hospital facilities',
+                'icon' => 'fa-solid fa-hospital',
+                'alt' => 'Hospital',
+                'type' => 'fa',
+            ],
 
-                [
-            'url' => route('services.byType', 'hospital'),
-            'title1' => $language === 'Odia' ? 'ହସ୍ପିଟାଲ୍' : 'Hospital',
-            'title2' => $language === 'Odia' ? 'ସୁବିଧା' : 'Facility',
-            'desc' => $language === 'Odia' ? 'ନିକଟସ୍ଥ ହସ୍ପିଟାଲ୍ ଖୋଜନ୍ତୁ' : 'Find nearby hospital facilities',
-            'icon' => 'fa-solid fa-hospital',
-            'alt' => 'Hospital',
-            'type' => 'fa',
-        ],
+
         
         ];
     @endphp

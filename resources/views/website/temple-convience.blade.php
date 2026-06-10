@@ -171,6 +171,19 @@
             box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
         }
 
+        .service-card-new.charging-station .service-tag {
+            background: rgba(14, 165, 233, 0.12);
+            color: #0ea5e9;
+        }
+
+        .service-card-new.charging-station .service-image-wrap {
+            background: linear-gradient(135deg, #eff8ff, #dbeefe);
+        }
+
+        .service-card-new.charging-station .service-image {
+            filter: saturate(1.05);
+        }
+
         .available-tag {
             position: absolute;
             right: 14px;
@@ -587,6 +600,7 @@
     $rawTitle = ucfirst(str_replace('_', ' ', $service_type));
     $normalizedTitle = strtolower(str_replace('_', ' ', $service_type));
     $isFreeFoodPage = $normalizedTitle === 'free food';
+    $isChargingStationPage = $normalizedTitle === 'charging station';
 
     $odiaTitles = [
         'drinking water' => 'ବିଶୁଦ୍ଧ ପାନୀୟ ଜଳ',
@@ -607,6 +621,7 @@
         'railway station' => 'ରେଲୱେ ଷ୍ଟେସନ୍',
         'hospital' => 'ହସ୍ପିଟାଲ୍',
         'police station' => 'ପୋଲିସ୍ ଷ୍ଟେସନ୍',
+
     ];
 
     $localizedTitle = $language === 'Odia'
@@ -625,6 +640,11 @@
     $publicServicePhotoFolders = [
         'assets/uploads/public_services',
         'uploads/public_services',
+    ];
+
+    $serviceTypeIconMap = [
+        'charging station' => 'fa-solid fa-car-bolt',
+        'free food' => 'fa-solid fa-bowl-rice',
     ];
 
     $fallbackImage = 'data:image/svg+xml;charset=UTF-8,' . rawurlencode('
@@ -740,7 +760,7 @@
     <section class="page-heading-section">
         <div class="heading-inner">
             <div class="page-heading-badge">
-                <i class="{{ $isFreeFoodPage ? 'fa-solid fa-bowl-food' : 'fa-solid fa-location-dot' }}"></i>
+                <i class="{{ $isFreeFoodPage ? 'fa-solid fa-bowl-food' : ($isChargingStationPage ? 'fa-solid fa-car-bolt' : 'fa-solid fa-location-dot') }}"></i>
                 {{ $language === 'Odia' ? 'ଶ୍ରୀ ଜଗନ୍ନାଥ ଧାମ' : 'Shree Jagannatha Dham' }}
             </div>
 
@@ -751,6 +771,10 @@
                     {{ $language === 'Odia'
                         ? 'ମାଗଣା ଖାଦ୍ୟ ସେବା, ସ୍ଥାନ, ସମୟ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
                         : 'Find free food service points, timings, locations and directions near Shree Jagannatha Dham.' }}
+                @elseif($isChargingStationPage)
+                    {{ $language === 'Odia'
+                        ? 'ଚାର୍ଜିଂ ସ୍ଟେସନ୍ ଅବସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
+                        : 'Find charging station locations and directions near Shree Jagannatha Dham.' }}
                 @else
                     {{ $language === 'Odia'
                         ? 'ଏଠାରେ ଉପଲବ୍ଧ ସମସ୍ତ ସେବା, ସ୍ଥାନ ଓ ଦିଗ ନିର୍ଦ୍ଦେଶ ଦେଖନ୍ତୁ।'
@@ -864,7 +888,10 @@
 
                         $address = count($addressParts) ? implode(', ', $addressParts) : 'N/A';
 
-                        $serviceTypeText = ucwords(str_replace('_', ' ', $service->service_type ?? $service_type));
+                        $serviceTypeKey = strtolower(str_replace('_', ' ', $service->service_type ?? $service_type));
+                        $serviceTypeText = ucwords($serviceTypeKey);
+                        $serviceTypeIcon = $serviceTypeIconMap[$serviceTypeKey] ?? 'fa-solid fa-building-circle-check';
+                        $isChargingStation = $serviceTypeKey === 'charging station';
 
                         $mapUrl = $service->google_map_link
                             ?? $service->map_url
@@ -872,7 +899,7 @@
                             ?? null;
                     @endphp
 
-                    <article class="service-card-new">
+                    <article class="service-card-new{{ $isChargingStation ? ' charging-station' : '' }}">
                         <div class="service-image-wrap">
                             <img
                                 src="{{ $servicePhoto }}"
@@ -882,7 +909,7 @@
                             >
 
                             <div class="service-tag">
-                                <i class="fa-solid fa-building-circle-check"></i>
+                                <i class="{{ $serviceTypeIcon }}"></i>
                                 {{ $serviceTypeText }}
                             </div>
 
