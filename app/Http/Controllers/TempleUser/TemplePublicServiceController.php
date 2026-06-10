@@ -41,31 +41,31 @@ class TemplePublicServiceController extends Controller
     }
 
     private function uploadPhotos(Request $request): array
-    {
-        $photoPaths = [];
+{
+    $photoPaths = [];
 
-        if ($request->hasFile('photo')) {
-            $uploadPath = public_path('assets/uploads/public_services');
+    if ($request->hasFile('photo')) {
+        $uploadPath = public_path('assets/uploads/public_services');
 
-            if (!file_exists($uploadPath)) {
-                mkdir($uploadPath, 0775, true);
-            }
-
-            foreach ($request->file('photo') as $photo) {
-                $originalName = pathinfo($photo->getClientOriginalName(), PATHINFO_FILENAME);
-                $extension = $photo->getClientOriginalExtension();
-
-                $fileName = time() . '_' . Str::random(8) . '_' . Str::slug($originalName) . '.' . $extension;
-
-                $photo->move($uploadPath, $fileName);
-
-                $photoPaths[] = 'assets/uploads/public_services/' . $fileName;
-            }
+        if (!file_exists($uploadPath)) {
+            mkdir($uploadPath, 0775, true);
         }
 
-        return $photoPaths;
+        if (!is_writable($uploadPath)) {
+            throw new \Exception('Upload directory is not writable: ' . $uploadPath);
+        }
+
+        foreach ($request->file('photo') as $photo) {
+            $fileName = time() . '_' . uniqid() . '_' . preg_replace('/\s+/', '_', $photo->getClientOriginalName());
+
+            $photo->move($uploadPath, $fileName);
+
+            $photoPaths[] = 'assets/uploads/public_services/' . $fileName;
+        }
     }
 
+    return $photoPaths;
+}
     public function addService()
     {
         $serviceTypes = $this->serviceTypes();
